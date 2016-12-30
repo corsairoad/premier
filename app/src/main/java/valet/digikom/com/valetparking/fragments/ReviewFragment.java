@@ -108,6 +108,10 @@ public class ReviewFragment extends Fragment {
         textEmail.setText(checkin.getEmailCustomer());
     }
 
+    public void initDefects() {
+        textDefects.setText(checkin.defectsToString());
+    }
+
     public void setCheckin(String dropPoint, String platNo, String carType, String merk, String email, String warna) {
         checkin.setDropPoint(dropPoint);
         checkin.setPlatNo(platNo);
@@ -116,6 +120,16 @@ public class ReviewFragment extends Fragment {
         checkin.setEmailCustomer(email);
         checkin.setWarnaMobil(warna);
         init();
+    }
+
+    public void selectDefect(String defect) {
+        checkin.getDefects().add(defect);
+        initDefects();
+    }
+
+    public void unSelectDefect(String defect) {
+        checkin.getDefects().remove(defect);
+        initDefects();
     }
 
 }

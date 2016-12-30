@@ -219,4 +219,13 @@ public class Checkin implements Parcelable {
     public void setStuffs(List<String> stuffs) {
         this.stuffs = stuffs;
     }
+
+    public String defectsToString() {
+        StringBuilder sb = new StringBuilder();
+        for (String s : defects) {
+            sb.append(s)
+                    .append("\n");
+        }
+        return sb.toString();
+    }
 }

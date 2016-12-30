@@ -1,5 +1,6 @@
 package valet.digikom.com.valetparking;
 
+import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
@@ -31,7 +32,6 @@ public class AddCarActivity extends ActionBarActivity implements StepOneFragmet.
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_car);
-
         Toolbar toolbar = (Toolbar) findViewById(R.id.action_bar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -133,12 +133,14 @@ public class AddCarActivity extends ActionBarActivity implements StepOneFragmet.
 
     @Override
     public void onDefectSelected(String defect) {
-        checkin.getDefects().add(defect);
+        ReviewFragment reviewFragment = ReviewFragment.reviewFragment;
+        reviewFragment.selectDefect(defect);
     }
 
     @Override
     public void onDefectUnselected(String defect) {
-        checkin.getDefects().remove(defect);
+        ReviewFragment reviewFragment = ReviewFragment.reviewFragment;
+        reviewFragment.unSelectDefect(defect);
     }
 
     @Override
