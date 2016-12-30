@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "295459358847",
+    "firebase_url": "https://valet-parking-c6979.firebaseio.com",
+    "project_id": "valet-parking-c6979",
+    "storage_bucket": "valet-parking-c6979.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:295459358847:android:99a8a15ec92b1b6c",
+        "android_client_info": {
+          "package_name": "valet.digikom.com.valetparking"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "295459358847-3ftba233aovht3vo4ev60ngjm75injal.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAZfEgW9Vt8gaGmvbAzdN3hFEapdAPJh9U"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,91 @@
+<resources>
+    <string name="app_name">ValetParking</string>
+
+    <string name="title_activity_splash">SplashActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="login">Login</string>
+    <string name="login_error">Login gagal, username atau password salah</string>
+
+    <array name="location">
+        <item>Location 1</item>
+        <item>Location 2</item>
+        <item>Location 3</item>
+        <item>Location 4</item>
+        <item>Location 5</item>
+    </array>
+
+    <array name="location_values">
+        <item>loc-1</item>
+        <item>loc-2</item>
+        <item>loc-3</item>
+        <item>loc-4</item>
+        <item>loc-5</item>
+    </array>
+
+    <string name="default_location_value">Location is not defined</string>
+    <string name="title_pref_location">Select Location</string>
+    <string name="setting">Settings</string>
+    <string name="title_activity_main2">Premier Valet Parking</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="login_empty">Silahkan lengkapi username dan password.</string>
+    <string name="list_car_empty">Daftar mobil kosong</string>
+    <string name="action_search">Search</string>
+    <string name="prev">Kembali</string>
+    <string name="next">Lanjut</string>
+    <string name="finish">Submit &amp; Print</string>
+
+    <string name="submit_confirm_message">Place the order with the deli? You will receive an email
+        confirmation.</string>
+    <string name="submit_confirm_button">Place order</string>
+
+    <string name="label_your_name">Name</string>
+    <string name="hint_your_name">e.g. Larry</string>
+    <string name="label_your_email">Email</string>
+    <string name="hint_your_email">Optional</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Registration</string>
+    <string name="drop_point">Drop Point</string>
+    <string name="plat_no">Plat no.</string>
+    <string name="car_type">Jenis mobil</string>
+    <string name="color">Warna mobil</string>
+    <string name="merk_mobil">Merk mobil</string>
+    <string name="checkin">Checkin</string>
+    <string name="defects">Defects</string>
+    <string name="stuff">Stuff</string>
+    <string name="additional_info">Additional stuff</string>
+    <string name="sign">Please sign below..</string>
+    <string name="reset_signature">Clear</string>
+
+    <string-array name="car_type_array">
+        <item>Audi</item>
+        <item>BMW</item>
+        <item>Honda</item>
+        <item>Nissan</item>
+    </string-array>
+
+    <string-array name="car_defects">
+        <item>LEFT DEFECT</item>
+        <item>RIGHT DEFECT</item>
+        <item>FRONT DEFECT</item>
+        <item>REAR DEFECT</item>
+        <item>TOP DEFECT</item>
+        <item>BOTTOM DEFECT</item>
+    </string-array>
+
+    <string-array name="stuffs">
+        <item> Laptop </item>
+        <item> Tas </item>
+        <item> Ipad/ Tablet</item>
+        <item> Handphone </item>
+
+    </string-array>
+
+</resources>
