@@ -29,4 +29,9 @@ public class Notif {
     public void setMsg(String msg) {
         this.msg = msg;
     }
+
+    @Override
+    public String toString() {
+        return "Message : \nid: " + getId() + "\nmsg: " + getMsg() + "\n";
+    }
 }
