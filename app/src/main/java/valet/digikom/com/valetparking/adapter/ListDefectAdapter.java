@@ -48,6 +48,7 @@ public class ListDefectAdapter extends ArrayAdapter<String> {
                 }
             }
         }
+        
         textDefects.setText(getItem(position));
         checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override

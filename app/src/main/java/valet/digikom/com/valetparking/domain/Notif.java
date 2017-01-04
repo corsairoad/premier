@@ -43,7 +43,11 @@ public class Notif {
 
     @Override
     public String toString() {
+<<<<<<< HEAD
+        return "Message : \nid: " + getId() + "\nmsg: " + getMsg() + "\n";
+=======
         return "Message : \nid: " + getId() + "\nmsg: " + getMsg() + "\nsubject: " + getSubject() + "\n";
         // adfadfad;
+>>>>>>> cbd4ed75eeecd822ec254fe600d0afb9a28b0843
     }
 }
