@@ -8,10 +8,21 @@ public class Notif {
 
     private int id;
     private String msg;
+    private String subject;
 
-    public Notif(int id, String msg) {
+
+    public Notif(int id, String msg, String subject) {
         this.id = id;
         this.msg = msg;
+        this.subject = subject;
+    }
+
+    public String getSubject() {
+        return subject;
+    }
+
+    public void setSubject(String subject) {
+        this.subject = subject;
     }
 
     public int getId() {
@@ -32,6 +43,6 @@ public class Notif {
 
     @Override
     public String toString() {
-        return "Message : \nid: " + getId() + "\nmsg: " + getMsg() + "\n";
+        return "Message : \nid: " + getId() + "\nmsg: " + getMsg() + "\nsubject: " + getSubject() + "\n";
     }
 }
