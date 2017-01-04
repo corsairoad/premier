@@ -74,7 +74,7 @@ public class StepThreeFragment extends Fragment implements View.OnClickListener 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         listStuffs = new ArrayList<>(Arrays.asList(getContext().getResources().getStringArray(R.array.stuffs)));
-        adapter = new ListStuffAdapter(getContext(),listStuffs);
+        adapter = new ListStuffAdapter(getContext(),listStuffs, onStuffListener);
 
         if (savedInstanceState != null) {
             //selectedPositions = savedInstanceState.getIntegerArrayList(ARG_POST_STUFF);
@@ -106,12 +106,8 @@ public class StepThreeFragment extends Fragment implements View.OnClickListener 
                 String stuff = adapter.getItem(i);
                 if (cb.isChecked()) {
                     cb.setChecked(false);
-                    onStuffListener.onStuffUnselected(stuff);
-                    //selectedPositions.remove(i);
                 }else {
                     cb.setChecked(true);
-                    onStuffListener.onStuffSelected(stuff);
-                    //selectedPositions.add(i);
                 }
             }
         });

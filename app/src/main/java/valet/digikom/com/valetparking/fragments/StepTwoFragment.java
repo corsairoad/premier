@@ -64,7 +64,7 @@ public class StepTwoFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         listDefects = Arrays.asList(getContext().getResources().getStringArray(R.array.car_defects));
-        adapter = new ListDefectAdapter(getContext(), listDefects);
+        adapter = new ListDefectAdapter(getContext(), listDefects, defectListener);
         if (savedInstanceState != null){
             //selecedPosition = savedInstanceState.getIntegerArrayList(ARG_POSITION);
             //adapter.setSelectedPosition(selecedPosition);
@@ -89,11 +89,11 @@ public class StepTwoFragment extends Fragment {
                 String defect = adapter.getItem(i);
                 if (cb.isChecked()) {
                     cb.setChecked(false);
-                    defectListener.onDefectUnselected(defect);
+                    //defectListener.onDefectUnselected(defect);
                     //selecedPosition.remove(i);
                 }else {
                     cb.setChecked(true);
-                    defectListener.onDefectSelected(defect);
+                    //defectListener.onDefectSelected(defect);
                     //selecedPosition.add(i);
                 }
                 //Toast.makeText(getContext(),"Item clicked", Toast.LENGTH_SHORT).show();
