@@ -145,11 +145,13 @@ public class AddCarActivity extends ActionBarActivity implements StepOneFragmet.
 
     @Override
     public void onStuffSelected(String stuff) {
-        checkin.getStuffs().add(stuff);
+        ReviewFragment reviewFragment = ReviewFragment.reviewFragment;
+        reviewFragment.onSelectSuff(stuff);
     }
 
     @Override
     public void onStuffUnselected(String stuff) {
-        checkin.getStuffs().remove(stuff);
+        ReviewFragment reviewFragment = ReviewFragment.reviewFragment;
+        reviewFragment.onUnselectStuff(stuff);
     }
 }

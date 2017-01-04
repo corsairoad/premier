@@ -132,4 +132,18 @@ public class ReviewFragment extends Fragment {
         initDefects();
     }
 
+    public void onSelectSuff(String stuff) {
+        checkin.getStuffs().add(stuff);
+        initStuffs();
+    }
+
+    public void onUnselectStuff(String stuff) {
+        checkin.getStuffs().remove(stuff);
+        initStuffs();
+    }
+
+    private void initStuffs() {
+        textStuffs.setText(checkin.stuffsToString());
+    }
+
 }
