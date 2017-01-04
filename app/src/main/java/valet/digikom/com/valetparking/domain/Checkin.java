@@ -224,7 +224,16 @@ public class Checkin implements Parcelable {
         StringBuilder sb = new StringBuilder();
         for (String s : defects) {
             sb.append(s)
-                    .append("\n");
+                    .append("\n\n");
+        }
+        return sb.toString();
+    }
+
+    public String stuffsToString() {
+        StringBuilder sb = new StringBuilder();
+        for (String s : stuffs) {
+            sb.append(s)
+                    .append("\n\n");
         }
         return sb.toString();
     }
