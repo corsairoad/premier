@@ -1,20 +1,27 @@
 package valet.digikom.com.valetparking;
 
-import android.content.pm.ActivityInfo;
+import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
+
 import me.relex.circleindicator.CircleIndicator;
 import valet.digikom.com.valetparking.adapter.PagerCheckinAdapter;
+import valet.digikom.com.valetparking.dao.CheckinDao;
 import valet.digikom.com.valetparking.domain.Checkin;
 import valet.digikom.com.valetparking.fragments.ReviewFragment;
 import valet.digikom.com.valetparking.fragments.StepOneFragmet;
 import valet.digikom.com.valetparking.fragments.StepThreeFragment;
 import valet.digikom.com.valetparking.fragments.StepTwoFragment;
+import valet.digikom.com.valetparking.util.ValetDbHelper;
 
 public class AddCarActivity extends ActionBarActivity implements StepOneFragmet.OnRegsitrationValid, StepTwoFragment.OnDefectSelectedListener,
                 StepThreeFragment.OnStuffSelectedListener{
@@ -28,6 +35,7 @@ public class AddCarActivity extends ActionBarActivity implements StepOneFragmet.
     int totalPages = -1;
     boolean isCanScroll;
     Checkin checkin = new Checkin();
+    CoordinatorLayout coordinatorLayout;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,6 +44,7 @@ public class AddCarActivity extends ActionBarActivity implements StepOneFragmet.
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayout);
         mPager = (ViewPager) findViewById(R.id.pager);
         mPager.setOffscreenPageLimit(4);
         checkinAdapter = new PagerCheckinAdapter(getSupportFragmentManager());
@@ -85,7 +94,16 @@ public class AddCarActivity extends ActionBarActivity implements StepOneFragmet.
             @Override
             public void onClick(View view) {
                 if (position == totalPages) {
-
+                    ReviewFragment reviewFragment = ReviewFragment.reviewFragment;
+                    if (reviewFragment.ispadSigned()) {
+                        submitCheckin(reviewFragment.getSignatureBmp(), reviewFragment.getCheckin());
+                    }else {
+                        Snackbar sb =  Snackbar.make(coordinatorLayout,"Signature can't be empty", Snackbar.LENGTH_SHORT);
+                        View v = sb.getView();
+                        TextView text = (TextView) v.findViewById(android.support.design.R.id.snackbar_text);
+                        text.setTextColor(Color.RED);
+                        sb.show();
+                    }
                 } else {
                     mPager.setCurrentItem(position + 1);
                 }
@@ -100,6 +118,19 @@ public class AddCarActivity extends ActionBarActivity implements StepOneFragmet.
         });
 
         updateBottomBar();
+    }
+
+    private void submitCheckin(final Bitmap bmp, final Checkin checkin) {
+      new Thread(new Runnable() {
+          @Override
+          public void run() {
+              ValetDbHelper valetDbHelper = new ValetDbHelper(AddCarActivity.this);
+              CheckinDao checkinDao = CheckinDao.newInstance(valetDbHelper, AddCarActivity.this);
+              checkinDao.addCheckIn(checkin,bmp);
+              startActivity(new Intent(AddCarActivity.this, Main2Activity.class));
+              finish();
+          }
+      }).run();
     }
 
     private void updateBottomBar() {
@@ -124,6 +155,10 @@ public class AddCarActivity extends ActionBarActivity implements StepOneFragmet.
         super.onSaveInstanceState(outState);
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+    }
 
     @Override
     public void setCheckin(String dropPoint, String platNo, String carType, String merk, String email, String warna) {
