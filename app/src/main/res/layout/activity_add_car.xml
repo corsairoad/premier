@@ -1,90 +1,98 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/coordinatorLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/action_bar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="?attr/colorPrimary"
-        app:titleTextColor="@android:color/white"
-        android:minHeight="?attr/actionBarSize" />
-
-    <me.relex.circleindicator.CircleIndicator
-        android:id="@+id/indicator"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        app:ci_animator="@animator/indicator_animator"
-        app:ci_animator_reverse="@animator/indicator_animator_reverse"
-        app:ci_drawable="@drawable/black_radius_square"
-        app:ci_height="6dp"
-        app:ci_margin="6dp"
-        app:ci_width="10dp"/>
-
-    <android.support.v4.view.ViewPager
-        android:id="@+id/pager"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:visibility="visible">
-
-    </android.support.v4.view.ViewPager>
-
-    <include
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:visibility="gone"
-        layout="@layout/fragment_step_one"/>
-
-
-    <!--
-
-    <fragment
-        android:id="@+id/fragment3"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:name="valet.digikom.com.valetparking.fragments.ReviewFragment"/>
-    -->
-
-    <View
-        android:id="@+id/divider"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="?android:attr/listDivider" />
-
-    <LinearLayout
-        style="@style/ButtonBar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <Button
-            android:id="@+id/prev_button"
-            style="@style/ButtonBarButton"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="@drawable/selectable_item_background"
-            android:text="@string/prev"/>
-
-        <View
-            android:layout_width="1dp"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="?android:attr/listDivider"/>
+            android:orientation="vertical">
 
-        <Button
-            android:id="@+id/next_button"
-            style="@style/ButtonBarButton"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="@drawable/selectable_item_background"
-            android:text="@string/next" />
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/action_bar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?attr/colorPrimary"
+                app:titleTextColor="@android:color/white"
+                android:minHeight="?attr/actionBarSize" />
+
+            <me.relex.circleindicator.CircleIndicator
+                android:id="@+id/indicator"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                app:ci_animator="@animator/indicator_animator"
+                app:ci_animator_reverse="@animator/indicator_animator_reverse"
+                app:ci_drawable="@drawable/black_radius_square"
+                app:ci_height="6dp"
+                app:ci_margin="6dp"
+                app:ci_width="10dp"/>
+
+            <android.support.v4.view.ViewPager
+                android:id="@+id/pager"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:visibility="visible">
+
+            </android.support.v4.view.ViewPager>
+
+            <include
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:visibility="gone"
+                layout="@layout/fragment_step_one"/>
+
+
+            <!--
+
+            <fragment
+                android:id="@+id/fragment3"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:name="valet.digikom.com.valetparking.fragments.ReviewFragment"/>
+            -->
+
+            <View
+                android:id="@+id/divider"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="?android:attr/listDivider" />
+
+            <LinearLayout
+                style="@style/ButtonBar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/prev_button"
+                    style="@style/ButtonBarButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@drawable/selectable_item_background"
+                    android:text="@string/prev"/>
+
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="match_parent"
+                    android:background="?android:attr/listDivider"/>
+
+                <Button
+                    android:id="@+id/next_button"
+                    style="@style/ButtonBarButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@drawable/selectable_item_background"
+                    android:text="@string/next" />
+            </LinearLayout>
     </LinearLayout>
 
-</LinearLayout>
+
+</android.support.design.widget.CoordinatorLayout>
