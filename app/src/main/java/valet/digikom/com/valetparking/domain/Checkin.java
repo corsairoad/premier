@@ -112,8 +112,13 @@ public class Checkin implements Parcelable {
     private String runnerName;
     private String dropPoint;
     private String adminId;
+<<<<<<< HEAD
     List<String> defects = new ArrayList<>();
     List<String> stuffs = new ArrayList<>();
+=======
+    private List<String> defects = new ArrayList<>();
+    private List<String> stuffs = new ArrayList<>();
+>>>>>>> 31c6fece6bd34924f286228d90b5ba2529c385d7
     private String imageUrl;
 
     public Checkin() {
@@ -159,7 +164,7 @@ public class Checkin implements Parcelable {
         this.warnaMobil = warnaMobil;
     }
 
-    public Date getCheckinTime() {
+    private Date getCheckinTime() {
         return checkinTime;
     }
 
@@ -199,28 +204,14 @@ public class Checkin implements Parcelable {
         this.dropPoint = dropPoint;
     }
 
-    public String getAdminId() {
-        return adminId;
-    }
 
-    public void setAdminId(String adminId) {
-        this.adminId = adminId;
-    }
 
     public List<String> getDefects() {
         return defects;
     }
 
-    public void setDefects(List<String> defects) {
-        this.defects = defects;
-    }
-
     public List<String> getStuffs() {
         return stuffs;
-    }
-
-    public void setStuffs(List<String> stuffs) {
-        this.stuffs = stuffs;
     }
 
     public String defectsToString() {
@@ -241,6 +232,7 @@ public class Checkin implements Parcelable {
         return sb.toString();
     }
 
+<<<<<<< HEAD
     public String getImageUrl() {
         return imageUrl;
     }
@@ -256,5 +248,13 @@ public class Checkin implements Parcelable {
                 .append(getPlatNo().trim()).append("_").
                 append(getCheckinTime().getTime()).append(".jpg");
         return sb.toString();
+=======
+    public String getSignatureName() {
+        String name = getJenisMobil().trim() + "_" +
+                getMerkMobil().trim() + "_" +
+                getPlatNo().trim() + "_" +
+                getCheckinTime().getTime() + ".jpg";
+        return name;
+>>>>>>> 31c6fece6bd34924f286228d90b5ba2529c385d7
     }
 }
