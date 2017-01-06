@@ -3,9 +3,11 @@ package valet.digikom.com.valetparking.domain;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Created by DIGIKOM-EX4 on 12/20/2016.
@@ -112,13 +114,8 @@ public class Checkin implements Parcelable {
     private String runnerName;
     private String dropPoint;
     private String adminId;
-<<<<<<< HEAD
-    List<String> defects = new ArrayList<>();
-    List<String> stuffs = new ArrayList<>();
-=======
     private List<String> defects = new ArrayList<>();
     private List<String> stuffs = new ArrayList<>();
->>>>>>> 31c6fece6bd34924f286228d90b5ba2529c385d7
     private String imageUrl;
 
     public Checkin() {
@@ -204,8 +201,6 @@ public class Checkin implements Parcelable {
         this.dropPoint = dropPoint;
     }
 
-
-
     public List<String> getDefects() {
         return defects;
     }
@@ -232,7 +227,7 @@ public class Checkin implements Parcelable {
         return sb.toString();
     }
 
-<<<<<<< HEAD
+
     public String getImageUrl() {
         return imageUrl;
     }
@@ -248,13 +243,13 @@ public class Checkin implements Parcelable {
                 .append(getPlatNo().trim()).append("_").
                 append(getCheckinTime().getTime()).append(".jpg");
         return sb.toString();
-=======
-    public String getSignatureName() {
-        String name = getJenisMobil().trim() + "_" +
-                getMerkMobil().trim() + "_" +
-                getPlatNo().trim() + "_" +
-                getCheckinTime().getTime() + ".jpg";
-        return name;
->>>>>>> 31c6fece6bd34924f286228d90b5ba2529c385d7
     }
+
+    public String getDateString() {
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault());
+        String v = sdf.format(getCheckinTime());
+        return v;
+    }
+
+
 }

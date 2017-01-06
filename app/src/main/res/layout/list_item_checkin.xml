@@ -4,9 +4,9 @@
     android:layout_gravity="center"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="1dp"
+    android:layout_marginBottom="0.1dp"
     android:clickable="true"
-    app:cardCornerRadius="4dp">
+    app:cardCornerRadius="0dp">
 
     <LinearLayout
         android:paddingTop="@dimen/activity_horizontal_margin"
@@ -18,9 +18,9 @@
         android:orientation="horizontal">
 
         <de.hdodenhof.circleimageview.CircleImageView
-            android:layout_width="65dp"
+            android:layout_width="45dp"
             android:src="@drawable/car_icon"
-            android:layout_height="65dp" />
+            android:layout_height="45dp" />
 
         <LinearLayout
             android:layout_width="match_parent"
