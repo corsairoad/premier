@@ -30,6 +30,7 @@
     </LinearLayout>
 
     <android.support.v7.widget.RecyclerView
+        android:id="@+id/list_checkin"
         android:layout_below="@id/container_search"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>

@@ -7,4 +7,6 @@
     <color name="black_overlay">#66000000</color>
     <color name="background_color_1">#eeeeee</color>
     <color name="bg_color_signature">#80deea</color>
+    <color name="color_text_runnername_checkin">#bdbdbd</color>
+    <color name="color_text_plat_no_checkin">#424242</color>
 </resources>

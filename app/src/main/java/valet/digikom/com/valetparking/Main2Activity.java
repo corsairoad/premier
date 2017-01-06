@@ -1,9 +1,12 @@
 package valet.digikom.com.valetparking;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -13,9 +16,24 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
+
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
+
+import valet.digikom.com.valetparking.adapter.ListCheckinAdapter;
+import valet.digikom.com.valetparking.dao.CheckinDao;
+import valet.digikom.com.valetparking.domain.Checkin;
+import valet.digikom.com.valetparking.util.ValetDbHelper;
 
 public class Main2Activity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+
+    RecyclerView listCheckin;
+    ListCheckinAdapter adapter;
+    ArrayList<Checkin> checkins = new ArrayList<>();
+    TextView textEmpty;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,6 +41,15 @@ public class Main2Activity extends AppCompatActivity
         setContentView(R.layout.activity_main2);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        listCheckin = (RecyclerView) findViewById(R.id.list_checkin);
+        textEmpty = (TextView) findViewById(R.id.text_empty);
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
+        listCheckin.setHasFixedSize(true);
+        listCheckin.setLayoutManager(layoutManager);
+        adapter = new ListCheckinAdapter(checkins, Main2Activity.this);
+        listCheckin.setAdapter(adapter);
+        new LoadCheckin().execute();
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -98,5 +125,32 @@ public class Main2Activity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    class LoadCheckin extends AsyncTask<String, Void, List<Checkin>> {
+
+        @Override
+        protected List<Checkin> doInBackground(String... strings) {
+            CheckinDao dao = CheckinDao.newInstance(new ValetDbHelper(Main2Activity.this),Main2Activity.this);
+            List<Checkin> checkinList = null;
+            try {
+                checkinList = dao.getAllListCheckIn();
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            return checkinList;
+        }
+
+        @Override
+        protected void onPostExecute(List<Checkin> checkinsx) {
+            if (checkinsx != null || !checkinsx.isEmpty()) {
+                checkins.clear();
+                checkins.addAll(checkinsx);
+                adapter.notifyDataSetChanged();
+                textEmpty.setVisibility(View.GONE);
+            }else {
+                textEmpty.setVisibility(View.VISIBLE);
+            }
+        }
     }
 }
