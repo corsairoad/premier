@@ -1,6 +1,7 @@
 package valet.digikom.com.valetparking.fragments;
 
 
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -146,4 +147,22 @@ public class ReviewFragment extends Fragment {
         textStuffs.setText(checkin.stuffsToString());
     }
 
+    public boolean ispadSigned() {
+        if (signPad.isEmpty()) {
+            return false;
+        }
+        return true;
+    }
+
+    public Bitmap getSignatureBmp() {
+        return signPad.getSignatureBitmap();
+    }
+
+    public Checkin getCheckin() {
+        return checkin;
+    }
+
+    public void setCheckin(Checkin checkin) {
+        this.checkin = checkin;
+    }
 }

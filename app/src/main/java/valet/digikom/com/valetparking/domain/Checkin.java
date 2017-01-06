@@ -83,6 +83,7 @@ public class Checkin implements Parcelable {
         public static final String COL_DEFECTS = "defects";
         public static final String COL_STUFFS = "stuffs";
         public static final String COL_ADMIN_ID = "admin_id";
+        public static final String COL_IMAGE_URL = "image_url";
 
         public static final String CREATE_TABLE = "CREATE TABLE " + TABLE_NAME + "(" + COL_ID + " INTEGER PRIMARY KEY, " +
                 COL_TRANSACTION_ID + " TEXT, " +
@@ -96,7 +97,8 @@ public class Checkin implements Parcelable {
                 COL_DROP_POINT + " TEXT, " +
                 COL_DEFECTS + " TEXT, " +
                 COL_STUFFS + " TEXT, " +
-                COL_ADMIN_ID + " TEXT)";
+                COL_ADMIN_ID + " TEXT, " +
+                COL_IMAGE_URL + " TEXT)";
     }
 
     private int id;
@@ -112,6 +114,7 @@ public class Checkin implements Parcelable {
     private String adminId;
     List<String> defects = new ArrayList<>();
     List<String> stuffs = new ArrayList<>();
+    private String imageUrl;
 
     public Checkin() {
     }
@@ -235,6 +238,23 @@ public class Checkin implements Parcelable {
             sb.append(s)
                     .append("\n\n");
         }
+        return sb.toString();
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    public String getSignatureName() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(getJenisMobil().trim()).append("_")
+                .append(getMerkMobil().trim()).append("_")
+                .append(getPlatNo().trim()).append("_").
+                append(getCheckinTime().getTime()).append(".jpg");
         return sb.toString();
     }
 }
