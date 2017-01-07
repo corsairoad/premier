@@ -34,6 +34,7 @@ public class Main2Activity extends AppCompatActivity
     ListCheckinAdapter adapter;
     ArrayList<Checkin> checkins = new ArrayList<>();
     TextView textEmpty;
+    TextView textTotalCheckin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +43,7 @@ public class Main2Activity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        textTotalCheckin = (TextView) findViewById(R.id.text_total_checkin);
         listCheckin = (RecyclerView) findViewById(R.id.list_checkin);
         textEmpty = (TextView) findViewById(R.id.text_empty);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
@@ -51,7 +53,7 @@ public class Main2Activity extends AppCompatActivity
         listCheckin.setAdapter(adapter);
         new LoadCheckin().execute();
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab_entry);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -148,7 +150,9 @@ public class Main2Activity extends AppCompatActivity
                 checkins.addAll(checkinsx);
                 adapter.notifyDataSetChanged();
                 textEmpty.setVisibility(View.GONE);
+                textTotalCheckin.setText(getResources().getString(R.string.total_checkin) + " " + checkinsx.size());
             }else {
+                textTotalCheckin.setVisibility(View.INVISIBLE);
                 textEmpty.setVisibility(View.VISIBLE);
             }
         }

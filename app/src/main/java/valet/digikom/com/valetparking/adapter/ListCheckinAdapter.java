@@ -35,7 +35,8 @@ public class ListCheckinAdapter extends RecyclerView.Adapter<ListCheckinAdapter.
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         //holder.textIdCheckin.setText(checkinList.get(position).getId());
-        String platNo = checkinList.get(position).getPlatNo() + " " + checkinList.get(position).getJenisMobil();
+        String platNo = checkinList.get(position).getPlatNo() + " - " + checkinList.get(position).getJenisMobil()
+                 + " " + checkinList.get(position).getMerkMobil() + " " + checkinList.get(position).getWarnaMobil();
         holder.textPlatNo.setText(platNo);
         holder.textRunnerName.setText(checkinList.get(position).getDateString());
     }

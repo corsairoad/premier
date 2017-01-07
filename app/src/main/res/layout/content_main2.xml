@@ -29,9 +29,20 @@
 
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/text_total_checkin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="16dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp"
+        android:paddingRight="16dp"
+        android:textSize="16sp"
+        android:textColor="@color/color_total_checkin"/>
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/list_checkin"
-        android:layout_below="@id/container_search"
+        android:layout_below="@id/text_total_checkin"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
