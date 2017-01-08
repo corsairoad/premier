@@ -25,6 +25,7 @@ import java.util.List;
 import valet.digikom.com.valetparking.adapter.ListCheckinAdapter;
 import valet.digikom.com.valetparking.dao.CheckinDao;
 import valet.digikom.com.valetparking.dao.DefectDao;
+import valet.digikom.com.valetparking.dao.TokenDao;
 import valet.digikom.com.valetparking.domain.Checkin;
 import valet.digikom.com.valetparking.util.ValetDbHelper;
 
@@ -37,6 +38,7 @@ public class Main2Activity extends AppCompatActivity
     TextView textEmpty;
     TextView textTotalCheckin;
     private ValetDbHelper dbHelper;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,7 +76,7 @@ public class Main2Activity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         DefectDao defectDao = DefectDao.getInstance(dbHelper);
-        defectDao.downloadDefects();
+        TokenDao.getToken(defectDao);
     }
 
     @Override

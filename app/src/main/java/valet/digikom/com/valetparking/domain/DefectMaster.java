@@ -23,21 +23,10 @@ public class DefectMaster {
 
     @SerializedName("id")
     private int id;
-    @SerializedName("dfms_name")
-    private String defectName;
-    @SerializedName("dfms_desc")
-    private String defectDesc;
-    @SerializedName("href")
-    private String href;
+    @SerializedName("attributes")
+    private DefectAttributes attributes;
 
     public DefectMaster() {
-    }
-
-    public DefectMaster(int id, String defectName, String defectDesc, String href) {
-        this.id = id;
-        this.defectName = defectName;
-        this.defectDesc = defectDesc;
-        this.href = href;
     }
 
     public int getId() {
@@ -48,27 +37,48 @@ public class DefectMaster {
         this.id = id;
     }
 
-    public String getDefectName() {
-        return defectName;
+    public DefectAttributes getAttributes() {
+        return attributes;
     }
 
-    public void setDefectName(String defectName) {
-        this.defectName = defectName;
+    public void setAttributes(DefectAttributes attributes) {
+        this.attributes = attributes;
     }
 
-    public String getDefectDesc() {
-        return defectDesc;
-    }
+    public static class DefectAttributes {
 
-    public void setDefectDesc(String defectDesc) {
-        this.defectDesc = defectDesc;
-    }
+        @SerializedName("dfms_name")
+        private String defectName;
+        @SerializedName("dfms_desc")
+        private String defectDesc;
+        @SerializedName("href")
+        private String href;
 
-    public String getHref() {
-        return href;
-    }
+        public DefectAttributes() {
+        }
 
-    public void setHref(String href) {
-        this.href = href;
+        public String getDefectName() {
+            return defectName;
+        }
+
+        public void setDefectName(String defectName) {
+            this.defectName = defectName;
+        }
+
+        public String getDefectDesc() {
+            return defectDesc;
+        }
+
+        public void setDefectDesc(String defectDesc) {
+            this.defectDesc = defectDesc;
+        }
+
+        public String getHref() {
+            return href;
+        }
+
+        public void setHref(String href) {
+            this.href = href;
+        }
     }
 }
