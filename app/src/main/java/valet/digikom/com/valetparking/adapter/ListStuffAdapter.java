@@ -24,12 +24,13 @@ import valet.digikom.com.valetparking.fragments.StepThreeFragment;
 public class ListStuffAdapter extends ArrayAdapter<AdditionalItems> {
 
     int post = -1;
-    ArrayList<Integer> positions = new ArrayList<>();
-    StepThreeFragment.OnStuffSelectedListener listener;
+    private ArrayList<Integer> positions;
+    private StepThreeFragment.OnStuffSelectedListener listener;
 
     public ListStuffAdapter(Context context, List<AdditionalItems> objects, StepThreeFragment.OnStuffSelectedListener onStuffListener) {
         super(context, 0, objects);
         this.listener = onStuffListener;
+        positions = new ArrayList<>();
     }
 
     @Override
@@ -39,7 +40,7 @@ public class ListStuffAdapter extends ArrayAdapter<AdditionalItems> {
 
     @NonNull
     @Override
-    public View getView(final int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, @NonNull ViewGroup parent) {
         if (convertView == null) {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.list_item_defects, parent, false);
         }
@@ -71,8 +72,10 @@ public class ListStuffAdapter extends ArrayAdapter<AdditionalItems> {
             }
         });
 
-        textId.setText("" + getItem(position).getAttributes().getAdditionalItemMaster().getId());
-        textDefects.setText(getItem(position).getAttributes().getAdditionalItemMaster().getName());
+        int id = getItem(position).getAttributes().getAdditionalItemMaster().getId();
+        String name = getItem(position).getAttributes().getAdditionalItemMaster().getName();
+        textId.setText(String.valueOf(id));
+        textDefects.setText(name);
         return convertView;
     }
 

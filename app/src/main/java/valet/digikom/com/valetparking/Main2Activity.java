@@ -3,19 +3,19 @@ package valet.digikom.com.valetparking;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 
 import java.text.ParseException;
@@ -39,7 +39,6 @@ public class Main2Activity extends AppCompatActivity
     ArrayList<Checkin> checkins = new ArrayList<>();
     TextView textEmpty;
     TextView textTotalCheckin;
-    private ValetDbHelper dbHelper;
 
 
     @Override
@@ -49,7 +48,7 @@ public class Main2Activity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        dbHelper = new ValetDbHelper(this);
+        ValetDbHelper dbHelper = new ValetDbHelper(this);
         textTotalCheckin = (TextView) findViewById(R.id.text_total_checkin);
         listCheckin = (RecyclerView) findViewById(R.id.list_checkin);
         textEmpty = (TextView) findViewById(R.id.text_empty);
@@ -118,7 +117,7 @@ public class Main2Activity extends AppCompatActivity
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
@@ -157,7 +156,7 @@ public class Main2Activity extends AppCompatActivity
 
         @Override
         protected void onPostExecute(List<Checkin> checkinsx) {
-            if (checkinsx != null || !checkinsx.isEmpty()) {
+            if (checkinsx != null && !checkinsx.isEmpty()) {
                 checkins.clear();
                 checkins.addAll(checkinsx);
                 adapter.notifyDataSetChanged();

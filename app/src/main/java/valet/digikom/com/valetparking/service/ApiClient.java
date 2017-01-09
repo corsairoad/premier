@@ -1,8 +1,6 @@
 package valet.digikom.com.valetparking.service;
 
 import java.io.IOException;
-import java.lang.reflect.Type;
-
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -16,8 +14,6 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ApiClient {
     public static final String BASE_URL = "http://valet-api.donny.id/v1/";
-    private static Retrofit retrofit = null;
-
     private static OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
 
     private static Retrofit.Builder builder =
@@ -25,15 +21,6 @@ public class ApiClient {
                     .baseUrl(BASE_URL)
                     .addConverterFactory(GsonConverterFactory.create());
 
-    public static Retrofit getClient() {
-        if (retrofit==null) {
-            retrofit = new Retrofit.Builder()
-                    .baseUrl(BASE_URL)
-                    .addConverterFactory(GsonConverterFactory.create())
-                    .build();
-        }
-        return retrofit;
-    }
 
     public static <S> S createService(Class<S> serviceClass) {
         return createService(serviceClass, null);
