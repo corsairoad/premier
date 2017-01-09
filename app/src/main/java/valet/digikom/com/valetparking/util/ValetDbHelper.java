@@ -5,6 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import valet.digikom.com.valetparking.domain.AdditionalItems;
+import valet.digikom.com.valetparking.domain.CarMaster;
 import valet.digikom.com.valetparking.domain.Checkin;
 import valet.digikom.com.valetparking.domain.DefectMaster;
 
@@ -29,6 +30,7 @@ public class ValetDbHelper extends SQLiteOpenHelper {
         db.execSQL(Checkin.Table.CREATE_TABLE);
         db.execSQL(DefectMaster.Table.CREATE);
         db.execSQL(AdditionalItems.Table.CREATE);
+        db.execSQL(CarMaster.Table.CREATE);
     }
 
     @Override
@@ -36,6 +38,7 @@ public class ValetDbHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + Checkin.Table.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + DefectMaster.Table.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + AdditionalItems.Table.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + CarMaster.Table.TABLE_NAME);
 
         onCreate(db);
     }
