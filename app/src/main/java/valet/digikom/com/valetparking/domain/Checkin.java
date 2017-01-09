@@ -3,9 +3,11 @@ package valet.digikom.com.valetparking.domain;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Created by DIGIKOM-EX4 on 12/20/2016.
@@ -112,8 +114,8 @@ public class Checkin implements Parcelable {
     private String runnerName;
     private String dropPoint;
     private String adminId;
-    List<String> defects = new ArrayList<>();
-    List<String> stuffs = new ArrayList<>();
+    private List<String> defects = new ArrayList<>();
+    private List<String> stuffs = new ArrayList<>();
     private String imageUrl;
 
     public Checkin() {
@@ -159,7 +161,7 @@ public class Checkin implements Parcelable {
         this.warnaMobil = warnaMobil;
     }
 
-    public Date getCheckinTime() {
+    private Date getCheckinTime() {
         return checkinTime;
     }
 
@@ -199,28 +201,12 @@ public class Checkin implements Parcelable {
         this.dropPoint = dropPoint;
     }
 
-    public String getAdminId() {
-        return adminId;
-    }
-
-    public void setAdminId(String adminId) {
-        this.adminId = adminId;
-    }
-
     public List<String> getDefects() {
         return defects;
     }
 
-    public void setDefects(List<String> defects) {
-        this.defects = defects;
-    }
-
     public List<String> getStuffs() {
         return stuffs;
-    }
-
-    public void setStuffs(List<String> stuffs) {
-        this.stuffs = stuffs;
     }
 
     public String defectsToString() {
@@ -241,6 +227,7 @@ public class Checkin implements Parcelable {
         return sb.toString();
     }
 
+
     public String getImageUrl() {
         return imageUrl;
     }
@@ -257,4 +244,12 @@ public class Checkin implements Parcelable {
                 append(getCheckinTime().getTime()).append(".jpg");
         return sb.toString();
     }
+
+    public String getDateString() {
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault());
+        String v = sdf.format(getCheckinTime());
+        return v;
+    }
+
+
 }

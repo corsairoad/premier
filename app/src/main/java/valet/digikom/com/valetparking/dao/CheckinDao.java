@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import valet.digikom.com.valetparking.domain.Checkin;
@@ -52,12 +53,16 @@ public class CheckinDao {
     public void addCheckIn(Checkin checkin, Bitmap bmp) {
         //String imgUrl = saveToInternalStorage(bmp, checkin.getSignatureName().trim());
         String imgUrl = saveImage(bmp, checkin.getSignatureName());
+
+
         SQLiteDatabase db = valetDbHelper.getWritableDatabase();
+
         ContentValues values = new ContentValues();
         values.put(Checkin.Table.COL_TRANSACTION_ID, checkin.getTransactionId());
         values.put(Checkin.Table.COL_PLAT_NO, checkin.getPlatNo());
         values.put(Checkin.Table.COL_MERK, checkin.getMerkMobil());
         values.put(Checkin.Table.COL_WARNA, checkin.getWarnaMobil());
+        values.put(Checkin.Table.COL_CHECKIN_TIME, checkin.getDateString());
         values.put(Checkin.Table.COL_JENIS, checkin.getJenisMobil());
         values.put(Checkin.Table.COL_EMAIL, checkin.getEmailCustomer());
         values.put(Checkin.Table.COL_RUNNER, checkin.getRunnerName());
@@ -76,16 +81,18 @@ public class CheckinDao {
         SQLiteDatabase db = valetDbHelper.getReadableDatabase();
         String query = "SELECT * FROM " + Checkin.Table.TABLE_NAME + " ORDER BY " + Checkin.Table.COL_CHECKIN_TIME + " DESC";
         Cursor cursor = db.rawQuery(query, null);
-        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/YYYY HH:mm:ss", Locale.getDefault());
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault());
 
         if (cursor.moveToFirst()) {
             do {
                 Checkin checkin = new Checkin();
+                checkin.setId(cursor.getInt(cursor.getColumnIndex(Checkin.Table.COL_ID)));
                 checkin.setTransactionId(cursor.getString(cursor.getColumnIndex(Checkin.Table.COL_TRANSACTION_ID)));
                 checkin.setPlatNo(cursor.getString(cursor.getColumnIndex(Checkin.Table.COL_PLAT_NO)));
                 checkin.setMerkMobil(cursor.getString(cursor.getColumnIndex(Checkin.Table.COL_MERK)));
                 checkin.setWarnaMobil(cursor.getString(cursor.getColumnIndex(Checkin.Table.COL_WARNA)));
                 checkin.setCheckinTime(sdf.parse(cursor.getString(cursor.getColumnIndex(Checkin.Table.COL_CHECKIN_TIME))));
+                //checkin.setCheckinTime(cursor.getString(cursor.getColumnIndex(Checkin.Table.COL_CHECKIN_TIME)));
                 checkin.setJenisMobil(cursor.getString(cursor.getColumnIndex(Checkin.Table.COL_JENIS)));
                 checkin.setEmailCustomer(cursor.getString(cursor.getColumnIndex(Checkin.Table.COL_EMAIL)));
                 checkin.setRunnerName(cursor.getString(cursor.getColumnIndex(Checkin.Table.COL_RUNNER)));
