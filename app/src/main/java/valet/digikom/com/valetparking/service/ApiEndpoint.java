@@ -6,6 +6,7 @@ import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import valet.digikom.com.valetparking.domain.AdditionalItemsResponse;
+import valet.digikom.com.valetparking.domain.CarMasterResponse;
 import valet.digikom.com.valetparking.domain.DefectResponse;
 import valet.digikom.com.valetparking.domain.TokenResponse;
 
@@ -24,4 +25,7 @@ public interface ApiEndpoint {
 
     @GET("additional_item_site_detail")
     Call<AdditionalItemsResponse> getItems();
+
+    @GET("car_master")
+    Call<CarMasterResponse> getCars();
 }
