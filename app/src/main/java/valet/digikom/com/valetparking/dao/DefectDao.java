@@ -86,7 +86,7 @@ public class DefectDao implements ProcessRequest {
 
         for (DefectMaster defect: defectMasterList) {
             ContentValues cv = new ContentValues();
-            cv.put(DefectMaster.Table.COL_ID, defect.getId());
+            cv.put(DefectMaster.Table.COL_ID, defect.getAttributes().getId());
             cv.put(DefectMaster.Table.COL_NAME, defect.getAttributes().getDefectName());
             cv.put(DefectMaster.Table.COL_DESC, defect.getAttributes().getDefectDesc());
             cv.put(DefectMaster.Table.COL_HREF, defect.getAttributes().getHref());

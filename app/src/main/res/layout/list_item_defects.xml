@@ -9,6 +9,12 @@
     android:paddingTop="16dp">
 
     <TextView
+        android:id="@+id/text_id_x"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"/>
+
+    <TextView
         android:id="@+id/text_defect"
         android:layout_width="0dp"
         android:layout_weight="10"

@@ -46,7 +46,8 @@ public class DefectMaster {
     }
 
     public static class DefectAttributes {
-
+        @SerializedName("dfms_id")
+        private int id;
         @SerializedName("dfms_name")
         private String defectName;
         @SerializedName("dfms_desc")
@@ -79,6 +80,14 @@ public class DefectMaster {
 
         public void setHref(String href) {
             this.href = href;
+        }
+
+        public int getId() {
+            return id;
+        }
+
+        public void setId(int id) {
+            this.id = id;
         }
     }
 }

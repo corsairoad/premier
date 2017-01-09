@@ -122,11 +122,7 @@ public class StepTwoFragment extends Fragment {
         @Override
         protected void onPostExecute(List<DefectMaster> defectMasterList) {
             if (!defectMasterList.isEmpty()) {
-                listDefects = new ArrayList<>();
-                for (DefectMaster dm : defectMasterList) {
-                    listDefects.add(dm.getAttributes().getDefectName());
-                }
-                adapter = new ListDefectAdapter(getContext(), listDefects, defectListener);
+                adapter = new ListDefectAdapter(getContext(), defectMasterList, defectListener);
                 mListviewDefect.setAdapter(adapter);
                 mListviewDefect.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override

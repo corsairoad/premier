@@ -16,18 +16,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 import valet.digikom.com.valetparking.R;
+import valet.digikom.com.valetparking.domain.DefectMaster;
 import valet.digikom.com.valetparking.fragments.StepTwoFragment;
 
 /**
  * Created by DIGIKOM-EX4 on 12/26/2016.
  */
 
-public class ListDefectAdapter extends ArrayAdapter<String> {
+public class ListDefectAdapter extends ArrayAdapter<DefectMaster> {
 
     ArrayList<Integer> positions = new ArrayList<>();
     StepTwoFragment.OnDefectSelectedListener listener;
 
-    public ListDefectAdapter(Context context, List<String> objects, StepTwoFragment.OnDefectSelectedListener defectListener) {
+    public ListDefectAdapter(Context context, List<DefectMaster> objects, StepTwoFragment.OnDefectSelectedListener defectListener) {
         super(context, 0, objects);
         this.listener = defectListener;
     }
@@ -39,33 +40,24 @@ public class ListDefectAdapter extends ArrayAdapter<String> {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.list_item_defects, parent, false);
         }
 
+        TextView textId = (TextView) convertView.findViewById(R.id.text_id_x);
         TextView textDefects = (TextView) convertView.findViewById(R.id.text_defect);
         CheckBox checkBox = (CheckBox) convertView.findViewById(R.id.checkbox_defect);
-        if (!positions.isEmpty()) {
-            for (Integer i : positions) {
-                if (i == position) {
-                    checkBox.setChecked(true);
-                }
-            }
-        }
 
-        textDefects.setText(getItem(position));
+        textId.setText("" + getItem(position).getAttributes().getId());
+        textDefects.setText(getItem(position).getAttributes().getDefectName());
         checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
                 if (isChecked) {
-                    listener.onDefectSelected(getItem(position));
+                    listener.onDefectSelected(getItem(position).getAttributes().getDefectName());
                 }else {
-                    listener.onDefectUnselected(getItem(position));
+                    listener.onDefectUnselected(getItem(position).getAttributes().getDefectName());
                 }
             }
         });
         return convertView;
     }
 
-    public void setSelectedPosition(ArrayList<Integer> positions) {
-        this.positions = positions;
-
-    }
 
 }
