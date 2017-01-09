@@ -2,6 +2,7 @@ package valet.digikom.com.valetparking.fragments;
 
 
 import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
@@ -23,7 +24,10 @@ import java.util.List;
 
 import valet.digikom.com.valetparking.R;
 import valet.digikom.com.valetparking.adapter.ListStuffAdapter;
+import valet.digikom.com.valetparking.dao.ItemsDao;
+import valet.digikom.com.valetparking.domain.AdditionalItems;
 import valet.digikom.com.valetparking.domain.Checkin;
+import valet.digikom.com.valetparking.util.ValetDbHelper;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -42,6 +46,7 @@ public class StepThreeFragment extends Fragment implements View.OnClickListener 
     private String mParam2;
     ListView mListviewStuff;
     List<String> listStuffs;
+    List<AdditionalItems> listItems = new ArrayList<>();
     ImageButton btnAddStuff;
     EditText inputStuff;
     ListStuffAdapter adapter;
@@ -73,8 +78,7 @@ public class StepThreeFragment extends Fragment implements View.OnClickListener 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        listStuffs = new ArrayList<>(Arrays.asList(getContext().getResources().getStringArray(R.array.stuffs)));
-        adapter = new ListStuffAdapter(getContext(),listStuffs, onStuffListener);
+
 
         if (savedInstanceState != null) {
             //selectedPositions = savedInstanceState.getIntegerArrayList(ARG_POST_STUFF);
@@ -94,24 +98,11 @@ public class StepThreeFragment extends Fragment implements View.OnClickListener 
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_step_three, container, false);
         mListviewStuff = (ListView) view.findViewById(R.id.listview_stuff);
-
         inputStuff = (EditText) view.findViewById(R.id.input_stuff);
-
         btnAddStuff = (ImageButton) view.findViewById(R.id.btn_add_stuff);
-        mListviewStuff.setAdapter(adapter);
-        mListviewStuff.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                CheckBox cb = (CheckBox) view.findViewById(R.id.checkbox_defect);
-                String stuff = adapter.getItem(i);
-                if (cb.isChecked()) {
-                    cb.setChecked(false);
-                }else {
-                    cb.setChecked(true);
-                }
-            }
-        });
         btnAddStuff.setOnClickListener(this);
+
+        new FetchItems().execute();
 
         return view;
     }
@@ -137,11 +128,18 @@ public class StepThreeFragment extends Fragment implements View.OnClickListener 
             return;
         }
 
+        AdditionalItems.AdditionalItemMaster item = new AdditionalItems.AdditionalItemMaster();
+        item.setId(listItems.size() + 1);
+        item.setName(input);
+        AdditionalItems.Attributes attributes = new AdditionalItems.Attributes();
+        attributes.setAdditionalItemMaster(item);
+        AdditionalItems additionalItems = new AdditionalItems();
+        additionalItems.setAttributes(attributes);
         onStuffListener.onStuffSelected(input);
-        listStuffs.add(input);
-        selectedPositions.add(listStuffs.size()-1);
+        listItems.add(additionalItems);
+        selectedPositions.add(listItems.size()-1);
         adapter.notifyDataSetChanged();
-        int post = adapter.getPosition(input);
+        int post = adapter.getPosition(additionalItems);
         adapter.setPost(post);
         adapter.notifyDataSetChanged();
         inputStuff.setText("");
@@ -150,5 +148,34 @@ public class StepThreeFragment extends Fragment implements View.OnClickListener 
     public interface OnStuffSelectedListener{
         void onStuffSelected(String stuff);
         void onStuffUnselected(String stuff);
+    }
+
+    private class FetchItems extends AsyncTask<Void, Void, List<AdditionalItems>> {
+
+        @Override
+        protected List<AdditionalItems> doInBackground(Void... voids) {
+            ItemsDao itemsDao = ItemsDao.getInstance(new ValetDbHelper(getContext()));
+            return itemsDao.fetchItems();
+        }
+
+        @Override
+        protected void onPostExecute(List<AdditionalItems> itemsList) {
+            if (!itemsList.isEmpty()) {
+                listItems.addAll(itemsList);
+                adapter = new ListStuffAdapter(getContext(),listItems, onStuffListener);
+                mListviewStuff.setAdapter(adapter);
+                mListviewStuff.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                        CheckBox cb = (CheckBox) view.findViewById(R.id.checkbox_defect);
+                        if (cb.isChecked()) {
+                            cb.setChecked(false);
+                        }else {
+                            cb.setChecked(true);
+                        }
+                    }
+                });
+            }
+        }
     }
 }

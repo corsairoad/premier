@@ -14,21 +14,27 @@ import java.util.ArrayList;
 import java.util.List;
 
 import valet.digikom.com.valetparking.R;
+import valet.digikom.com.valetparking.domain.AdditionalItems;
 import valet.digikom.com.valetparking.fragments.StepThreeFragment;
 
 /**
  * Created by DIGIKOM-EX4 on 12/26/2016.
  */
 
-public class ListStuffAdapter extends ArrayAdapter<String> {
+public class ListStuffAdapter extends ArrayAdapter<AdditionalItems> {
 
     int post = -1;
     ArrayList<Integer> positions = new ArrayList<>();
     StepThreeFragment.OnStuffSelectedListener listener;
 
-    public ListStuffAdapter(Context context, List<String> objects, StepThreeFragment.OnStuffSelectedListener onStuffListener) {
+    public ListStuffAdapter(Context context, List<AdditionalItems> objects, StepThreeFragment.OnStuffSelectedListener onStuffListener) {
         super(context, 0, objects);
         this.listener = onStuffListener;
+    }
+
+    @Override
+    public int getCount() {
+        return super.getCount();
     }
 
     @NonNull
@@ -38,6 +44,7 @@ public class ListStuffAdapter extends ArrayAdapter<String> {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.list_item_defects, parent, false);
         }
 
+        TextView textId = (TextView) convertView.findViewById(R.id.text_id_x);
         TextView textDefects = (TextView) convertView.findViewById(R.id.text_defect);
         CheckBox checkBox = (CheckBox) convertView.findViewById(R.id.checkbox_defect);
 
@@ -57,26 +64,25 @@ public class ListStuffAdapter extends ArrayAdapter<String> {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 if (b) {
-                    listener.onStuffSelected(getItem(position));
+                    listener.onStuffSelected(getItem(position).getAttributes().getAdditionalItemMaster().getName());
                 }else {
-                    listener.onStuffUnselected(getItem(position));
+                    listener.onStuffUnselected(getItem(position).getAttributes().getAdditionalItemMaster().getName());
                 }
             }
         });
 
-        textDefects.setText(getItem(position));
+        textId.setText("" + getItem(position).getAttributes().getAdditionalItemMaster().getId());
+        textDefects.setText(getItem(position).getAttributes().getAdditionalItemMaster().getName());
         return convertView;
     }
 
-    public int getPost() {
-        return post;
+    @Override
+    public int getPosition(AdditionalItems item) {
+        return super.getPosition(item);
     }
 
     public void setPost(int post) {
         this.post = post;
     }
 
-    public void setSelectedPositions(ArrayList<Integer> positions) {
-        this.positions = positions;
-    }
 }

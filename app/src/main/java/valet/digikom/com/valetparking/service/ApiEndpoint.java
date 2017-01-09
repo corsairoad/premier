@@ -5,6 +5,7 @@ import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
+import valet.digikom.com.valetparking.domain.AdditionalItemsResponse;
 import valet.digikom.com.valetparking.domain.DefectResponse;
 import valet.digikom.com.valetparking.domain.TokenResponse;
 
@@ -21,4 +22,6 @@ public interface ApiEndpoint {
     @POST("authenticate")
     Call<TokenResponse> getToken(@Field("email") String email, @Field("password") String password);
 
+    @GET("additional_item_site_detail")
+    Call<AdditionalItemsResponse> getItems();
 }
