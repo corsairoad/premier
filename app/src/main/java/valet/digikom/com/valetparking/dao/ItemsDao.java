@@ -25,7 +25,7 @@ import valet.digikom.com.valetparking.util.ValetDbHelper;
 
 public class ItemsDao implements ProcessRequest{
 
-    ValetDbHelper dbHelper;
+    private ValetDbHelper dbHelper;
     private static ItemsDao itemsDao;
 
     private ItemsDao(ValetDbHelper dbHelper) {
@@ -100,6 +100,8 @@ public class ItemsDao implements ProcessRequest{
                 itemsList.add(ai);
             } while (cursor.moveToNext());
         }
+        cursor.close();
+        db.close();
         return itemsList;
     }
 }

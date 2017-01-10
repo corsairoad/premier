@@ -1,10 +1,12 @@
 package valet.digikom.com.valetparking.dao;
 
 import android.content.ContentValues;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -37,6 +39,30 @@ public class CarDao implements ProcessRequest {
         return carDao;
     }
 
+    public List<CarMaster> fetchAllCars() {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        List<CarMaster> carMasterList = new ArrayList<>();
+        String qry = "SELECT * FROM " + CarMaster.Table.TABLE_NAME + " ORDER BY " + CarMaster.Table.COL_CAR_NAME;
+        Cursor cursor = db.rawQuery(qry, new String[]{});
+
+        if (cursor.moveToFirst()) {
+            do {
+                CarMaster carMaster = new CarMaster();
+                CarMaster.Attrib attrib = new CarMaster.Attrib();
+                attrib.setId_attrib(cursor.getInt(cursor.getColumnIndex(CarMaster.Table.COL_CAR_ID)));
+                attrib.setCarName(cursor.getString(cursor.getColumnIndex(CarMaster.Table.COL_CAR_NAME)));
+                carMaster.setId(cursor.getInt(cursor.getColumnIndex(CarMaster.Table.COL_ID)));
+                carMaster.setAttrib(attrib);
+
+                carMasterList.add(carMaster);
+            }while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        db.close();
+        return carMasterList;
+    }
+
     private void downloadCarMaster(String token) {
         ApiEndpoint endpoint = ApiClient.createService(ApiEndpoint.class, token);
         Call<CarMasterResponse> call = endpoint.getCars();
@@ -59,6 +85,7 @@ public class CarDao implements ProcessRequest {
 
     private void insertCars(List<CarMaster> carMasterList) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
+        db.execSQL("DELETE FROM " + CarMaster.Table.TABLE_NAME);
         for (CarMaster carMaster : carMasterList) {
             ContentValues cv = new ContentValues();
             cv.put(CarMaster.Table.COL_ID, carMaster.getId());

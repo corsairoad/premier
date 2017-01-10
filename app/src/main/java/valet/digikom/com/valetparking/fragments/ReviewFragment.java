@@ -12,8 +12,15 @@ import android.widget.TextView;
 
 import com.github.gcacace.signaturepad.views.SignaturePad;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import valet.digikom.com.valetparking.R;
+import valet.digikom.com.valetparking.domain.AdditionalItems;
+import valet.digikom.com.valetparking.domain.CarMaster;
 import valet.digikom.com.valetparking.domain.Checkin;
+import valet.digikom.com.valetparking.domain.ColorMaster;
+import valet.digikom.com.valetparking.domain.DefectMaster;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -40,6 +47,11 @@ public class ReviewFragment extends Fragment {
     private TextView textDefects;
     private TextView textStuffs;
     public static ReviewFragment reviewFragment;
+
+    private List<DefectMaster> defectMasterList;
+    private List<AdditionalItems> itemsList;
+    private CarMaster carMaster;
+    private ColorMaster colorMaster;
 
     public ReviewFragment() {
         // Required empty public constructor
@@ -68,10 +80,13 @@ public class ReviewFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         reviewFragment = this;
+
+        defectMasterList = new ArrayList<>();
+        itemsList = new ArrayList<>();
+
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
-            //checkin = getArguments().getParcelable(ARG_CHECKIN);
         }
     }
 
@@ -123,23 +138,27 @@ public class ReviewFragment extends Fragment {
         init();
     }
 
-    public void selectDefect(String defect) {
+    public void selectDefect(String defect, DefectMaster defectMaster) {
         checkin.getDefects().add(defect);
+        getDefectMasterList().add(defectMaster);
         initDefects();
     }
 
-    public void unSelectDefect(String defect) {
+    public void unSelectDefect(String defect, DefectMaster defectMaster) {
         checkin.getDefects().remove(defect);
+        getDefectMasterList().remove(defectMaster);
         initDefects();
     }
 
-    public void onSelectSuff(String stuff) {
+    public void onSelectSuff(String stuff, AdditionalItems items) {
         checkin.getStuffs().add(stuff);
+        getItemsList().add(items);
         initStuffs();
     }
 
-    public void onUnselectStuff(String stuff) {
+    public void onUnselectStuff(String stuff, AdditionalItems items) {
         checkin.getStuffs().remove(stuff);
+        getItemsList().remove(items);
         initStuffs();
     }
 
@@ -148,10 +167,7 @@ public class ReviewFragment extends Fragment {
     }
 
     public boolean ispadSigned() {
-        if (signPad.isEmpty()) {
-            return false;
-        }
-        return true;
+        return !signPad.isEmpty();
     }
 
     public Bitmap getSignatureBmp() {
@@ -162,7 +178,35 @@ public class ReviewFragment extends Fragment {
         return checkin;
     }
 
-    public void setCheckin(Checkin checkin) {
-        this.checkin = checkin;
+    public CarMaster getCarMaster() {
+        return carMaster;
+    }
+
+    public void setCarMaster(CarMaster carMaster) {
+        this.carMaster = carMaster;
+    }
+
+    public List<DefectMaster> getDefectMasterList() {
+        return defectMasterList;
+    }
+
+    public void setDefectMasterList(List<DefectMaster> defectMasterList) {
+        this.defectMasterList = defectMasterList;
+    }
+
+    public ColorMaster getColorMaster() {
+        return colorMaster;
+    }
+
+    public void setColorMaster(ColorMaster colorMaster) {
+        this.colorMaster = colorMaster;
+    }
+
+    public List<AdditionalItems> getItemsList() {
+        return itemsList;
+    }
+
+    public void setItemsList(List<AdditionalItems> itemsList) {
+        this.itemsList = itemsList;
     }
 }

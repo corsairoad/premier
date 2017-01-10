@@ -1,8 +1,8 @@
 package valet.digikom.com.valetparking.fragments;
 
 
-import android.app.Activity;
 import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.InputFilter;
@@ -15,11 +15,15 @@ import android.widget.ImageButton;
 import com.orhanobut.dialogplus.DialogPlus;
 import com.orhanobut.dialogplus.ListHolder;
 import com.orhanobut.dialogplus.OnItemClickListener;
-import java.util.Arrays;
 import java.util.List;
 import valet.digikom.com.valetparking.R;
 import valet.digikom.com.valetparking.adapter.CarTypeAdapter;
-import valet.digikom.com.valetparking.domain.Checkin;
+import valet.digikom.com.valetparking.adapter.ColorTypeAdapter;
+import valet.digikom.com.valetparking.dao.CarDao;
+import valet.digikom.com.valetparking.dao.ColorDao;
+import valet.digikom.com.valetparking.domain.CarMaster;
+import valet.digikom.com.valetparking.domain.ColorMaster;
+import valet.digikom.com.valetparking.util.ValetDbHelper;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -36,6 +40,7 @@ public class StepOneFragmet extends Fragment {
     private String mParam1;
     private String mParam2;
     private ImageButton btnCarType;
+    private ImageButton btnColorType;
     private EditText inputDropPoint;
     private EditText inputPlatNo;
     private EditText inputCartype;
@@ -44,7 +49,6 @@ public class StepOneFragmet extends Fragment {
     private EditText inputColor;
     InputFilter[] filters = new InputFilter[]{new InputFilter.AllCaps()};
     private OnRegsitrationValid onRegsitrationValid;
-
 
     public StepOneFragmet() {
         // Required empty public constructor
@@ -71,6 +75,7 @@ public class StepOneFragmet extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
@@ -96,26 +101,10 @@ public class StepOneFragmet extends Fragment {
         inputColor.setFilters(filters);
 
         btnCarType = (ImageButton) view.findViewById(R.id.btn_dropdown_cartype);
-        btnCarType.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                List<String> carTypeList = Arrays.asList(getContext().getResources().getStringArray(R.array.car_type_array));
-                final CarTypeAdapter adapter = new CarTypeAdapter(getContext(), carTypeList);
-                DialogPlus dialogPlus  = DialogPlus.newDialog(getContext())
-                        .setContentHolder(new ListHolder())
-                        .setAdapter(adapter)
-                        .setOnItemClickListener(new OnItemClickListener() {
-                            @Override
-                            public void onItemClick(DialogPlus dialog, Object item, View view, int position) {
-                                inputCartype.setText((String)adapter.getItem(position));
-                                dialog.dismiss();
-                            }
-                        })
-                        .setExpanded(true)
-                        .create();
-                dialogPlus.show();
-            }
-        });
+        btnColorType = (ImageButton) view.findViewById(R.id.btn_dropdown_color);
+
+        new FetchCarsTask().execute();
+        new FetchColorsTask().execute();
         return view;
     }
 
@@ -150,13 +139,81 @@ public class StepOneFragmet extends Fragment {
         String merk = inputMerk.getText().toString();
         String email = inputEmail.getText().toString();
         String color = inputColor.getText().toString();
-        ReviewFragment reviewFragment = ReviewFragment.reviewFragment;
-        //reviewFragment.setCheckin(dropPoint, platNo,carType,merk,email,color);
         onRegsitrationValid.setCheckin(dropPoint,platNo,carType,merk,email,color);
     }
 
     public interface OnRegsitrationValid{
         void setCheckin(String dropPoint, String platNo, String carType, String merk, String email, String warna);
+    }
+
+    private class FetchCarsTask extends AsyncTask<Void, Void, List<CarMaster>> {
+
+        @Override
+        protected List<CarMaster> doInBackground(Void... voids) {
+            return CarDao.getInstance(new ValetDbHelper(getContext())).fetchAllCars();
+        }
+
+        @Override
+        protected void onPostExecute(List<CarMaster> s) {
+            if (!s.isEmpty()) {
+                final CarTypeAdapter adapter = new CarTypeAdapter(getContext(), s);
+                btnCarType.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        DialogPlus dialogPlus  = DialogPlus.newDialog(getContext())
+                                .setContentHolder(new ListHolder())
+                                .setAdapter(adapter)
+                                .setOnItemClickListener(new OnItemClickListener() {
+                                    @Override
+                                    public void onItemClick(DialogPlus dialog, Object item, View view, int position) {
+                                        CarMaster carMaster = (CarMaster) item;
+                                        inputCartype.setText(carMaster.getAttrib().getCarName());
+                                        ReviewFragment.reviewFragment.setCarMaster(carMaster);
+                                        dialog.dismiss();
+                                    }
+                                })
+                                .setExpanded(true)
+                                .create();
+                        dialogPlus.show();
+                    }
+                });
+            }
+        }
+    }
+
+    private class FetchColorsTask extends AsyncTask<Void, Void, List<ColorMaster>> {
+
+        @Override
+        protected List<ColorMaster> doInBackground(Void... voids) {
+            return ColorDao.getInstance(new ValetDbHelper(getContext())).fetchColors();
+        }
+
+        @Override
+        protected void onPostExecute(final List<ColorMaster> colorMasters) {
+            if (!colorMasters.isEmpty()) {
+                final ColorTypeAdapter adapter = new ColorTypeAdapter(colorMasters, getContext());
+                btnColorType.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        DialogPlus dialogPlus  = DialogPlus.newDialog(getContext())
+                                .setContentHolder(new ListHolder())
+                                .setAdapter(adapter)
+                                .setOnItemClickListener(new OnItemClickListener() {
+                                    @Override
+                                    public void onItemClick(DialogPlus dialog, Object item, View view, int position) {
+                                        ColorMaster cm = (ColorMaster) item;
+                                        inputColor.setText(cm.getAttrib().getColorName());
+                                        ReviewFragment.reviewFragment.setColorMaster(cm);
+                                        dialog.dismiss();
+                                    }
+                                })
+                                .setExpanded(true)
+                                .create();
+                        dialogPlus.show();
+                    }
+                });
+            }
+        }
     }
 
 }

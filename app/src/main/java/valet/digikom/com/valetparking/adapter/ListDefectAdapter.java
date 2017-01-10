@@ -46,18 +46,20 @@ public class ListDefectAdapter extends ArrayAdapter<DefectMaster> {
 
         textId.setText("" + getItem(position).getAttributes().getId());
         textDefects.setText(getItem(position).getAttributes().getDefectName());
+
+        final DefectMaster dm = getItem(position);
+
         checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
                 if (isChecked) {
-                    listener.onDefectSelected(getItem(position).getAttributes().getDefectName());
+                    listener.onDefectSelected(dm.getAttributes().getDefectName(), dm);
                 }else {
-                    listener.onDefectUnselected(getItem(position).getAttributes().getDefectName());
+                    listener.onDefectUnselected(dm.getAttributes().getDefectName(), dm);
                 }
             }
         });
         return convertView;
     }
-
 
 }

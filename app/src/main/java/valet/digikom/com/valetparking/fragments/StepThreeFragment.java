@@ -9,24 +9,18 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Toast;
-
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-
 import valet.digikom.com.valetparking.R;
 import valet.digikom.com.valetparking.adapter.ListStuffAdapter;
 import valet.digikom.com.valetparking.dao.ItemsDao;
 import valet.digikom.com.valetparking.domain.AdditionalItems;
-import valet.digikom.com.valetparking.domain.Checkin;
 import valet.digikom.com.valetparking.util.ValetDbHelper;
 
 /**
@@ -39,13 +33,10 @@ public class StepThreeFragment extends Fragment implements View.OnClickListener 
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-    private static final String ARG_POST_STUFF = "poststuff";
-    private static final String ARG_STUFFS = "stuffs";
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
     ListView mListviewStuff;
-    List<String> listStuffs;
     List<AdditionalItems> listItems = new ArrayList<>();
     ImageButton btnAddStuff;
     EditText inputStuff;
@@ -80,12 +71,6 @@ public class StepThreeFragment extends Fragment implements View.OnClickListener 
         super.onCreate(savedInstanceState);
 
 
-        if (savedInstanceState != null) {
-            //selectedPositions = savedInstanceState.getIntegerArrayList(ARG_POST_STUFF);
-            //listStuffs = savedInstanceState.getStringArrayList(ARG_STUFFS);
-            //adapter.setSelectedPositions(selectedPositions);
-        }
-
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
@@ -115,8 +100,6 @@ public class StepThreeFragment extends Fragment implements View.OnClickListener 
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        //outState.putIntegerArrayList(ARG_POST_STUFF, selectedPositions);
-        //outState.putStringArrayList(ARG_STUFFS, (ArrayList<String>) listStuffs);
         super.onSaveInstanceState(outState);
     }
 
@@ -131,11 +114,15 @@ public class StepThreeFragment extends Fragment implements View.OnClickListener 
         AdditionalItems.AdditionalItemMaster item = new AdditionalItems.AdditionalItemMaster();
         item.setId(listItems.size() + 1);
         item.setName(input);
+
         AdditionalItems.Attributes attributes = new AdditionalItems.Attributes();
         attributes.setAdditionalItemMaster(item);
+
         AdditionalItems additionalItems = new AdditionalItems();
         additionalItems.setAttributes(attributes);
-        onStuffListener.onStuffSelected(input);
+
+        onStuffListener.onStuffSelected(input, additionalItems);
+
         listItems.add(additionalItems);
         selectedPositions.add(listItems.size()-1);
         adapter.notifyDataSetChanged();
@@ -146,8 +133,8 @@ public class StepThreeFragment extends Fragment implements View.OnClickListener 
     }
 
     public interface OnStuffSelectedListener{
-        void onStuffSelected(String stuff);
-        void onStuffUnselected(String stuff);
+        void onStuffSelected(String stuff, AdditionalItems items);
+        void onStuffUnselected(String stuff, AdditionalItems items);
     }
 
     private class FetchItems extends AsyncTask<Void, Void, List<AdditionalItems>> {

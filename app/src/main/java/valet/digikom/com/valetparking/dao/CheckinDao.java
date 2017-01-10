@@ -2,23 +2,20 @@ package valet.digikom.com.valetparking.dao;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.ContextWrapper;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.os.Environment;
 import android.util.Log;
 import android.widget.Toast;
-
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+
 import valet.digikom.com.valetparking.domain.Checkin;
 import valet.digikom.com.valetparking.util.ValetDbHelper;
 
@@ -105,32 +102,9 @@ public class CheckinDao {
         return checkinList;
     }
 
-    private String saveToInternalStorage(Bitmap bitmapImage, String fileName){
-        ContextWrapper cw = new ContextWrapper(context);
-        // path to /data/data/yourapp/app_data/imageDir
-        File directory = cw.getDir("imageDir", Context.MODE_WORLD_READABLE);
-        String d = directory.getAbsolutePath();
-        // Create imageDir
-        File mypath=new File(directory,fileName);
 
-        FileOutputStream fos = null;
-        try {
-            fos = new FileOutputStream(mypath);
-            // Use the compress method on the BitMap object to write image to the OutputStream
-            bitmapImage.compress(Bitmap.CompressFormat.PNG, 100, fos);
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                fos.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        return directory.getAbsolutePath();
-    }
 
-    public String saveImage(Bitmap bmp, String fileName) {
+    private String saveImage(Bitmap bmp, String fileName) {
         String root = Environment.getExternalStorageDirectory().toString();
         File myDir = new File(root + "/signature_images");
         myDir.mkdirs();

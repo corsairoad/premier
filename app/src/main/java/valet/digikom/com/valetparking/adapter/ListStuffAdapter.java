@@ -24,12 +24,13 @@ import valet.digikom.com.valetparking.fragments.StepThreeFragment;
 public class ListStuffAdapter extends ArrayAdapter<AdditionalItems> {
 
     int post = -1;
-    ArrayList<Integer> positions = new ArrayList<>();
-    StepThreeFragment.OnStuffSelectedListener listener;
+    private ArrayList<Integer> positions;
+    private StepThreeFragment.OnStuffSelectedListener listener;
 
     public ListStuffAdapter(Context context, List<AdditionalItems> objects, StepThreeFragment.OnStuffSelectedListener onStuffListener) {
         super(context, 0, objects);
         this.listener = onStuffListener;
+        positions = new ArrayList<>();
     }
 
     @Override
@@ -39,7 +40,7 @@ public class ListStuffAdapter extends ArrayAdapter<AdditionalItems> {
 
     @NonNull
     @Override
-    public View getView(final int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, @NonNull ViewGroup parent) {
         if (convertView == null) {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.list_item_defects, parent, false);
         }
@@ -47,7 +48,7 @@ public class ListStuffAdapter extends ArrayAdapter<AdditionalItems> {
         TextView textId = (TextView) convertView.findViewById(R.id.text_id_x);
         TextView textDefects = (TextView) convertView.findViewById(R.id.text_defect);
         CheckBox checkBox = (CheckBox) convertView.findViewById(R.id.checkbox_defect);
-
+        final AdditionalItems item = getItem(position);
         if (position == post) {
             checkBox.setChecked(true);
         }
@@ -64,15 +65,17 @@ public class ListStuffAdapter extends ArrayAdapter<AdditionalItems> {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 if (b) {
-                    listener.onStuffSelected(getItem(position).getAttributes().getAdditionalItemMaster().getName());
+                    listener.onStuffSelected(item.getAttributes().getAdditionalItemMaster().getName(), item);
                 }else {
-                    listener.onStuffUnselected(getItem(position).getAttributes().getAdditionalItemMaster().getName());
+                    listener.onStuffUnselected(item.getAttributes().getAdditionalItemMaster().getName(), item);
                 }
             }
         });
 
-        textId.setText("" + getItem(position).getAttributes().getAdditionalItemMaster().getId());
-        textDefects.setText(getItem(position).getAttributes().getAdditionalItemMaster().getName());
+        int id = getItem(position).getAttributes().getAdditionalItemMaster().getId();
+        String name = getItem(position).getAttributes().getAdditionalItemMaster().getName();
+        textId.setText(String.valueOf(id));
+        textDefects.setText(name);
         return convertView;
     }
 

@@ -95,8 +95,8 @@ public class StepTwoFragment extends Fragment {
     }
 
     public interface OnDefectSelectedListener{
-        void onDefectSelected(String defect);
-        void onDefectUnselected(String defect);
+        void onDefectSelected(String defect, DefectMaster defectMaster);
+        void onDefectUnselected(String defect, DefectMaster defectMaster);
     }
 
     @Override
@@ -107,7 +107,6 @@ public class StepTwoFragment extends Fragment {
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        //outState.putIntegerArrayList(ARG_POSITION, selecedPosition);
         super.onSaveInstanceState(outState);
     }
 
