@@ -17,14 +17,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
-
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
-
 import valet.digikom.com.valetparking.adapter.ListCheckinAdapter;
 import valet.digikom.com.valetparking.dao.CarDao;
 import valet.digikom.com.valetparking.dao.CheckinDao;
+import valet.digikom.com.valetparking.dao.ColorDao;
 import valet.digikom.com.valetparking.dao.DefectDao;
 import valet.digikom.com.valetparking.dao.ItemsDao;
 import valet.digikom.com.valetparking.dao.TokenDao;
@@ -80,6 +79,7 @@ public class Main2Activity extends AppCompatActivity
         TokenDao.getToken(defectDao);
         TokenDao.getToken(ItemsDao.getInstance(dbHelper));
         TokenDao.getToken(CarDao.getInstance(dbHelper));
+        TokenDao.getToken(ColorDao.getInstance(dbHelper));
     }
 
     @Override

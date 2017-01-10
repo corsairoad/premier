@@ -10,6 +10,7 @@ import android.widget.TextView;
 import java.util.List;
 
 import valet.digikom.com.valetparking.R;
+import valet.digikom.com.valetparking.domain.CarMaster;
 
 /**
  * Created by DIGIKOM-EX4 on 12/23/2016.
@@ -17,27 +18,27 @@ import valet.digikom.com.valetparking.R;
 
 public class CarTypeAdapter extends BaseAdapter {
 
-    Context context;
-    List<String> carTypeList;
+    private Context context;
+    private List<CarMaster> carMasterList;
 
-    public CarTypeAdapter(Context context, List<String> carTypeList) {
+    public CarTypeAdapter(Context context, List<CarMaster> carMasterList) {
         this.context = context;
-        this.carTypeList = carTypeList;
+        this.carMasterList = carMasterList;
     }
 
     @Override
     public int getCount() {
-        return carTypeList.size();
+        return carMasterList.size();
     }
 
     @Override
     public Object getItem(int i) {
-        return carTypeList.get(i);
+        return carMasterList.get(i);
     }
 
     @Override
     public long getItemId(int i) {
-        return i;
+        return carMasterList.get(i).getId();
     }
 
     @Override
@@ -47,7 +48,7 @@ public class CarTypeAdapter extends BaseAdapter {
         }
 
         TextView textView = (TextView) view.findViewById(R.id.text_cartype);
-        textView.setText(carTypeList.get(i));
+        textView.setText(carMasterList.get(i).getAttrib().getCarName());
 
         return view;
     }

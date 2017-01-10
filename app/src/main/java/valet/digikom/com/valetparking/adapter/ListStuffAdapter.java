@@ -48,7 +48,7 @@ public class ListStuffAdapter extends ArrayAdapter<AdditionalItems> {
         TextView textId = (TextView) convertView.findViewById(R.id.text_id_x);
         TextView textDefects = (TextView) convertView.findViewById(R.id.text_defect);
         CheckBox checkBox = (CheckBox) convertView.findViewById(R.id.checkbox_defect);
-
+        final AdditionalItems item = getItem(position);
         if (position == post) {
             checkBox.setChecked(true);
         }
@@ -65,9 +65,9 @@ public class ListStuffAdapter extends ArrayAdapter<AdditionalItems> {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 if (b) {
-                    listener.onStuffSelected(getItem(position).getAttributes().getAdditionalItemMaster().getName());
+                    listener.onStuffSelected(item.getAttributes().getAdditionalItemMaster().getName(), item);
                 }else {
-                    listener.onStuffUnselected(getItem(position).getAttributes().getAdditionalItemMaster().getName());
+                    listener.onStuffUnselected(item.getAttributes().getAdditionalItemMaster().getName(), item);
                 }
             }
         });

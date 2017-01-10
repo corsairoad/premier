@@ -176,7 +176,8 @@
             android:src="@drawable/ic_format_color_fill_black_24dp" />
 
         <android.support.design.widget.TextInputLayout
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
+            android:layout_weight="10"
             android:layout_height="match_parent">
 
             <EditText
@@ -186,6 +187,14 @@
                 android:hint="@string/color"/>
 
         </android.support.design.widget.TextInputLayout>
+
+        <ImageButton
+            android:id="@+id/btn_dropdown_color"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:background="@drawable/addcar_button_bg"
+            android:src="@drawable/ic_arrow_drop_down_black_24dp"/>
 
     </LinearLayout>
 

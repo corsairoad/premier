@@ -114,11 +114,15 @@ public class StepThreeFragment extends Fragment implements View.OnClickListener 
         AdditionalItems.AdditionalItemMaster item = new AdditionalItems.AdditionalItemMaster();
         item.setId(listItems.size() + 1);
         item.setName(input);
+
         AdditionalItems.Attributes attributes = new AdditionalItems.Attributes();
         attributes.setAdditionalItemMaster(item);
+
         AdditionalItems additionalItems = new AdditionalItems();
         additionalItems.setAttributes(attributes);
-        onStuffListener.onStuffSelected(input);
+
+        onStuffListener.onStuffSelected(input, additionalItems);
+
         listItems.add(additionalItems);
         selectedPositions.add(listItems.size()-1);
         adapter.notifyDataSetChanged();
@@ -129,8 +133,8 @@ public class StepThreeFragment extends Fragment implements View.OnClickListener 
     }
 
     public interface OnStuffSelectedListener{
-        void onStuffSelected(String stuff);
-        void onStuffUnselected(String stuff);
+        void onStuffSelected(String stuff, AdditionalItems items);
+        void onStuffUnselected(String stuff, AdditionalItems items);
     }
 
     private class FetchItems extends AsyncTask<Void, Void, List<AdditionalItems>> {

@@ -1,14 +1,11 @@
 package valet.digikom.com.valetparking.dao;
 
 import android.content.ContentValues;
-import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.widget.Toast;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -25,10 +22,10 @@ import valet.digikom.com.valetparking.util.ValetDbHelper;
 
 public class DefectDao implements ProcessRequest {
 
-    public static DefectDao defectDao;
-    ValetDbHelper dbHelper;
+    private static DefectDao defectDao;
+    private ValetDbHelper dbHelper;
 
-    public DefectDao(ValetDbHelper dbHelper) {
+    private DefectDao(ValetDbHelper dbHelper) {
         this.dbHelper = dbHelper;
     }
 

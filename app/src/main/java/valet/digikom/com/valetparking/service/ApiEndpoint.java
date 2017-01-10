@@ -7,6 +7,7 @@ import retrofit2.http.GET;
 import retrofit2.http.POST;
 import valet.digikom.com.valetparking.domain.AdditionalItemsResponse;
 import valet.digikom.com.valetparking.domain.CarMasterResponse;
+import valet.digikom.com.valetparking.domain.ColorMasterResponse;
 import valet.digikom.com.valetparking.domain.DefectResponse;
 import valet.digikom.com.valetparking.domain.TokenResponse;
 
@@ -28,4 +29,7 @@ public interface ApiEndpoint {
 
     @GET("car_master")
     Call<CarMasterResponse> getCars();
+
+    @GET("color_master")
+    Call<ColorMasterResponse> getColors();
 }

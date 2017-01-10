@@ -16,7 +16,9 @@ import android.widget.TextView;
 import me.relex.circleindicator.CircleIndicator;
 import valet.digikom.com.valetparking.adapter.PagerCheckinAdapter;
 import valet.digikom.com.valetparking.dao.CheckinDao;
+import valet.digikom.com.valetparking.domain.AdditionalItems;
 import valet.digikom.com.valetparking.domain.Checkin;
+import valet.digikom.com.valetparking.domain.DefectMaster;
 import valet.digikom.com.valetparking.fragments.ReviewFragment;
 import valet.digikom.com.valetparking.fragments.StepOneFragmet;
 import valet.digikom.com.valetparking.fragments.StepThreeFragment;
@@ -167,26 +169,26 @@ public class AddCarActivity extends ActionBarActivity implements StepOneFragmet.
     }
 
     @Override
-    public void onDefectSelected(String defect) {
+    public void onDefectSelected(String defect, DefectMaster defectMaster) {
         ReviewFragment reviewFragment = ReviewFragment.reviewFragment;
-        reviewFragment.selectDefect(defect);
+        reviewFragment.selectDefect(defect, defectMaster);
     }
 
     @Override
-    public void onDefectUnselected(String defect) {
+    public void onDefectUnselected(String defect, DefectMaster defectMaster) {
         ReviewFragment reviewFragment = ReviewFragment.reviewFragment;
-        reviewFragment.unSelectDefect(defect);
+        reviewFragment.unSelectDefect(defect, defectMaster);
     }
 
     @Override
-    public void onStuffSelected(String stuff) {
+    public void onStuffSelected(String stuff, AdditionalItems items) {
         ReviewFragment reviewFragment = ReviewFragment.reviewFragment;
-        reviewFragment.onSelectSuff(stuff);
+        reviewFragment.onSelectSuff(stuff, items);
     }
 
     @Override
-    public void onStuffUnselected(String stuff) {
+    public void onStuffUnselected(String stuff, AdditionalItems items) {
         ReviewFragment reviewFragment = ReviewFragment.reviewFragment;
-        reviewFragment.onUnselectStuff(stuff);
+        reviewFragment.onUnselectStuff(stuff, items);
     }
 }

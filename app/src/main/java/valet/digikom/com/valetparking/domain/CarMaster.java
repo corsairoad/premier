@@ -8,18 +8,6 @@ import com.google.gson.annotations.SerializedName;
 
 public class CarMaster {
 
-    public static class Table {
-        public static final String TABLE_NAME = "car_master";
-
-        public static final String COL_ID = "_id";
-        public static final String COL_CAR_NAME = "car_name";
-        public static final String COL_CAR_ID = "id_car";
-
-        public static final String CREATE = "CREATE TABLE " + TABLE_NAME + "( " + COL_ID + " INTEGER PRIMARY KEY, " +
-                COL_CAR_NAME + " TEXT, " +
-                COL_CAR_ID + " INTEGER)";
-    }
-
     @SerializedName("id")
     private int id;
     @SerializedName("type")
@@ -78,5 +66,17 @@ public class CarMaster {
         public void setCarName(String carName) {
             this.carName = carName;
         }
+    }
+
+    public static class Table {
+        public static final String TABLE_NAME = "car_master";
+
+        public static final String COL_ID = "_id";
+        public static final String COL_CAR_NAME = "car_name";
+        public static final String COL_CAR_ID = "id_car";
+
+        public static final String CREATE = "CREATE TABLE " + TABLE_NAME + "( " + COL_ID + " INTEGER PRIMARY KEY, " +
+                COL_CAR_NAME + " TEXT, " +
+                COL_CAR_ID + " INTEGER)";
     }
 }

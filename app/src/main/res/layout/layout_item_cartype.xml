@@ -14,15 +14,16 @@
         android:orientation="horizontal">
 
         <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/circle_image"
             android:layout_width="75dp"
             android:layout_height="75dp"
-            android:src="@mipmap/logo_1"
             app:civ_border_width="2dp"
             app:civ_border_color="@android:color/black"/>
 
         <TextView
             android:id="@+id/text_cartype"
             android:paddingLeft="@dimen/activity_vertical_margin"
+            android:textColor="@color/color_text_plat_no_checkin"
             android:layout_width="match_parent"
             android:gravity="center_vertical"
             android:textSize="20sp"
