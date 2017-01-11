@@ -7,22 +7,30 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.InputFilter;
 import android.text.TextUtils;
+import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import com.orhanobut.dialogplus.DialogPlus;
+import com.orhanobut.dialogplus.GridHolder;
 import com.orhanobut.dialogplus.ListHolder;
 import com.orhanobut.dialogplus.OnItemClickListener;
 import java.util.List;
 import valet.digikom.com.valetparking.R;
 import valet.digikom.com.valetparking.adapter.CarTypeAdapter;
 import valet.digikom.com.valetparking.adapter.ColorTypeAdapter;
+import valet.digikom.com.valetparking.adapter.DropPointAdapter;
 import valet.digikom.com.valetparking.dao.CarDao;
 import valet.digikom.com.valetparking.dao.ColorDao;
+import valet.digikom.com.valetparking.dao.DropDao;
 import valet.digikom.com.valetparking.domain.CarMaster;
 import valet.digikom.com.valetparking.domain.ColorMaster;
+import valet.digikom.com.valetparking.domain.DropPointMaster;
 import valet.digikom.com.valetparking.util.ValetDbHelper;
 
 /**
@@ -41,6 +49,7 @@ public class StepOneFragmet extends Fragment {
     private String mParam2;
     private ImageButton btnCarType;
     private ImageButton btnColorType;
+    private ImageButton btnDropPoint;
     private EditText inputDropPoint;
     private EditText inputPlatNo;
     private EditText inputCartype;
@@ -49,6 +58,7 @@ public class StepOneFragmet extends Fragment {
     private EditText inputColor;
     InputFilter[] filters = new InputFilter[]{new InputFilter.AllCaps()};
     private OnRegsitrationValid onRegsitrationValid;
+    private ValetDbHelper dbHelper;
 
     public StepOneFragmet() {
         // Required empty public constructor
@@ -76,6 +86,7 @@ public class StepOneFragmet extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        dbHelper = new ValetDbHelper(getContext());
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
@@ -100,11 +111,12 @@ public class StepOneFragmet extends Fragment {
         inputColor = (EditText) view.findViewById(R.id.input_color);
         inputColor.setFilters(filters);
 
+
         btnCarType = (ImageButton) view.findViewById(R.id.btn_dropdown_cartype);
         btnColorType = (ImageButton) view.findViewById(R.id.btn_dropdown_color);
+        btnDropPoint = (ImageButton) view.findViewById(R.id.btn_drop);
 
-        new FetchCarsTask().execute();
-        new FetchColorsTask().execute();
+        initData();
         return view;
     }
 
@@ -142,6 +154,7 @@ public class StepOneFragmet extends Fragment {
         onRegsitrationValid.setCheckin(dropPoint,platNo,carType,merk,email,color);
     }
 
+
     public interface OnRegsitrationValid{
         void setCheckin(String dropPoint, String platNo, String carType, String merk, String email, String warna);
     }
@@ -150,7 +163,7 @@ public class StepOneFragmet extends Fragment {
 
         @Override
         protected List<CarMaster> doInBackground(Void... voids) {
-            return CarDao.getInstance(new ValetDbHelper(getContext())).fetchAllCars();
+            return CarDao.getInstance(dbHelper).fetchAllCars();
         }
 
         @Override
@@ -161,7 +174,7 @@ public class StepOneFragmet extends Fragment {
                     @Override
                     public void onClick(View view) {
                         DialogPlus dialogPlus  = DialogPlus.newDialog(getContext())
-                                .setContentHolder(new ListHolder())
+                                .setContentHolder(new GridHolder(3))
                                 .setAdapter(adapter)
                                 .setOnItemClickListener(new OnItemClickListener() {
                                     @Override
@@ -172,7 +185,8 @@ public class StepOneFragmet extends Fragment {
                                         dialog.dismiss();
                                     }
                                 })
-                                .setExpanded(true)
+                                .setGravity(Gravity.CENTER)
+                                .setExpanded(false)
                                 .create();
                         dialogPlus.show();
                     }
@@ -185,7 +199,7 @@ public class StepOneFragmet extends Fragment {
 
         @Override
         protected List<ColorMaster> doInBackground(Void... voids) {
-            return ColorDao.getInstance(new ValetDbHelper(getContext())).fetchColors();
+            return ColorDao.getInstance(dbHelper).fetchColors();
         }
 
         @Override
@@ -196,7 +210,7 @@ public class StepOneFragmet extends Fragment {
                     @Override
                     public void onClick(View view) {
                         DialogPlus dialogPlus  = DialogPlus.newDialog(getContext())
-                                .setContentHolder(new ListHolder())
+                                .setContentHolder(new GridHolder(3))
                                 .setAdapter(adapter)
                                 .setOnItemClickListener(new OnItemClickListener() {
                                     @Override
@@ -207,7 +221,8 @@ public class StepOneFragmet extends Fragment {
                                         dialog.dismiss();
                                     }
                                 })
-                                .setExpanded(true)
+                                .setGravity(Gravity.CENTER)
+                                .setExpanded(false)
                                 .create();
                         dialogPlus.show();
                     }
@@ -216,4 +231,45 @@ public class StepOneFragmet extends Fragment {
         }
     }
 
+    private class FetchDropPointTask extends AsyncTask<Void, Void, List<DropPointMaster>> {
+
+        @Override
+        protected List<DropPointMaster> doInBackground(Void... voids) {
+            return DropDao.getInstance(dbHelper).fetchAllDropPoints();
+        }
+
+        @Override
+        protected void onPostExecute(List<DropPointMaster> dropPointMasters) {
+            if (!dropPointMasters.isEmpty()){
+                final DropPointAdapter adapter = new DropPointAdapter(getContext(), dropPointMasters);
+                btnDropPoint.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        DialogPlus dialogPlus  = DialogPlus.newDialog(getContext())
+                                .setContentHolder(new GridHolder(2))
+                                .setAdapter(adapter)
+                                .setOnItemClickListener(new OnItemClickListener() {
+                                    @Override
+                                    public void onItemClick(DialogPlus dialog, Object item, View view, int position) {
+                                        DropPointMaster dropPoint = (DropPointMaster) item;
+                                        inputDropPoint.setText(dropPoint.getAttrib().getDropName());
+                                        ReviewFragment.reviewFragment.setDropPoint(dropPoint);
+                                        dialog.dismiss();
+                                    }
+                                })
+                                .setGravity(Gravity.CENTER)
+                                .setExpanded(false)
+                                .create();
+                        dialogPlus.show();
+                    }
+                });
+            }
+        }
+    }
+
+    private void initData() {
+        new FetchCarsTask().execute();
+        new FetchColorsTask().execute();
+        new FetchDropPointTask().execute();
+    }
 }

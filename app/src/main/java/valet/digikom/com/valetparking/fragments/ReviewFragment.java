@@ -21,6 +21,7 @@ import valet.digikom.com.valetparking.domain.CarMaster;
 import valet.digikom.com.valetparking.domain.Checkin;
 import valet.digikom.com.valetparking.domain.ColorMaster;
 import valet.digikom.com.valetparking.domain.DefectMaster;
+import valet.digikom.com.valetparking.domain.DropPointMaster;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -52,6 +53,7 @@ public class ReviewFragment extends Fragment {
     private List<AdditionalItems> itemsList;
     private CarMaster carMaster;
     private ColorMaster colorMaster;
+    private DropPointMaster dropPoint;
 
     public ReviewFragment() {
         // Required empty public constructor
@@ -208,5 +210,13 @@ public class ReviewFragment extends Fragment {
 
     public void setItemsList(List<AdditionalItems> itemsList) {
         this.itemsList = itemsList;
+    }
+
+    public DropPointMaster getDropPoint() {
+        return dropPoint;
+    }
+
+    public void setDropPoint(DropPointMaster dropPoint) {
+        this.dropPoint = dropPoint;
     }
 }

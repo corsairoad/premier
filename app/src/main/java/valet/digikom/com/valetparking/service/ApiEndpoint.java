@@ -9,6 +9,7 @@ import valet.digikom.com.valetparking.domain.AdditionalItemsResponse;
 import valet.digikom.com.valetparking.domain.CarMasterResponse;
 import valet.digikom.com.valetparking.domain.ColorMasterResponse;
 import valet.digikom.com.valetparking.domain.DefectResponse;
+import valet.digikom.com.valetparking.domain.DropPointMasterResponse;
 import valet.digikom.com.valetparking.domain.TokenResponse;
 
 /**
@@ -32,4 +33,7 @@ public interface ApiEndpoint {
 
     @GET("color_master")
     Call<ColorMasterResponse> getColors();
+
+    @GET("droppoint_floor_master")
+    Call<DropPointMasterResponse> getDropPoints();
 }

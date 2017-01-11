@@ -11,35 +11,35 @@ import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import valet.digikom.com.valetparking.R;
-import valet.digikom.com.valetparking.domain.CarMaster;
+import valet.digikom.com.valetparking.domain.DropPointMaster;
 
 /**
- * Created by DIGIKOM-EX4 on 12/23/2016.
+ * Created by DIGIKOM-EX4 on 1/11/2017.
  */
 
-public class CarTypeAdapter extends BaseAdapter {
+public class DropPointAdapter extends BaseAdapter {
 
     private Context context;
-    private List<CarMaster> carMasterList;
+    private List<DropPointMaster> dropPointList;
 
-    public CarTypeAdapter(Context context, List<CarMaster> carMasterList) {
+    public DropPointAdapter(Context context, List<DropPointMaster> dropPointList) {
         this.context = context;
-        this.carMasterList = carMasterList;
+        this.dropPointList = dropPointList;
     }
 
     @Override
     public int getCount() {
-        return carMasterList.size();
+        return dropPointList.size();
     }
 
     @Override
     public Object getItem(int i) {
-        return carMasterList.get(i);
+        return dropPointList.get(i);
     }
 
     @Override
     public long getItemId(int i) {
-        return carMasterList.get(i).getId();
+        return dropPointList.get(i).getAttrib().getDropId();
     }
 
     @Override
@@ -47,10 +47,12 @@ public class CarTypeAdapter extends BaseAdapter {
         if(view == null) {
             view = LayoutInflater.from(context).inflate(R.layout.layout_item_cartype,viewGroup, false);
         }
+
         CircleImageView circleImageView = (CircleImageView) view.findViewById(R.id.circle_image);
         circleImageView.setVisibility(View.GONE);
         TextView textView = (TextView) view.findViewById(R.id.text_cartype);
-        textView.setText(carMasterList.get(i).getAttrib().getCarName());
+        DropPointMaster dropPoint = (DropPointMaster) getItem(i);
+        textView.setText(dropPoint.getAttrib().getDropName());
 
         return view;
     }
