@@ -4,13 +4,16 @@ package valet.digikom.com.valetparking.fragments;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.github.gcacace.signaturepad.views.SignaturePad;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +25,8 @@ import valet.digikom.com.valetparking.domain.Checkin;
 import valet.digikom.com.valetparking.domain.ColorMaster;
 import valet.digikom.com.valetparking.domain.DefectMaster;
 import valet.digikom.com.valetparking.domain.DropPointMaster;
+import valet.digikom.com.valetparking.domain.EntryCheckin;
+import valet.digikom.com.valetparking.domain.EntryCheckinContainer;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -47,13 +52,16 @@ public class ReviewFragment extends Fragment {
     private TextView textEmail;
     private TextView textDefects;
     private TextView textStuffs;
+    private ImageView imgDefect;
     public static ReviewFragment reviewFragment;
-
+    private Button btnTestJson;
     private List<DefectMaster> defectMasterList;
     private List<AdditionalItems> itemsList;
     private CarMaster carMaster;
     private ColorMaster colorMaster;
     private DropPointMaster dropPoint;
+    private Bitmap bitmapDefect;
+
 
     public ReviewFragment() {
         // Required empty public constructor
@@ -97,6 +105,7 @@ public class ReviewFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_review, container, false);
+
         textDropPoint = (TextView) view.findViewById(R.id.text_drop_point);
         textPlatNo = (TextView) view.findViewById(R.id.text_plat_no);
         textJenisMobil = (TextView) view.findViewById(R.id.text_cartype);
@@ -104,6 +113,7 @@ public class ReviewFragment extends Fragment {
         textEmail = (TextView) view.findViewById(R.id.text_email);
         textDefects = (TextView) view.findViewById(R.id.text_defect);
         textStuffs = (TextView) view.findViewById(R.id.text_stuff);
+        imgDefect = (ImageView) view.findViewById(R.id.img_defecs_review);
         init();
         btnResetSign = (Button) view.findViewById(R.id.btn_reset_sign);
         signPad = (SignaturePad) view.findViewById(R.id.signature_pad);
@@ -115,6 +125,21 @@ public class ReviewFragment extends Fragment {
             }
         });
 
+        btnTestJson = (Button) view.findViewById(R.id.test_json);
+        btnTestJson.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                EntryCheckin.Builder builder = new EntryCheckin.Builder();
+                builder.setAttribute(dropPoint,textPlatNo.getText().toString(), carMaster, colorMaster,textEmail.getText().toString(),bitmapDefect, signPad.getSignatureBitmap());
+                builder.setRelationShip(getDefectMasterList(), getItemsList());
+                EntryCheckin entryCheckin = builder.build();
+                EntryCheckinContainer entryCheckinContainer = new EntryCheckinContainer();
+                entryCheckinContainer.setEntryCheckin(entryCheckin);
+                Gson gson = new Gson();
+                String jsonEntryCheckin = gson.toJson(entryCheckinContainer);
+                Log.d("JSON CHECKIN", jsonEntryCheckin);
+            }
+        });
         return view;
     }
 
@@ -218,5 +243,14 @@ public class ReviewFragment extends Fragment {
 
     public void setDropPoint(DropPointMaster dropPoint) {
         this.dropPoint = dropPoint;
+    }
+
+    public void setImageDefect(Bitmap bitmap) {
+        bitmapDefect = bitmap;
+        imgDefect.setImageBitmap(bitmap);
+    }
+
+    public void clearImageDefect() {
+
     }
 }

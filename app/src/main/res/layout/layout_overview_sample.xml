@@ -1,14 +1,11 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:paddingTop="@dimen/activity_horizontal_margin">
+    android:orientation="vertical">
 
     <android.support.v7.widget.CardView
         android:layout_gravity="center"
-        android:paddingTop="@dimen/activity_horizontal_margin"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:cardCornerRadius="4dp">
@@ -16,7 +13,6 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingTop="@dimen/activity_horizontal_margin"
             android:paddingLeft="@dimen/activity_horizontal_margin"
             android:paddingRight="@dimen/activity_horizontal_margin"
             android:paddingBottom="@dimen/activity_horizontal_margin"
@@ -29,6 +25,11 @@
                 android:paddingTop="@dimen/activity_horizontal_margin"
                 android:paddingBottom="@dimen/activity_horizontal_margin"
                 android:orientation="horizontal">
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:layout_width="45dp"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/droppoint"/>
 
                 <TextView
                     android:layout_width="0dp"
@@ -43,7 +44,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:textColor="@android:color/black"
-                    android:textSize="14sp"
+                    android:textSize="17sp"
                     android:layout_weight="1"/>
 
             </LinearLayout>
@@ -54,6 +55,12 @@
                 android:paddingTop="@dimen/activity_horizontal_margin"
                 android:paddingBottom="@dimen/activity_horizontal_margin"
                 android:orientation="horizontal">
+
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:layout_width="45dp"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/license_plate"/>
 
                 <TextView
                     android:layout_width="0dp"
@@ -68,7 +75,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:textColor="@android:color/black"
-                    android:textSize="14sp"
+                    android:textSize="17sp"
                     android:layout_weight="1"/>
 
             </LinearLayout>
@@ -79,6 +86,12 @@
                 android:paddingTop="@dimen/activity_horizontal_margin"
                 android:paddingBottom="@dimen/activity_horizontal_margin"
                 android:orientation="horizontal">
+
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:layout_width="45dp"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/car"/>
 
                 <TextView
                     android:layout_width="0dp"
@@ -93,7 +106,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:textColor="@android:color/black"
-                    android:textSize="14sp"
+                    android:textSize="17sp"
                     android:layout_weight="1"/>
 
             </LinearLayout>
@@ -104,6 +117,12 @@
                 android:paddingTop="@dimen/activity_horizontal_margin"
                 android:paddingBottom="@dimen/activity_horizontal_margin"
                 android:orientation="horizontal">
+
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:layout_width="45dp"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/color_icon"/>
 
                 <TextView
                     android:layout_width="0dp"
@@ -118,7 +137,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:textColor="@android:color/black"
-                    android:textSize="14sp"
+                    android:textSize="17sp"
                     android:layout_weight="1"/>
 
             </LinearLayout>
@@ -129,6 +148,12 @@
                 android:paddingTop="@dimen/activity_horizontal_margin"
                 android:paddingBottom="@dimen/activity_horizontal_margin"
                 android:orientation="horizontal">
+
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:layout_width="45dp"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/mail"/>
 
                 <TextView
                     android:layout_width="0dp"
@@ -143,7 +168,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:textColor="@android:color/black"
-                    android:textSize="14sp"
+                    android:textSize="17sp"
                     android:layout_weight="1"/>
 
             </LinearLayout>
@@ -153,10 +178,66 @@
 
     </android.support.v7.widget.CardView>
 
+
+    <android.support.v7.widget.CardView
+        android:layout_marginTop="@dimen/activity_horizontal_margin"
+        android:layout_gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="4dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="@dimen/activity_horizontal_margin"
+            android:paddingLeft="@dimen/activity_horizontal_margin"
+            android:paddingRight="@dimen/activity_horizontal_margin"
+            android:paddingBottom="@dimen/activity_horizontal_margin"
+            android:orientation="vertical">
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingTop="@dimen/activity_horizontal_margin"
+                android:paddingBottom="@dimen/activity_horizontal_margin"
+                android:orientation="horizontal">
+
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:layout_width="45dp"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/stuff"/>
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:text="@string/stuff"
+                    android:layout_height="match_parent"
+                    android:gravity="center|start"
+                    android:textColor="@android:color/black"
+                    android:textSize="14sp"
+                    android:layout_weight="1"/>
+
+                <TextView
+                    android:id="@+id/text_stuff"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:textColor="@android:color/black"
+                    android:textSize="17sp"
+                    android:layout_weight="1"/>
+
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+    </android.support.v7.widget.CardView>
+
     <android.support.v7.widget.CardView
         android:layout_gravity="center"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/activity_horizontal_margin"
         android:paddingTop="@dimen/activity_horizontal_margin"
         app:cardCornerRadius="4dp">
 
@@ -176,10 +257,17 @@
                 android:paddingBottom="@dimen/activity_horizontal_margin"
                 android:orientation="horizontal">
 
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:layout_width="45dp"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/defect_car"/>
+
                 <TextView
                     android:layout_width="0dp"
                     android:text="@string/defects"
-                    android:layout_height="wrap_content"
+                    android:paddingLeft="@dimen/activity_vertical_margin"
+                    android:layout_height="match_parent"
+                    android:gravity="center|start"
                     android:textColor="@android:color/black"
                     android:textSize="14sp"
                     android:layout_weight="1"/>
@@ -190,7 +278,13 @@
                     android:layout_height="wrap_content"
                     android:textColor="@android:color/black"
                     android:textSize="14sp"
+                    android:visibility="gone"
                     android:layout_weight="1"/>
+
+                <ImageView
+                    android:id="@+id/img_defecs_review"
+                    android:layout_width="350dp"
+                    android:layout_height="120dp" />
 
             </LinearLayout>
 
@@ -198,53 +292,5 @@
         </LinearLayout>
 
     </android.support.v7.widget.CardView>
-
-    <android.support.v7.widget.CardView
-        android:paddingTop="@dimen/activity_horizontal_margin"
-        android:layout_gravity="center"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:cardCornerRadius="4dp">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingTop="@dimen/activity_horizontal_margin"
-            android:paddingLeft="@dimen/activity_horizontal_margin"
-            android:paddingRight="@dimen/activity_horizontal_margin"
-            android:paddingBottom="@dimen/activity_horizontal_margin"
-            android:orientation="vertical">
-
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:paddingTop="@dimen/activity_horizontal_margin"
-                android:paddingBottom="@dimen/activity_horizontal_margin"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:text="@string/stuff"
-                    android:layout_height="wrap_content"
-                    android:textColor="@android:color/black"
-                    android:textSize="14sp"
-                    android:layout_weight="1"/>
-
-                <TextView
-                    android:id="@+id/text_stuff"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:textColor="@android:color/black"
-                    android:textSize="14sp"
-                    android:layout_weight="1"/>
-
-            </LinearLayout>
-
-
-        </LinearLayout>
-
-    </android.support.v7.widget.CardView>
-
 
 </LinearLayout>

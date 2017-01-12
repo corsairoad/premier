@@ -30,14 +30,13 @@
                 app:ci_margin="6dp"
                 app:ci_width="10dp"/>
 
-            <android.support.v4.view.ViewPager
+            <valet.digikom.com.valetparking.util.CustomViewPager
                 android:id="@+id/pager"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
                 android:visibility="visible">
-
-            </android.support.v4.view.ViewPager>
+            </valet.digikom.com.valetparking.util.CustomViewPager>
 
             <include
                 android:layout_width="match_parent"

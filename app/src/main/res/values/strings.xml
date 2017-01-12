@@ -54,13 +54,13 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Registration</string>
     <string name="drop_point">Drop Point</string>
-    <string name="plat_no">Plat no.</string>
-    <string name="car_type">Jenis mobil</string>
-    <string name="color">Warna mobil</string>
-    <string name="merk_mobil">Merk mobil</string>
+    <string name="plat_no">License Plate</string>
+    <string name="car_type">Car Type</string>
+    <string name="color">Color</string>
+    <string name="merk_mobil">Car Brand</string>
     <string name="checkin">Checkin</string>
     <string name="defects">Defects</string>
-    <string name="stuff">Stuff</string>
+    <string name="stuff">Stuffs</string>
     <string name="additional_info">Additional stuff</string>
     <string name="sign">Please sign below..</string>
     <string name="reset_signature">Clear</string>

@@ -19,16 +19,19 @@ import valet.digikom.com.valetparking.dao.CheckinDao;
 import valet.digikom.com.valetparking.domain.AdditionalItems;
 import valet.digikom.com.valetparking.domain.Checkin;
 import valet.digikom.com.valetparking.domain.DefectMaster;
+import valet.digikom.com.valetparking.fragments.DefectFragment;
 import valet.digikom.com.valetparking.fragments.ReviewFragment;
 import valet.digikom.com.valetparking.fragments.StepOneFragmet;
 import valet.digikom.com.valetparking.fragments.StepThreeFragment;
 import valet.digikom.com.valetparking.fragments.StepTwoFragment;
+import valet.digikom.com.valetparking.util.CustomViewPager;
 import valet.digikom.com.valetparking.util.ValetDbHelper;
 
 public class AddCarActivity extends ActionBarActivity implements StepOneFragmet.OnRegsitrationValid, StepTwoFragment.OnDefectSelectedListener,
-                StepThreeFragment.OnStuffSelectedListener{
+                StepThreeFragment.OnStuffSelectedListener, DefectFragment.OnDefectDrawingListener{
 
-    private ViewPager mPager;
+    //private ViewPager mPager;
+    CustomViewPager mPager;
     private Button mNextButton;
     private Button mPrevButton;
     CircleIndicator indicator;
@@ -47,11 +50,12 @@ public class AddCarActivity extends ActionBarActivity implements StepOneFragmet.
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayout);
-        mPager = (ViewPager) findViewById(R.id.pager);
+        mPager = (CustomViewPager) findViewById(R.id.pager);
         mPager.setOffscreenPageLimit(4);
         checkinAdapter = new PagerCheckinAdapter(getSupportFragmentManager());
         checkinAdapter.addFragment(StepOneFragmet.newInstance(null, null), "" );
-        checkinAdapter.addFragment(StepTwoFragment.newInstance(null, null), "");
+        //checkinAdapter.addFragment(StepTwoFragment.newInstance(null, null), "");
+        checkinAdapter.addFragment(DefectFragment.newInstance(null,null),"");
         checkinAdapter.addFragment(StepThreeFragment.newInstance(null, null), "");
         checkinAdapter.addFragment(valet.digikom.com.valetparking.fragments.ReviewFragment.newInstance(null, null, checkin), "");
         mPager.setAdapter(checkinAdapter);
@@ -190,5 +194,11 @@ public class AddCarActivity extends ActionBarActivity implements StepOneFragmet.
     public void onStuffUnselected(String stuff, AdditionalItems items) {
         ReviewFragment reviewFragment = ReviewFragment.reviewFragment;
         reviewFragment.onUnselectStuff(stuff, items);
+    }
+
+
+    @Override
+    public void onDefectDrawing(boolean isPagingEnabled) {
+        mPager.setPagingEnabled(isPagingEnabled);
     }
 }

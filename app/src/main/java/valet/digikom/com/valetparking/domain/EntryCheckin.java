@@ -1,8 +1,13 @@
 package valet.digikom.com.valetparking.domain;
 
+import android.graphics.Bitmap;
+
 import com.google.gson.annotations.SerializedName;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import valet.digikom.com.valetparking.util.BitmapToString;
 
 /**
  * Created by DIGIKOM-EX4 on 1/11/2017.
@@ -11,15 +16,31 @@ import java.util.List;
 public class EntryCheckin {
 
     @SerializedName("type")
-    private static final String type = "valet_header_transaction";
+    private String type = "ad_entry_checkin";
     @SerializedName("attributes")
     private EntryCheckin.Attrib attrib;
+    @SerializedName("relationships")
+    private RelationShip relationShip;
 
-    public EntryCheckin() {
+    public EntryCheckin (EntryCheckin.Builder builder) {
+        attrib = builder.attrib;
+        relationShip = builder.relationShip;
     }
 
-    public static String getType() {
+    public RelationShip getRelationShip() {
+        return relationShip;
+    }
+
+    public void setRelationShip(RelationShip relationShip) {
+        this.relationShip = relationShip;
+    }
+
+    public String getType() {
         return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 
     public Attrib getAttrib() {
@@ -43,6 +64,8 @@ public class EntryCheckin {
         private String emailCustomer;
         @SerializedName("vthdCumsParaf")
         private String paraf;
+        @SerializedName("vthdDefectsBlob")
+        private String defect;
 
         public Attrib() {
         }
@@ -94,6 +117,14 @@ public class EntryCheckin {
         public void setParaf(String paraf) {
             this.paraf = paraf;
         }
+
+        public String getDefect() {
+            return defect;
+        }
+
+        public void setDefect(String defect) {
+            this.defect = defect;
+        }
     }
 
     public static class RelationShip {
@@ -140,15 +171,19 @@ public class EntryCheckin {
 
             public static class DefectItem {
                 @SerializedName("type")
-                private static final String type = "valet_defect_detail_transaction";
+                private String type = "valet_defect_detail_transaction";
                 @SerializedName("attributes")
                 private AttrDefect attrDefect;
 
                 public DefectItem() {
                 }
 
-                public static String getType() {
+                public  String getType() {
                     return type;
+                }
+
+                public void setType(String type) {
+                    this.type = type;
                 }
 
                 public AttrDefect getAttrDefect() {
@@ -196,9 +231,26 @@ public class EntryCheckin {
             public static class Item {
 
                 @SerializedName("type")
-                private static final String type = "valet_additional_item_detail_transaction";
+                private String type = "valet_additional_item_detail_transaction";
                 @SerializedName("attributes")
                 private AttribItem attribItem;
+
+
+                public String getType() {
+                    return type;
+                }
+
+                public void setType(String type) {
+                    this.type = type;
+                }
+
+                public AttribItem getAttribItem() {
+                    return attribItem;
+                }
+
+                public void setAttribItem(AttribItem attribItem) {
+                    this.attribItem = attribItem;
+                }
 
                 public static class AttribItem {
                     @SerializedName("vidtAidtId")
@@ -219,6 +271,66 @@ public class EntryCheckin {
 
         }
 
+    }
+
+    public static class Builder{
+
+        private Attrib attrib;
+        private RelationShip relationShip;
+
+        public Builder() {
+        }
+
+        public Builder setAttribute(DropPointMaster dropPointMaster, String platNo, CarMaster carMaster, ColorMaster colorMaster, String email, Bitmap bmpDefects, Bitmap bmpSignature) {
+            attrib = new Attrib();
+            attrib.setDropMasterId(String.valueOf(dropPointMaster.getAttrib().getDropId()));
+            attrib.setPlatNo(platNo);
+            attrib.setCarType(String.valueOf(carMaster.getAttrib().getId_attrib()));
+            attrib.setColorId(String.valueOf(colorMaster.getAttrib().getId_color()));
+            attrib.setEmailCustomer(email);
+            attrib.setDefect(BitmapToString.create(bmpDefects));
+            attrib.setParaf(BitmapToString.create(bmpSignature));
+
+            return this;
+        }
+
+        public Builder setRelationShip(List<DefectMaster> defectMasterList, List<AdditionalItems> itemsList){
+            relationShip = new RelationShip();
+
+            RelationShip.DefectDetail defectDetail = new RelationShip.DefectDetail();
+            List<RelationShip.DefectDetail.DefectItem> defectItems = new ArrayList<>();
+            for (DefectMaster dm : defectMasterList) {
+                RelationShip.DefectDetail.DefectItem defectItem = new RelationShip.DefectDetail.DefectItem();
+                RelationShip.DefectDetail.DefectItem.AttrDefect attrDefect = new RelationShip.DefectDetail.DefectItem.AttrDefect();
+                attrDefect.setIdDefect(String.valueOf(dm.getAttributes().getId()));
+                defectItem.setAttrDefect(attrDefect);
+
+                defectItems.add(defectItem);
+            }
+            defectDetail.setData(defectItems);
+
+
+            RelationShip.ItemDetail itemDetail = new RelationShip.ItemDetail();
+            List<RelationShip.ItemDetail.Item> items = new ArrayList<>();
+
+            for (AdditionalItems i : itemsList) {
+                RelationShip.ItemDetail.Item item = new RelationShip.ItemDetail.Item();
+                RelationShip.ItemDetail.Item.AttribItem attribItem = new RelationShip.ItemDetail.Item.AttribItem();
+                attribItem.setItemId(String.valueOf(i.getAttributes().getAdditionalItemMaster().getId()));
+                item.setAttribItem(attribItem);
+
+                items.add(item);
+            }
+            itemDetail.setListItem(items);
+
+            relationShip.setDefectDetail(defectDetail);
+            relationShip.setItemDetail(itemDetail);
+            return this;
+        }
+
+        public EntryCheckin build() {
+            return new EntryCheckin(this);
+        }
     }
 
 
