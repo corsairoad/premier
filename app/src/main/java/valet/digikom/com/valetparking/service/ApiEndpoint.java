@@ -1,6 +1,7 @@
 package valet.digikom.com.valetparking.service;
 
 import retrofit2.Call;
+import retrofit2.http.Body;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
@@ -10,6 +11,8 @@ import valet.digikom.com.valetparking.domain.CarMasterResponse;
 import valet.digikom.com.valetparking.domain.ColorMasterResponse;
 import valet.digikom.com.valetparking.domain.DefectResponse;
 import valet.digikom.com.valetparking.domain.DropPointMasterResponse;
+import valet.digikom.com.valetparking.domain.EntryCheckinContainer;
+import valet.digikom.com.valetparking.domain.EntryCheckinResponse;
 import valet.digikom.com.valetparking.domain.TokenResponse;
 
 /**
@@ -36,4 +39,7 @@ public interface ApiEndpoint {
 
     @GET("droppoint_floor_master")
     Call<DropPointMasterResponse> getDropPoints();
+
+    @POST("ad_entry_checkin")
+    Call<EntryCheckinResponse> postCheckin(@Body EntryCheckinContainer checkinContainer);
 }

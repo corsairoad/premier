@@ -11,112 +11,51 @@
     android:focusableInTouchMode="true"
     tools:context="valet.digikom.com.valetparking.fragments.StepOneFragmet">
 
-    <LinearLayout
-        android:id="@+id/defect_container"
+    <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
-
-        <!-- TODO: Update blank fragment layout -->
-        <TextView
-            android:id="@+id/title_step_one"
-            android:textSize="30sp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/hello_blank_fragment"
-            android:paddingBottom="32dp"/>
+        android:layout_height="wrap_content">
 
         <LinearLayout
+            android:id="@+id/defect_container"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginBottom="16dp">
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:src="@drawable/ic_pin_drop_black_24dp" />
-
-            <android.support.design.widget.TextInputLayout
-                android:layout_width="0dp"
-                android:layout_weight="10"
-                android:layout_height="wrap_content">
-
-                <EditText
-                    android:id="@+id/input_drop_point"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/drop_point"/>
-
-            </android.support.design.widget.TextInputLayout>
-
-            <ImageButton
-                android:id="@+id/btn_drop"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="match_parent"
-                android:background="@drawable/addcar_button_bg"
-                android:src="@drawable/ic_arrow_drop_down_black_24dp"/>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginBottom="16dp">
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:src="@drawable/ic_filter_1_black_24dp"
-                android:id="@+id/imageView2" />
-
-            <android.support.design.widget.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-                <EditText
-                    android:id="@+id/input_plat_no"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/plat_no"/>
-
-            </android.support.design.widget.TextInputLayout>
-
-        </LinearLayout>
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="14dp">
-
-            <LinearLayout
-                android:id="@+id/container_car"
+            <!-- TODO: Update blank fragment layout -->
+            <TextView
+                android:id="@+id/title_step_one"
+                android:textSize="30sp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:text="@string/hello_blank_fragment"
+                android:paddingBottom="32dp"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="16dp">
 
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:src="@drawable/ic_directions_car_black_24dp" />
+                    android:src="@drawable/ic_pin_drop_black_24dp" />
 
                 <android.support.design.widget.TextInputLayout
                     android:layout_width="0dp"
                     android:layout_weight="10"
-                    android:layout_height="match_parent">
+                    android:layout_height="wrap_content">
 
                     <EditText
-                        android:id="@+id/input_car_type"
+                        android:id="@+id/input_drop_point"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:hint="@string/car_type"/>
+                        android:layout_height="wrap_content"
+                        android:hint="@string/drop_point"/>
 
                 </android.support.design.widget.TextInputLayout>
 
                 <ImageButton
-                    android:id="@+id/btn_dropdown_cartype"
+                    android:id="@+id/btn_drop"
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:layout_height="match_parent"
@@ -129,94 +68,160 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_below="@id/container_car">
+                android:layout_marginBottom="16dp">
 
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:visibility="invisible"
                     android:src="@drawable/ic_filter_1_black_24dp"
-                    />
+                    android:id="@+id/imageView2" />
 
                 <android.support.design.widget.TextInputLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="match_parent">
 
                     <EditText
-                        android:id="@+id/input_merk_mobil"
+                        android:id="@+id/input_plat_no"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="@string/merk_mobil" />
+                        android:hint="@string/plat_no"/>
 
                 </android.support.design.widget.TextInputLayout>
 
             </LinearLayout>
 
-        </RelativeLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginBottom="16dp">
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:src="@drawable/ic_email_black_24dp" />
-
-            <android.support.design.widget.TextInputLayout
+            <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="14dp">
 
-                <EditText
-                    android:id="@+id/input_email"
+                <LinearLayout
+                    android:id="@+id/container_car"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="textEmailAddress"
-                    android:hint="@string/email"/>
+                    android:orientation="horizontal">
 
-            </android.support.design.widget.TextInputLayout>
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:src="@drawable/ic_directions_car_black_24dp" />
+
+                    <android.support.design.widget.TextInputLayout
+                        android:layout_width="0dp"
+                        android:layout_weight="10"
+                        android:layout_height="match_parent">
+
+                        <EditText
+                            android:id="@+id/input_car_type"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:hint="@string/car_type"/>
+
+                    </android.support.design.widget.TextInputLayout>
+
+                    <ImageButton
+                        android:id="@+id/btn_dropdown_cartype"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/addcar_button_bg"
+                        android:src="@drawable/ic_arrow_drop_down_black_24dp"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_below="@id/container_car">
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:visibility="invisible"
+                        android:src="@drawable/ic_filter_1_black_24dp"
+                        />
+
+                    <android.support.design.widget.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <EditText
+                            android:id="@+id/input_merk_mobil"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="@string/merk_mobil" />
+
+                    </android.support.design.widget.TextInputLayout>
+
+                </LinearLayout>
+
+            </RelativeLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="16dp">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/ic_email_black_24dp" />
+
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <EditText
+                        android:id="@+id/input_email"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textEmailAddress"
+                        android:hint="@string/email"/>
+
+                </android.support.design.widget.TextInputLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="16dp">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/ic_format_color_fill_black_24dp" />
+
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="0dp"
+                    android:layout_weight="10"
+                    android:layout_height="match_parent">
+
+                    <EditText
+                        android:id="@+id/input_color"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/color"/>
+
+                </android.support.design.widget.TextInputLayout>
+
+                <ImageButton
+                    android:id="@+id/btn_dropdown_color"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/addcar_button_bg"
+                    android:src="@drawable/ic_arrow_drop_down_black_24dp"/>
+
+            </LinearLayout>
+
 
         </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginBottom="16dp">
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:src="@drawable/ic_format_color_fill_black_24dp" />
-
-            <android.support.design.widget.TextInputLayout
-                android:layout_width="0dp"
-                android:layout_weight="10"
-                android:layout_height="match_parent">
-
-                <EditText
-                    android:id="@+id/input_color"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/color"/>
-
-            </android.support.design.widget.TextInputLayout>
-
-            <ImageButton
-                android:id="@+id/btn_dropdown_color"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="match_parent"
-                android:background="@drawable/addcar_button_bg"
-                android:src="@drawable/ic_arrow_drop_down_black_24dp"/>
-
-        </LinearLayout>
-
-
-    </LinearLayout>
-
+    </android.support.v4.widget.NestedScrollView>
 
 
 </LinearLayout>

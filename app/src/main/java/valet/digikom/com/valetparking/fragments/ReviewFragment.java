@@ -61,6 +61,7 @@ public class ReviewFragment extends Fragment {
     private ColorMaster colorMaster;
     private DropPointMaster dropPoint;
     private Bitmap bitmapDefect;
+    private EntryCheckinContainer entryCheckinContainer;
 
 
     public ReviewFragment() {
@@ -92,6 +93,16 @@ public class ReviewFragment extends Fragment {
         reviewFragment = this;
 
         defectMasterList = new ArrayList<>();
+        DefectMaster defectMaster = new DefectMaster();
+        DefectMaster.DefectAttributes attributes = new DefectMaster.DefectAttributes();
+        attributes.setId(1);
+        attributes.setDefectDesc("no defects");
+        attributes.setHref("");
+        attributes.setDefectName("no defects");
+        defectMaster.setId(0);
+        defectMaster.setAttributes(attributes);
+        defectMasterList.add(defectMaster);
+
         itemsList = new ArrayList<>();
 
         if (getArguments() != null) {
@@ -129,15 +140,7 @@ public class ReviewFragment extends Fragment {
         btnTestJson.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                EntryCheckin.Builder builder = new EntryCheckin.Builder();
-                builder.setAttribute(dropPoint,textPlatNo.getText().toString(), carMaster, colorMaster,textEmail.getText().toString(),bitmapDefect, signPad.getSignatureBitmap());
-                builder.setRelationShip(getDefectMasterList(), getItemsList());
-                EntryCheckin entryCheckin = builder.build();
-                EntryCheckinContainer entryCheckinContainer = new EntryCheckinContainer();
-                entryCheckinContainer.setEntryCheckin(entryCheckin);
-                Gson gson = new Gson();
-                String jsonEntryCheckin = gson.toJson(entryCheckinContainer);
-                Log.d("JSON CHECKIN", jsonEntryCheckin);
+               buildCheckinEntry();
             }
         });
         return view;
@@ -252,5 +255,24 @@ public class ReviewFragment extends Fragment {
 
     public void clearImageDefect() {
 
+    }
+
+    public EntryCheckinContainer getEntryCheckinContainer() {
+        return buildCheckinEntry();
+    }
+
+
+
+    private EntryCheckinContainer buildCheckinEntry() {
+        EntryCheckin.Builder builder = new EntryCheckin.Builder();
+        builder.setAttribute(dropPoint,textPlatNo.getText().toString(), carMaster, colorMaster,textEmail.getText().toString(),bitmapDefect, signPad.getSignatureBitmap());
+        builder.setRelationShip(getDefectMasterList(), getItemsList());
+        EntryCheckin entryCheckin = builder.build();
+        entryCheckinContainer = new EntryCheckinContainer();
+        entryCheckinContainer.setEntryCheckin(entryCheckin);
+        Gson gson = new Gson();
+        String jsonEntryCheckin = gson.toJson(entryCheckinContainer);
+        Log.d("JSON CHECKIN", jsonEntryCheckin);
+        return entryCheckinContainer;
     }
 }

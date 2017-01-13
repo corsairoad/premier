@@ -115,7 +115,7 @@ public class EntryCheckin {
         }
 
         public void setParaf(String paraf) {
-            this.paraf = paraf;
+            this.paraf = "paraf";
         }
 
         public String getDefect() {
@@ -123,7 +123,7 @@ public class EntryCheckin {
         }
 
         public void setDefect(String defect) {
-            this.defect = defect;
+            this.defect = "defect";
         }
     }
 

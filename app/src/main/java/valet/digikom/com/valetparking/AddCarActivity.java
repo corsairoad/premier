@@ -9,21 +9,31 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
 import me.relex.circleindicator.CircleIndicator;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import valet.digikom.com.valetparking.adapter.PagerCheckinAdapter;
 import valet.digikom.com.valetparking.dao.CheckinDao;
+import valet.digikom.com.valetparking.dao.TokenDao;
 import valet.digikom.com.valetparking.domain.AdditionalItems;
 import valet.digikom.com.valetparking.domain.Checkin;
 import valet.digikom.com.valetparking.domain.DefectMaster;
+import valet.digikom.com.valetparking.domain.EntryCheckinContainer;
+import valet.digikom.com.valetparking.domain.EntryCheckinResponse;
 import valet.digikom.com.valetparking.fragments.DefectFragment;
 import valet.digikom.com.valetparking.fragments.ReviewFragment;
 import valet.digikom.com.valetparking.fragments.StepOneFragmet;
 import valet.digikom.com.valetparking.fragments.StepThreeFragment;
 import valet.digikom.com.valetparking.fragments.StepTwoFragment;
+import valet.digikom.com.valetparking.service.ApiClient;
+import valet.digikom.com.valetparking.service.ApiEndpoint;
+import valet.digikom.com.valetparking.service.ProcessRequest;
 import valet.digikom.com.valetparking.util.CustomViewPager;
 import valet.digikom.com.valetparking.util.ValetDbHelper;
 
@@ -102,7 +112,7 @@ public class AddCarActivity extends ActionBarActivity implements StepOneFragmet.
                 if (position == totalPages) {
                     ReviewFragment reviewFragment = ReviewFragment.reviewFragment;
                     if (reviewFragment.ispadSigned()) {
-                        submitCheckin(reviewFragment.getSignatureBmp(), reviewFragment.getCheckin());
+                        submitCheckin(reviewFragment.getSignatureBmp(), reviewFragment.getCheckin(), reviewFragment.getEntryCheckinContainer());
                     }else {
                         Snackbar sb =  Snackbar.make(coordinatorLayout,"Signature can't be empty", Snackbar.LENGTH_SHORT);
                         View v = sb.getView();
@@ -126,7 +136,29 @@ public class AddCarActivity extends ActionBarActivity implements StepOneFragmet.
         updateBottomBar();
     }
 
-    private void submitCheckin(final Bitmap bmp, final Checkin checkin) {
+    private void submitCheckin(final Bitmap bmp, final Checkin checkin, final EntryCheckinContainer checkinContainer) {
+        TokenDao.getToken(new ProcessRequest() {
+            @Override
+            public void process(String token) {
+                ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class, token);
+                Call<EntryCheckinResponse> call = apiEndpoint.postCheckin(checkinContainer);
+                call.enqueue(new Callback<EntryCheckinResponse>() {
+                    @Override
+                    public void onResponse(Call<EntryCheckinResponse> call, Response<EntryCheckinResponse> response) {
+                        if (response != null && response.body() != null) {
+                            EntryCheckinResponse res = response.body();
+                            Log.d("Post checkin success: ", res.getData().getType());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<EntryCheckinResponse> call, Throwable t) {
+                        Log.d("Post checkin error: ", t.getMessage());
+                    }
+                });
+            }
+        });
+
       new Thread(new Runnable() {
           @Override
           public void run() {

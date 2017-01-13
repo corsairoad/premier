@@ -259,6 +259,7 @@
 
                 <de.hdodenhof.circleimageview.CircleImageView
                     android:layout_width="45dp"
+                    android:visibility="gone"
                     android:layout_height="match_parent"
                     android:src="@drawable/defect_car"/>
 
