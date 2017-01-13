@@ -25,6 +25,7 @@ import valet.digikom.com.valetparking.dao.CarDao;
 import valet.digikom.com.valetparking.dao.CheckinDao;
 import valet.digikom.com.valetparking.dao.ColorDao;
 import valet.digikom.com.valetparking.dao.DefectDao;
+import valet.digikom.com.valetparking.dao.DropDao;
 import valet.digikom.com.valetparking.dao.ItemsDao;
 import valet.digikom.com.valetparking.dao.TokenDao;
 import valet.digikom.com.valetparking.domain.Checkin;
@@ -80,6 +81,7 @@ public class Main2Activity extends AppCompatActivity
         TokenDao.getToken(ItemsDao.getInstance(dbHelper));
         TokenDao.getToken(CarDao.getInstance(dbHelper));
         TokenDao.getToken(ColorDao.getInstance(dbHelper));
+        TokenDao.getToken(DropDao.getInstance(dbHelper));
     }
 
     @Override
