@@ -144,10 +144,7 @@ public class DefectFragment extends Fragment implements View.OnTouchListener, Vi
     private void setImage() {
         try {
             BitmapFactory.Options bmpFactoryOptions = new BitmapFactory.Options();
-
-
             bmpFactoryOptions.inJustDecodeBounds = false;
-
 
             bmp = BitmapFactory.decodeResource(getResources(), R.drawable.cartoon_car, bmpFactoryOptions);
 
