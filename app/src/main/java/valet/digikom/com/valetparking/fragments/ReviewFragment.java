@@ -95,11 +95,11 @@ public class ReviewFragment extends Fragment {
         defectMasterList = new ArrayList<>();
         DefectMaster defectMaster = new DefectMaster();
         DefectMaster.DefectAttributes attributes = new DefectMaster.DefectAttributes();
-        attributes.setId(1);
-        attributes.setDefectDesc("no defects");
-        attributes.setHref("");
-        attributes.setDefectName("no defects");
-        defectMaster.setId(0);
+        //attributes.setId(1);
+        //attributes.setDefectDesc("no defects");
+        //attributes.setHref("");
+        //attributes.setDefectName("no defects");
+        //defectMaster.setId(0);
         defectMaster.setAttributes(attributes);
         defectMasterList.add(defectMaster);
 

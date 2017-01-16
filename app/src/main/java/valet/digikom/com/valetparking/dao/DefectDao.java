@@ -63,10 +63,20 @@ public class DefectDao implements ProcessRequest {
             do {
                 DefectMaster defectMaster = new DefectMaster();
                 DefectMaster.DefectAttributes attr = new DefectMaster.DefectAttributes();
-                attr.setDefectName(cursor.getString(cursor.getColumnIndex(DefectMaster.Table.COL_NAME)));
-                attr.setDefectDesc(cursor.getString(cursor.getColumnIndex(DefectMaster.Table.COL_DESC)));
-                attr.setHref(cursor.getString(cursor.getColumnIndex(DefectMaster.Table.COL_HREF)));
-                defectMaster.setId(cursor.getInt(cursor.getColumnIndex(DefectMaster.Table.COL_ID)));
+
+                DefectMaster.Defect defect = new DefectMaster.Defect();
+                defect.setId(cursor.getInt(cursor.getColumnIndex(DefectMaster.Table.COL_ID)));
+                defect.setDefectName(cursor.getString(cursor.getColumnIndex(DefectMaster.Table.COL_NAME)));
+                defect.setDefectDesc(cursor.getString(cursor.getColumnIndex(DefectMaster.Table.COL_DESC)));
+                defect.setFileName(cursor.getString(cursor.getColumnIndex(DefectMaster.Table.COL_IMAGE_NAME)));
+                defect.setFilePath(cursor.getString(cursor.getColumnIndex(DefectMaster.Table.COL_IMAGE_PATH)));
+
+                attr.setDefect(defect);
+                attr.setImgHeight(cursor.getFloat(cursor.getColumnIndex(DefectMaster.Table.COL_IMAGE_HEIGHT)));
+                attr.setImgWidth(cursor.getFloat(cursor.getColumnIndex(DefectMaster.Table.COL_IMAGE_WIDTH)));
+                attr.setxAxis(cursor.getFloat(cursor.getColumnIndex(DefectMaster.Table.COL_X_AXIS)));
+                attr.setyAxis(cursor.getFloat(cursor.getColumnIndex(DefectMaster.Table.COL_Y_AXIS)));
+
                 defectMaster.setAttributes(attr);
 
                 defectMasters.add(defectMaster);
@@ -82,14 +92,23 @@ public class DefectDao implements ProcessRequest {
         db.execSQL("DELETE FROM " + DefectMaster.Table.TABLE_NAME);
 
         for (DefectMaster defect: defectMasterList) {
+            DefectMaster.Defect d = defect.getAttributes().getDefect();
+            DefectMaster.DefectAttributes attributes = defect.getAttributes();
+
             ContentValues cv = new ContentValues();
-            cv.put(DefectMaster.Table.COL_ID, defect.getAttributes().getId());
-            cv.put(DefectMaster.Table.COL_NAME, defect.getAttributes().getDefectName());
-            cv.put(DefectMaster.Table.COL_DESC, defect.getAttributes().getDefectDesc());
-            cv.put(DefectMaster.Table.COL_HREF, defect.getAttributes().getHref());
+            cv.put(DefectMaster.Table.COL_ID, d.getId());
+            cv.put(DefectMaster.Table.COL_NAME, d.getDefectName());
+            cv.put(DefectMaster.Table.COL_DESC, d.getDefectDesc());
+            cv.put(DefectMaster.Table.COL_IMAGE_NAME, d.getFileName());
+            cv.put(DefectMaster.Table.COL_IMAGE_PATH, d.getFilePath());
+            cv.put(DefectMaster.Table.COL_IMAGE_HEIGHT, attributes.getImgHeight());
+            cv.put(DefectMaster.Table.COL_IMAGE_WIDTH, attributes.getImgWidth());
+            cv.put(DefectMaster.Table.COL_X_AXIS, attributes.getxAxis());
+            cv.put(DefectMaster.Table.COL_Y_AXIS, attributes.getyAxis());
 
             db.insert(DefectMaster.Table.TABLE_NAME, null, cv);
         }
+
         db.close();
     }
 

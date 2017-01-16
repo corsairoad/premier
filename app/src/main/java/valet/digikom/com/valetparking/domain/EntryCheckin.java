@@ -302,7 +302,7 @@ public class EntryCheckin {
             for (DefectMaster dm : defectMasterList) {
                 RelationShip.DefectDetail.DefectItem defectItem = new RelationShip.DefectDetail.DefectItem();
                 RelationShip.DefectDetail.DefectItem.AttrDefect attrDefect = new RelationShip.DefectDetail.DefectItem.AttrDefect();
-                attrDefect.setIdDefect(String.valueOf(dm.getAttributes().getId()));
+                attrDefect.setIdDefect(String.valueOf(dm.getAttributes().getDefect().getId()));
                 defectItem.setAttrDefect(attrDefect);
 
                 defectItems.add(defectItem);

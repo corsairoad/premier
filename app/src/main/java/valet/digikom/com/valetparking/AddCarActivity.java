@@ -64,8 +64,8 @@ public class AddCarActivity extends ActionBarActivity implements StepOneFragmet.
         mPager.setOffscreenPageLimit(4);
         checkinAdapter = new PagerCheckinAdapter(getSupportFragmentManager());
         checkinAdapter.addFragment(StepOneFragmet.newInstance(null, null), "" );
-        //checkinAdapter.addFragment(StepTwoFragment.newInstance(null, null), "");
-        checkinAdapter.addFragment(DefectFragment.newInstance(null,null),"");
+        checkinAdapter.addFragment(StepTwoFragment.newInstance(null, null), "");
+        //checkinAdapter.addFragment(DefectFragment.newInstance(null,null),"");
         checkinAdapter.addFragment(StepThreeFragment.newInstance(null, null), "");
         checkinAdapter.addFragment(valet.digikom.com.valetparking.fragments.ReviewFragment.newInstance(null, null, checkin), "");
         mPager.setAdapter(checkinAdapter);

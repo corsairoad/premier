@@ -44,8 +44,8 @@ public class ListDefectAdapter extends ArrayAdapter<DefectMaster> {
         TextView textDefects = (TextView) convertView.findViewById(R.id.text_defect);
         CheckBox checkBox = (CheckBox) convertView.findViewById(R.id.checkbox_defect);
 
-        textId.setText("" + getItem(position).getAttributes().getId());
-        textDefects.setText(getItem(position).getAttributes().getDefectName());
+        textId.setText("" + getItem(position).getAttributes().getDefect().getId());
+        textDefects.setText(getItem(position).getAttributes().getDefect().getDefectName());
 
         final DefectMaster dm = getItem(position);
 
@@ -53,9 +53,9 @@ public class ListDefectAdapter extends ArrayAdapter<DefectMaster> {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
                 if (isChecked) {
-                    listener.onDefectSelected(dm.getAttributes().getDefectName(), dm);
+                    listener.onDefectSelected(dm.getAttributes().getDefect().getDefectName(), dm);
                 }else {
-                    listener.onDefectUnselected(dm.getAttributes().getDefectName(), dm);
+                    listener.onDefectUnselected(dm.getAttributes().getDefect().getDefectName(), dm);
                 }
             }
         });
