@@ -12,11 +12,14 @@ import java.io.ByteArrayOutputStream;
 public class BitmapToString {
 
     public static String create(Bitmap bitmap) {
-        String base64Image;
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
-        byte[] b = baos.toByteArray();
-        base64Image = Base64.encodeToString(b, Base64.DEFAULT);
-        return base64Image;
+        if (bitmap != null) {
+            String base64Image;
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
+            byte[] b = baos.toByteArray();
+            base64Image = Base64.encodeToString(b, Base64.DEFAULT);
+            return base64Image;
+        }
+        return null;
     }
 }

@@ -28,6 +28,7 @@
 
                 <de.hdodenhof.circleimageview.CircleImageView
                     android:layout_width="45dp"
+                    android:visibility="gone"
                     android:layout_height="match_parent"
                     android:src="@drawable/droppoint"/>
 
@@ -60,6 +61,7 @@
                 <de.hdodenhof.circleimageview.CircleImageView
                     android:layout_width="45dp"
                     android:layout_height="match_parent"
+                    android:visibility="gone"
                     android:src="@drawable/license_plate"/>
 
                 <TextView
@@ -91,6 +93,7 @@
                 <de.hdodenhof.circleimageview.CircleImageView
                     android:layout_width="45dp"
                     android:layout_height="match_parent"
+                    android:visibility="gone"
                     android:src="@drawable/car"/>
 
                 <TextView
@@ -122,6 +125,7 @@
                 <de.hdodenhof.circleimageview.CircleImageView
                     android:layout_width="45dp"
                     android:layout_height="match_parent"
+                    android:visibility="gone"
                     android:src="@drawable/color_icon"/>
 
                 <TextView
@@ -153,6 +157,7 @@
                 <de.hdodenhof.circleimageview.CircleImageView
                     android:layout_width="45dp"
                     android:layout_height="match_parent"
+                    android:visibility="gone"
                     android:src="@drawable/mail"/>
 
                 <TextView
@@ -207,6 +212,7 @@
                 <de.hdodenhof.circleimageview.CircleImageView
                     android:layout_width="45dp"
                     android:layout_height="match_parent"
+                    android:visibility="gone"
                     android:src="@drawable/stuff"/>
 
                 <TextView

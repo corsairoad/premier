@@ -16,6 +16,7 @@ import com.github.gcacace.signaturepad.views.SignaturePad;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import valet.digikom.com.valetparking.R;
@@ -93,16 +94,6 @@ public class ReviewFragment extends Fragment {
         reviewFragment = this;
 
         defectMasterList = new ArrayList<>();
-        DefectMaster defectMaster = new DefectMaster();
-        DefectMaster.DefectAttributes attributes = new DefectMaster.DefectAttributes();
-        //attributes.setId(1);
-        //attributes.setDefectDesc("no defects");
-        //attributes.setHref("");
-        //attributes.setDefectName("no defects");
-        //defectMaster.setId(0);
-        defectMaster.setAttributes(attributes);
-        defectMasterList.add(defectMaster);
-
         itemsList = new ArrayList<>();
 
         if (getArguments() != null) {
@@ -221,7 +212,11 @@ public class ReviewFragment extends Fragment {
     }
 
     public void setDefectMasterList(List<DefectMaster> defectMasterList) {
-        this.defectMasterList = defectMasterList;
+        HashSet<DefectMaster> set = new HashSet<>();
+        set.addAll(defectMasterList);
+
+        this.defectMasterList.clear();
+        this.defectMasterList.addAll(set);
     }
 
     public ColorMaster getColorMaster() {

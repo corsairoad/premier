@@ -15,6 +15,29 @@
         android:layout_height="wrap_content"
         android:text="@string/defects" />
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+
+        <ImageView android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="2"
+            android:layout_gravity="center"
+            android:id="@+id/ChoosenImageView">
+        </ImageView>
+
+        <Button
+            android:id="@+id/btn_clear"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:paddingRight="@dimen/activity_horizontal_margin"
+            android:text="@string/reset_signature"/>
+
+    </LinearLayout>
+
     <RelativeLayout
         android:id="@+id/container_defect"
         android:layout_width="match_parent"
@@ -26,19 +49,7 @@
             android:layout_centerVertical="true"
             android:orientation="vertical">
 
-            <ImageView android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/cartoon_car"
-                android:id="@+id/ChoosenImageView">
-            </ImageView>
 
-            <Button
-                android:id="@+id/btn_clear"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@null"
-                android:paddingRight="@dimen/activity_horizontal_margin"
-                android:text="@string/reset_signature"/>
 
         </LinearLayout>
 

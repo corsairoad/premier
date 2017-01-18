@@ -8,6 +8,8 @@ import com.google.gson.annotations.SerializedName;
 
 public class AdditionalItems {
 
+    private static AdditionalItems additionalItems;
+
     public static class Table {
         public static final String TABLE_NAME = "additional_items";
         public static final String COL_ID = "_id";
@@ -71,6 +73,15 @@ public class AdditionalItems {
         public void setName(String name) {
             this.name = name;
         }
+    }
+
+    public static AdditionalItems newInstance() {
+        additionalItems  = new AdditionalItems();
+        Attributes attributes = new Attributes();
+        AdditionalItemMaster additionalItemMaster = new AdditionalItemMaster();
+        attributes.setAdditionalItemMaster(additionalItemMaster);
+        additionalItems.setAttributes(attributes);
+        return additionalItems;
     }
 }
 

@@ -66,6 +66,8 @@ public class EntryCheckin {
         private String paraf;
         @SerializedName("vthdDefectsBlob")
         private String defect;
+        @SerializedName("vthdUsmsIdRnnrTkrCI")
+        private String idRunner = "1";
 
         public Attrib() {
         }
@@ -124,6 +126,14 @@ public class EntryCheckin {
 
         public void setDefect(String defect) {
             this.defect = "defect";
+        }
+
+        public String getIdRunner() {
+            return idRunner;
+        }
+
+        public void setIdRunner(String idRunner) {
+            this.idRunner = idRunner;
         }
     }
 
@@ -195,7 +205,7 @@ public class EntryCheckin {
                 }
 
                 public static class AttrDefect {
-                    @SerializedName("vddtDsdtId")
+                    @SerializedName("vddtDfdtId")
                     String idDefect;
 
                     public AttrDefect() {
@@ -295,36 +305,46 @@ public class EntryCheckin {
         }
 
         public Builder setRelationShip(List<DefectMaster> defectMasterList, List<AdditionalItems> itemsList){
-            relationShip = new RelationShip();
+            if (defectMasterList.isEmpty() && itemsList.isEmpty()) {
+                relationShip = null;
+            }else {
+                relationShip = new RelationShip();
 
-            RelationShip.DefectDetail defectDetail = new RelationShip.DefectDetail();
-            List<RelationShip.DefectDetail.DefectItem> defectItems = new ArrayList<>();
-            for (DefectMaster dm : defectMasterList) {
-                RelationShip.DefectDetail.DefectItem defectItem = new RelationShip.DefectDetail.DefectItem();
-                RelationShip.DefectDetail.DefectItem.AttrDefect attrDefect = new RelationShip.DefectDetail.DefectItem.AttrDefect();
-                attrDefect.setIdDefect(String.valueOf(dm.getAttributes().getDefect().getId()));
-                defectItem.setAttrDefect(attrDefect);
+                if (!defectMasterList.isEmpty()) {
+                    RelationShip.DefectDetail defectDetail = new RelationShip.DefectDetail();
+                    List<RelationShip.DefectDetail.DefectItem> defectItems = new ArrayList<>();
+                    for (DefectMaster dm : defectMasterList) {
+                        RelationShip.DefectDetail.DefectItem defectItem = new RelationShip.DefectDetail.DefectItem();
+                        RelationShip.DefectDetail.DefectItem.AttrDefect attrDefect = new RelationShip.DefectDetail.DefectItem.AttrDefect();
 
-                defectItems.add(defectItem);
+                        attrDefect.setIdDefect(String.valueOf(dm.getAttributes().getDefect().getId()));
+                        defectItem.setAttrDefect(attrDefect);
+
+                        defectItems.add(defectItem);
+                    }
+                    defectDetail.setData(defectItems);
+                    relationShip.setDefectDetail(defectDetail);
+                }
+
+                if (!itemsList.isEmpty()) {
+                    RelationShip.ItemDetail itemDetail = new RelationShip.ItemDetail();
+                    List<RelationShip.ItemDetail.Item> items = new ArrayList<>();
+
+                    for (AdditionalItems i : itemsList) {
+                        RelationShip.ItemDetail.Item item = new RelationShip.ItemDetail.Item();
+                        RelationShip.ItemDetail.Item.AttribItem attribItem = new RelationShip.ItemDetail.Item.AttribItem();
+                        attribItem.setItemId(String.valueOf(i.getAttributes().getAdditionalItemMaster().getId()));
+                        item.setAttribItem(attribItem);
+
+                        items.add(item);
+                    }
+
+                    itemDetail.setListItem(items);
+                    relationShip.setItemDetail(itemDetail);
+                }
+
             }
-            defectDetail.setData(defectItems);
 
-
-            RelationShip.ItemDetail itemDetail = new RelationShip.ItemDetail();
-            List<RelationShip.ItemDetail.Item> items = new ArrayList<>();
-
-            for (AdditionalItems i : itemsList) {
-                RelationShip.ItemDetail.Item item = new RelationShip.ItemDetail.Item();
-                RelationShip.ItemDetail.Item.AttribItem attribItem = new RelationShip.ItemDetail.Item.AttribItem();
-                attribItem.setItemId(String.valueOf(i.getAttributes().getAdditionalItemMaster().getId()));
-                item.setAttribItem(attribItem);
-
-                items.add(item);
-            }
-            itemDetail.setListItem(items);
-
-            relationShip.setDefectDetail(defectDetail);
-            relationShip.setItemDetail(itemDetail);
             return this;
         }
 

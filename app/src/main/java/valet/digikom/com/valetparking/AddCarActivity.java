@@ -109,6 +109,7 @@ public class AddCarActivity extends ActionBarActivity implements StepOneFragmet.
         mNextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                onDefectDrawing(true);
                 if (position == totalPages) {
                     ReviewFragment reviewFragment = ReviewFragment.reviewFragment;
                     if (reviewFragment.ispadSigned()) {
@@ -129,6 +130,7 @@ public class AddCarActivity extends ActionBarActivity implements StepOneFragmet.
         mPrevButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                onDefectDrawing(true);
                 mPager.setCurrentItem(position - 1);
             }
         });
@@ -148,6 +150,8 @@ public class AddCarActivity extends ActionBarActivity implements StepOneFragmet.
                         if (response != null && response.body() != null) {
                             EntryCheckinResponse res = response.body();
                             Log.d("Post checkin success: ", res.getData().getType());
+                        }else {
+                            Log.d("Post entry", "post entry checkin failed.");
                         }
                     }
 

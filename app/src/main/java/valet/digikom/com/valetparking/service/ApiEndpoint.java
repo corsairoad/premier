@@ -21,7 +21,7 @@ import valet.digikom.com.valetparking.domain.TokenResponse;
 
 public interface ApiEndpoint {
 
-    @GET("defect_master")
+    @GET("defect_detail")
     Call<DefectResponse> getDefects();
 
     @FormUrlEncoded
