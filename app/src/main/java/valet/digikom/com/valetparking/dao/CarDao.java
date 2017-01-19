@@ -77,7 +77,7 @@ public class CarDao implements ProcessRequest {
 
             @Override
             public void onFailure(Call<CarMasterResponse> call, Throwable t) {
-                Log.d("Download Car Master", t.getMessage());
+                //Log.d("Download Car Master", t.getMessage());
                 Toast.makeText(dbHelper.getContext(), t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });

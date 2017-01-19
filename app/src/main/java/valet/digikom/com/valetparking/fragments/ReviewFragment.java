@@ -249,7 +249,7 @@ public class ReviewFragment extends Fragment {
     }
 
     public void clearImageDefect() {
-
+        imgDefect.setImageBitmap(null);
     }
 
     public EntryCheckinContainer getEntryCheckinContainer() {

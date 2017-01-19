@@ -88,5 +88,10 @@
         <item> Handphone </item>
 
     </string-array>
+    <string name="title_activity_parked_car_detail">Parked Car</string>
+    <string name="trans_code">No. Transaksi</string>
+    <string name="runner">Runner</string>
+    <string name="fee">Fee</string>
+    <string name="drop_to">Drop di</string>
 
 </resources>

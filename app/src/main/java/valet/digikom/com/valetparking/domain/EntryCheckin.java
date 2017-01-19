@@ -353,6 +353,4 @@ public class EntryCheckin {
         }
     }
 
-
-
 }

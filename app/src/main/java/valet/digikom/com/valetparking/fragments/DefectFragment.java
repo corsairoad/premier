@@ -203,6 +203,7 @@ public class DefectFragment extends Fragment implements View.OnTouchListener, Vi
     private void clear() {
         canvas.drawColor(Color.WHITE);
         setImage();
+        ReviewFragment.reviewFragment.clearImageDefect();
     }
 
     @Override

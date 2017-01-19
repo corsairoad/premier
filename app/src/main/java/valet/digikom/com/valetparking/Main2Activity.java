@@ -26,17 +26,21 @@ import valet.digikom.com.valetparking.dao.CheckinDao;
 import valet.digikom.com.valetparking.dao.ColorDao;
 import valet.digikom.com.valetparking.dao.DefectDao;
 import valet.digikom.com.valetparking.dao.DropDao;
+import valet.digikom.com.valetparking.dao.EntryDao;
 import valet.digikom.com.valetparking.dao.ItemsDao;
 import valet.digikom.com.valetparking.dao.TokenDao;
 import valet.digikom.com.valetparking.domain.Checkin;
+import valet.digikom.com.valetparking.domain.EntryCheckin;
+import valet.digikom.com.valetparking.domain.EntryCheckinResponse;
 import valet.digikom.com.valetparking.util.ValetDbHelper;
 
 public class Main2Activity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, ListCheckinAdapter.OnItemCheckinListener {
 
     RecyclerView listCheckin;
     ListCheckinAdapter adapter;
     ArrayList<Checkin> checkins = new ArrayList<>();
+    List<EntryCheckinResponse> responseList = new ArrayList<>();
     TextView textEmpty;
     TextView textTotalCheckin;
 
@@ -55,9 +59,8 @@ public class Main2Activity extends AppCompatActivity
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         listCheckin.setHasFixedSize(true);
         listCheckin.setLayoutManager(layoutManager);
-        adapter = new ListCheckinAdapter(checkins, Main2Activity.this);
+        adapter = new ListCheckinAdapter(checkins, responseList,this, this);
         listCheckin.setAdapter(adapter);
-        new LoadCheckin().execute();
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab_entry);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -75,6 +78,9 @@ public class Main2Activity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        // load checkin on database
+        new LoadCheckinTask().execute();
 
         DefectDao defectDao = DefectDao.getInstance(dbHelper);
         TokenDao.getToken(defectDao);
@@ -142,7 +148,14 @@ public class Main2Activity extends AppCompatActivity
         return true;
     }
 
-    class LoadCheckin extends AsyncTask<String, Void, List<Checkin>> {
+    @Override
+    public void onItemCheckinClick(int id) {
+        Intent intent = new Intent(this, ParkedCarDetailActivity.class);
+        intent.putExtra(EntryCheckinResponse.ID_ENTRY_CHECKIN, id);
+        startActivity(intent);
+    }
+
+    private class LoadCheckin extends AsyncTask<String, Void, List<Checkin>> {
 
         @Override
         protected List<Checkin> doInBackground(String... strings) {
@@ -164,6 +177,30 @@ public class Main2Activity extends AppCompatActivity
                 adapter.notifyDataSetChanged();
                 textEmpty.setVisibility(View.GONE);
                 textTotalCheckin.setText(getResources().getString(R.string.total_checkin) + " " + checkinsx.size());
+            }else {
+                textTotalCheckin.setVisibility(View.INVISIBLE);
+                textEmpty.setVisibility(View.VISIBLE);
+            }
+        }
+    }
+
+    private class LoadCheckinTask extends AsyncTask<Void, Void, List<EntryCheckinResponse>> {
+
+        @Override
+        protected List<EntryCheckinResponse> doInBackground(Void... voids) {
+            EntryDao entryDao = EntryDao.getInstance(Main2Activity.this);
+            return entryDao.fetchAllCheckinResponse();
+        }
+
+        @Override
+        protected void onPostExecute(List<EntryCheckinResponse> entryCheckinResponses) {
+            super.onPostExecute(entryCheckinResponses);
+            if (entryCheckinResponses != null && !entryCheckinResponses.isEmpty()) {
+                responseList.clear();
+                responseList.addAll(entryCheckinResponses);
+                adapter.notifyDataSetChanged();
+                textEmpty.setVisibility(View.GONE);
+                textTotalCheckin.setText(getResources().getString(R.string.total_checkin) + " " + entryCheckinResponses.size());
             }else {
                 textTotalCheckin.setVisibility(View.INVISIBLE);
                 textEmpty.setVisibility(View.VISIBLE);

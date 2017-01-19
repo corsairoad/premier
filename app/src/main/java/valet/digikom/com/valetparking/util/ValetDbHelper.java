@@ -4,12 +4,14 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import valet.digikom.com.valetparking.dao.EntryDao;
 import valet.digikom.com.valetparking.domain.AdditionalItems;
 import valet.digikom.com.valetparking.domain.CarMaster;
 import valet.digikom.com.valetparking.domain.Checkin;
 import valet.digikom.com.valetparking.domain.ColorMaster;
 import valet.digikom.com.valetparking.domain.DefectMaster;
 import valet.digikom.com.valetparking.domain.DropPointMaster;
+import valet.digikom.com.valetparking.domain.EntryCheckinResponse;
 
 /**
  * Created by DIGIKOM-EX4 on 12/20/2016.
@@ -35,6 +37,8 @@ public class ValetDbHelper extends SQLiteOpenHelper {
         db.execSQL(CarMaster.Table.CREATE);
         db.execSQL(ColorMaster.Table.CREATE);
         db.execSQL(DropPointMaster.Table.CREATE);
+        db.execSQL(EntryDao.Table.CREATE);
+        db.execSQL(EntryCheckinResponse.Table.CREATE);
     }
 
     @Override
@@ -45,6 +49,8 @@ public class ValetDbHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + CarMaster.Table.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + ColorMaster.Table.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + DropPointMaster.Table.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + EntryDao.Table.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + EntryCheckinResponse.Table.TABLE_NAME);
 
         onCreate(db);
     }

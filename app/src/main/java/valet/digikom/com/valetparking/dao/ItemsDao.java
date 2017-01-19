@@ -53,9 +53,8 @@ public class ItemsDao implements ProcessRequest{
 
             @Override
             public void onFailure(Call<AdditionalItemsResponse> call, Throwable t) {
-
                 Toast.makeText(dbHelper.getContext(), t.getMessage(), Toast.LENGTH_SHORT).show();
-                Log.d("Additional Items", t.getMessage());
+                //Log.d("Additional Items", t.getMessage());
             }
         });
 

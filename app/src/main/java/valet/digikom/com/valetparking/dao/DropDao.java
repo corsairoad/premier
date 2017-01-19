@@ -53,7 +53,7 @@ public class DropDao implements ProcessRequest {
             @Override
             public void onFailure(Call<DropPointMasterResponse> call, Throwable t) {
                 Toast.makeText(dbHelper.getContext(), t.getMessage(), Toast.LENGTH_SHORT).show();
-                Log.d("DropPointMaster error: ", t.getMessage());
+                //Log.d("DropPointMaster error: ", t.getMessage());
             }
         });
     }

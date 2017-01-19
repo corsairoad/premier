@@ -51,7 +51,6 @@ public class CheckinDao {
         //String imgUrl = saveToInternalStorage(bmp, checkin.getSignatureName().trim());
         String imgUrl = saveImage(bmp, checkin.getSignatureName());
 
-
         SQLiteDatabase db = valetDbHelper.getWritableDatabase();
 
         ContentValues values = new ContentValues();

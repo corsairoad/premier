@@ -7,7 +7,6 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
-
     <application
         android:allowBackup="true"
         android:icon="@mipmap/logo_1"
@@ -18,14 +17,14 @@
         <activity android:name=".MainActivity" />
         <activity
             android:name=".SplashActivity"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen"></activity>
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen" />
         <activity
             android:name=".SettingsActivity"
             android:label="@string/setting" />
         <activity
             android:name=".Main2Activity"
-            android:screenOrientation="portrait"
             android:label="@string/title_activity_main2"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -33,18 +32,25 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <activity android:name=".AddCarActivity"
-            android:screenOrientation="portrait"
+        <activity
+            android:name=".AddCarActivity"
             android:label="@string/checkin"
             android:parentActivityName=".Main2Activity"
-            android:windowSoftInputMode="adjustPan"
-            android:theme="@style/AddCarTheme">
-
+            android:screenOrientation="portrait"
+            android:theme="@style/AddCarTheme"
+            android:windowSoftInputMode="adjustPan">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".AddCarActivity" />
-
+        </activity>
+        <activity
+            android:name=".ParkedCarDetailActivity"
+            android:label="@string/title_activity_parked_car_detail"
+            android:parentActivityName=".Main2Activity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="valet.digikom.com.valetparking.Main2Activity" />
         </activity>
     </application>
 

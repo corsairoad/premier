@@ -20,6 +20,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import valet.digikom.com.valetparking.adapter.PagerCheckinAdapter;
 import valet.digikom.com.valetparking.dao.CheckinDao;
+import valet.digikom.com.valetparking.dao.EntryDao;
 import valet.digikom.com.valetparking.dao.TokenDao;
 import valet.digikom.com.valetparking.domain.AdditionalItems;
 import valet.digikom.com.valetparking.domain.Checkin;
@@ -149,7 +150,11 @@ public class AddCarActivity extends ActionBarActivity implements StepOneFragmet.
                     public void onResponse(Call<EntryCheckinResponse> call, Response<EntryCheckinResponse> response) {
                         if (response != null && response.body() != null) {
                             EntryCheckinResponse res = response.body();
-                            Log.d("Post checkin success: ", res.getData().getType());
+                            EntryDao entryDao = EntryDao.getInstance(AddCarActivity.this);
+                            entryDao.insertEntryResponse(res, EntryCheckinResponse.FLAG_UPLOAD_SUCCESS);
+                            startActivity(new Intent(AddCarActivity.this, Main2Activity.class));
+                            finish();
+                            //Log.d("Post checkin success: ", res.getData().getType());
                         }else {
                             Log.d("Post entry", "post entry checkin failed.");
                         }
@@ -163,16 +168,16 @@ public class AddCarActivity extends ActionBarActivity implements StepOneFragmet.
             }
         });
 
+        /*
       new Thread(new Runnable() {
           @Override
           public void run() {
               ValetDbHelper valetDbHelper = new ValetDbHelper(AddCarActivity.this);
               CheckinDao checkinDao = CheckinDao.newInstance(valetDbHelper, AddCarActivity.this);
               checkinDao.addCheckIn(checkin,bmp);
-              startActivity(new Intent(AddCarActivity.this, Main2Activity.class));
-              finish();
           }
       }).run();
+      */
     }
 
     private void updateBottomBar() {

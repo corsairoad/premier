@@ -6,6 +6,10 @@ import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
+import retrofit2.http.PUT;
+import retrofit2.http.Path;
+import valet.digikom.com.valetparking.domain.AddCarCallBody;
+import valet.digikom.com.valetparking.domain.AddCarCallResponse;
 import valet.digikom.com.valetparking.domain.AdditionalItemsResponse;
 import valet.digikom.com.valetparking.domain.CarMasterResponse;
 import valet.digikom.com.valetparking.domain.ColorMasterResponse;
@@ -42,4 +46,7 @@ public interface ApiEndpoint {
 
     @POST("ad_entry_checkin")
     Call<EntryCheckinResponse> postCheckin(@Body EntryCheckinContainer checkinContainer);
+
+    @PUT("ad_car_call/{id}")
+    Call<AddCarCallResponse> postCallCar(@Path("id") int id, @Body AddCarCallBody addCarCallBody);
 }
