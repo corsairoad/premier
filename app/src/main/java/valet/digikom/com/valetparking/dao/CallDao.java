@@ -51,7 +51,7 @@ public class CallDao implements ProcessRequest {
 
             @Override
             public void onFailure(Call<AddCarCallResponse> call, Throwable t) {
-                Log.d("call error:", t.getMessage());
+                //Log.d("call error:", t.getMessage());
             }
         });
     }
