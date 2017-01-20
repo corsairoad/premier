@@ -20,6 +20,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import valet.digikom.com.valetparking.R;
+import valet.digikom.com.valetparking.dao.DropDao;
 import valet.digikom.com.valetparking.domain.AdditionalItems;
 import valet.digikom.com.valetparking.domain.CarMaster;
 import valet.digikom.com.valetparking.domain.Checkin;
@@ -28,6 +29,8 @@ import valet.digikom.com.valetparking.domain.DefectMaster;
 import valet.digikom.com.valetparking.domain.DropPointMaster;
 import valet.digikom.com.valetparking.domain.EntryCheckin;
 import valet.digikom.com.valetparking.domain.EntryCheckinContainer;
+import valet.digikom.com.valetparking.util.PrefManager;
+import valet.digikom.com.valetparking.util.ValetDbHelper;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -100,6 +103,8 @@ public class ReviewFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+
+        getDefualtDropPoint();
     }
 
     @Override
@@ -270,4 +275,22 @@ public class ReviewFragment extends Fragment {
         Log.d("JSON CHECKIN", jsonEntryCheckin);
         return entryCheckinContainer;
     }
+
+    private void getDefualtDropPoint() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                int dropIdDefault = PrefManager.getInstance(getContext()).getIdDefaultDropPoint();
+                if (dropIdDefault > 0) {
+                    final DropPointMaster dropPointMaster = DropDao.getInstance(new ValetDbHelper(getContext())).getDropPointById(dropIdDefault);
+                    if (dropPointMaster == null) {
+                        return;
+                    }
+                    setDropPoint(dropPointMaster);
+                }
+            }
+        }).run();
+    }
+
+
 }

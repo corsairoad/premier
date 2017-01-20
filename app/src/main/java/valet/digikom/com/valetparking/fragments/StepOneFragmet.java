@@ -4,6 +4,7 @@ package valet.digikom.com.valetparking.fragments;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.text.InputFilter;
 import android.text.TextUtils;
@@ -139,6 +140,17 @@ public class StepOneFragmet extends Fragment {
     public void onAttach(Context context) {
         super.onAttach(context);
         onRegsitrationValid = (OnRegsitrationValid) context;
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        getDefualtDropPoint();
     }
 
     public boolean isFormValid() {
@@ -306,7 +318,7 @@ public class StepOneFragmet extends Fragment {
     private void initData() {
         new FetchCarsTask().execute();
         new FetchColorsTask().execute();
-        getDefualtDropPoint();
+        //getDefualtDropPoint();
     }
 
     private void getDefualtDropPoint() {
@@ -322,7 +334,6 @@ public class StepOneFragmet extends Fragment {
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            ReviewFragment.reviewFragment.setDropPoint(dropPointMaster);
                             inputDropPoint.setText(dropPointMaster.getAttrib().getDropName());
                         }
                     });
