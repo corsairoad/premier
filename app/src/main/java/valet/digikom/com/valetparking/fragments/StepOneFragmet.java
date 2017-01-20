@@ -9,17 +9,17 @@ import android.text.InputFilter;
 import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
-import android.view.inputmethod.InputMethodManager;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.Toast;
 import com.orhanobut.dialogplus.DialogPlus;
 import com.orhanobut.dialogplus.GridHolder;
-import com.orhanobut.dialogplus.ListHolder;
 import com.orhanobut.dialogplus.OnItemClickListener;
+import java.util.ArrayList;
 import java.util.List;
 import valet.digikom.com.valetparking.R;
 import valet.digikom.com.valetparking.adapter.CarTypeAdapter;
@@ -31,6 +31,7 @@ import valet.digikom.com.valetparking.dao.DropDao;
 import valet.digikom.com.valetparking.domain.CarMaster;
 import valet.digikom.com.valetparking.domain.ColorMaster;
 import valet.digikom.com.valetparking.domain.DropPointMaster;
+import valet.digikom.com.valetparking.util.PrefManager;
 import valet.digikom.com.valetparking.util.ValetDbHelper;
 
 /**
@@ -59,6 +60,10 @@ public class StepOneFragmet extends Fragment {
     InputFilter[] filters = new InputFilter[]{new InputFilter.AllCaps()};
     private OnRegsitrationValid onRegsitrationValid;
     private ValetDbHelper dbHelper;
+    private List<DropPointMaster> dpMasters = new ArrayList<>();
+    private DropPointAdapter adapter;
+    private boolean isDefaultDropSet;
+    PrefManager prefManager;
 
     public StepOneFragmet() {
         // Required empty public constructor
@@ -86,7 +91,10 @@ public class StepOneFragmet extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        prefManager = PrefManager.getInstance(getContext());
         dbHelper = new ValetDbHelper(getContext());
+        adapter = new DropPointAdapter(getContext(), dpMasters);
+
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
@@ -116,6 +124,13 @@ public class StepOneFragmet extends Fragment {
         btnColorType = (ImageButton) view.findViewById(R.id.btn_dropdown_color);
         btnDropPoint = (ImageButton) view.findViewById(R.id.btn_drop);
 
+        btnDropPoint.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new FetchDropPointTask().execute();
+            }
+        });
+
         initData();
         return view;
     }
@@ -128,7 +143,7 @@ public class StepOneFragmet extends Fragment {
 
     public boolean isFormValid() {
         boolean allValid = true;
-        EditText[] editTexts = {inputDropPoint, inputPlatNo, inputCartype, inputEmail, inputColor};
+        EditText[] editTexts = {inputDropPoint, inputPlatNo, inputCartype};
 
         for (EditText editText : editTexts) {
             if (editText != null){
@@ -241,35 +256,79 @@ public class StepOneFragmet extends Fragment {
         @Override
         protected void onPostExecute(List<DropPointMaster> dropPointMasters) {
             if (!dropPointMasters.isEmpty()){
-                final DropPointAdapter adapter = new DropPointAdapter(getContext(), dropPointMasters);
-                btnDropPoint.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        DialogPlus dialogPlus  = DialogPlus.newDialog(getContext())
-                                .setContentHolder(new GridHolder(2))
-                                .setAdapter(adapter)
-                                .setOnItemClickListener(new OnItemClickListener() {
-                                    @Override
-                                    public void onItemClick(DialogPlus dialog, Object item, View view, int position) {
-                                        DropPointMaster dropPoint = (DropPointMaster) item;
-                                        inputDropPoint.setText(dropPoint.getAttrib().getDropName());
-                                        ReviewFragment.reviewFragment.setDropPoint(dropPoint);
-                                        dialog.dismiss();
-                                    }
-                                })
-                                .setGravity(Gravity.CENTER)
-                                .setExpanded(false)
-                                .create();
-                        dialogPlus.show();
-                    }
-                });
+                dpMasters.clear();
+                dpMasters.addAll(dropPointMasters);
+                adapter.notifyDataSetChanged();
+                //final DropPointAdapter adapter = new DropPointAdapter(getContext(), dropPointMasters);
+                View v = initFooter();
+                DialogPlus dialogPlus  = DialogPlus.newDialog(getContext())
+                        .setContentHolder(new GridHolder(2))
+                        .setAdapter(adapter)
+                        .setOnItemClickListener(new OnItemClickListener() {
+                            @Override
+                            public void onItemClick(DialogPlus dialog, Object item, View view, int position) {
+                                DropPointMaster dropPoint = (DropPointMaster) item;
+                                inputDropPoint.setText(dropPoint.getAttrib().getDropName());
+                                ReviewFragment.reviewFragment.setDropPoint(dropPoint);
+
+                                if (isDefaultDropSet) {
+                                    prefManager.setDefaultDropPoint(dropPoint.getAttrib().getDropId());
+                                }
+
+                                dialog.dismiss();
+                            }
+                        })
+                        .setGravity(Gravity.CENTER)
+                        .setExpanded(false)
+                        .setFooter(v)
+                        .create();
+                dialogPlus.show();
+            }else {
+                Toast.makeText(getContext(),"Cannot retrieve drop point at this time.", Toast.LENGTH_SHORT).show();
             }
         }
+    }
+
+    private View initFooter() {
+        View v = LayoutInflater.from(getContext()).inflate(R.layout.footer_drop_point, null);
+
+        final CheckBox cb = (CheckBox) v.findViewById(R.id.cb_default_droppoint);
+        cb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                isDefaultDropSet = b;
+            }
+        });
+
+        return v;
     }
 
     private void initData() {
         new FetchCarsTask().execute();
         new FetchColorsTask().execute();
-        new FetchDropPointTask().execute();
+        getDefualtDropPoint();
+    }
+
+    private void getDefualtDropPoint() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                int dropIdDefault = prefManager.getIdDefaultDropPoint();
+                if (dropIdDefault > 0) {
+                    final DropPointMaster dropPointMaster = DropDao.getInstance(new ValetDbHelper(getContext())).getDropPointById(dropIdDefault);
+                    if (dropPointMaster == null) {
+                        return;
+                    }
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            ReviewFragment.reviewFragment.setDropPoint(dropPointMaster);
+                            inputDropPoint.setText(dropPointMaster.getAttrib().getDropName());
+                        }
+                    });
+                }
+
+            }
+        }).run();
     }
 }
