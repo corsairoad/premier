@@ -150,7 +150,6 @@ public class StepOneFragmet extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        getDefualtDropPoint();
     }
 
     public boolean isFormValid() {
@@ -318,7 +317,7 @@ public class StepOneFragmet extends Fragment {
     private void initData() {
         new FetchCarsTask().execute();
         new FetchColorsTask().execute();
-        //getDefualtDropPoint();
+        getDefualtDropPoint();
     }
 
     private void getDefualtDropPoint() {

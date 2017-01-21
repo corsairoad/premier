@@ -66,8 +66,7 @@ public class EntryCheckin {
         private String paraf;
         @SerializedName("vthdDefectsBlob")
         private String defect;
-        @SerializedName("vthdUsmsIdRnnrTkrCI")
-        private String idRunner = "1";
+
 
         public Attrib() {
         }
@@ -128,13 +127,6 @@ public class EntryCheckin {
             this.defect = "defect";
         }
 
-        public String getIdRunner() {
-            return idRunner;
-        }
-
-        public void setIdRunner(String idRunner) {
-            this.idRunner = idRunner;
-        }
     }
 
     public static class RelationShip {

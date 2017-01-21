@@ -13,6 +13,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.orhanobut.dialogplus.DialogPlus;
@@ -83,6 +84,11 @@ public class ParkedCarDetailActivity extends AppCompatActivity implements View.O
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                if (dropPointMaster == null) {
+                    inputDropTo.setError("Please fill drop point.");
+                    return;
+                }
 
                 AddCarCallBody addCarCallBody = new AddCarCallBody();
                 AddCarCall addCarCall = new AddCarCall();

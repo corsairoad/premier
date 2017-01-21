@@ -3,6 +3,7 @@ package valet.digikom.com.valetparking.fragments;
 
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,10 +12,16 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.github.gcacace.signaturepad.views.SignaturePad;
 import com.google.gson.Gson;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -272,6 +279,7 @@ public class ReviewFragment extends Fragment {
         entryCheckinContainer.setEntryCheckin(entryCheckin);
         Gson gson = new Gson();
         String jsonEntryCheckin = gson.toJson(entryCheckinContainer);
+        exportToFile(jsonEntryCheckin);
         Log.d("JSON CHECKIN", jsonEntryCheckin);
         return entryCheckinContainer;
     }
@@ -290,6 +298,24 @@ public class ReviewFragment extends Fragment {
                 }
             }
         }).run();
+    }
+
+    private void exportToFile(String json) {
+        try {
+            File myFile = new File("/sdcard/mysdfile.txt");
+            myFile.createNewFile();
+            FileOutputStream fOut = new FileOutputStream(myFile);
+            OutputStreamWriter myOutWriter =new OutputStreamWriter(fOut);
+            myOutWriter.append(json);
+            myOutWriter.close();
+            fOut.close();
+            Toast.makeText(getContext(),"Done writing SD 'mysdfile.txt'", Toast.LENGTH_SHORT).show();
+
+        }
+        catch (Exception e)
+        {
+            Toast.makeText(getContext(), e.getMessage(),Toast.LENGTH_SHORT).show();
+        }
     }
 
 

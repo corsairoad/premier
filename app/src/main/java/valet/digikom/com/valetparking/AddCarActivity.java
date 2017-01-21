@@ -140,6 +140,7 @@ public class AddCarActivity extends ActionBarActivity implements StepOneFragmet.
     }
 
     private void submitCheckin(final Bitmap bmp, final Checkin checkin, final EntryCheckinContainer checkinContainer) {
+
         TokenDao.getToken(new ProcessRequest() {
             @Override
             public void process(String token) {
@@ -162,7 +163,7 @@ public class AddCarActivity extends ActionBarActivity implements StepOneFragmet.
 
                     @Override
                     public void onFailure(Call<EntryCheckinResponse> call, Throwable t) {
-                        Log.d("Post checkin error: ", t.getMessage());
+                        //Log.d("Post checkin error: ", t.getMessage());
                     }
                 });
             }

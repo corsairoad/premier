@@ -3,6 +3,7 @@ package valet.digikom.com.valetparking.dao;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -45,21 +46,26 @@ public class CarDao implements ProcessRequest {
         String qry = "SELECT * FROM " + CarMaster.Table.TABLE_NAME + " ORDER BY " + CarMaster.Table.COL_CAR_NAME;
         Cursor cursor = db.rawQuery(qry, new String[]{});
 
-        if (cursor.moveToFirst()) {
-            do {
-                CarMaster carMaster = new CarMaster();
-                CarMaster.Attrib attrib = new CarMaster.Attrib();
-                attrib.setId_attrib(cursor.getInt(cursor.getColumnIndex(CarMaster.Table.COL_CAR_ID)));
-                attrib.setCarName(cursor.getString(cursor.getColumnIndex(CarMaster.Table.COL_CAR_NAME)));
-                carMaster.setId(cursor.getInt(cursor.getColumnIndex(CarMaster.Table.COL_ID)));
-                carMaster.setAttrib(attrib);
+        try{
+            if (cursor.moveToFirst()) {
+                do {
+                    CarMaster carMaster = new CarMaster();
+                    CarMaster.Attrib attrib = new CarMaster.Attrib();
+                    attrib.setId_attrib(cursor.getInt(cursor.getColumnIndex(CarMaster.Table.COL_CAR_ID)));
+                    attrib.setCarName(cursor.getString(cursor.getColumnIndex(CarMaster.Table.COL_CAR_NAME)));
+                    carMaster.setId(cursor.getInt(cursor.getColumnIndex(CarMaster.Table.COL_ID)));
+                    carMaster.setAttrib(attrib);
 
-                carMasterList.add(carMaster);
-            }while (cursor.moveToNext());
+                    carMasterList.add(carMaster);
+                }while (cursor.moveToNext());
+            }
+        }catch (SQLiteException e) {
+            e.printStackTrace();
+        }finally {
+            cursor.close();
+            db.close();
         }
 
-        cursor.close();
-        db.close();
         return carMasterList;
     }
 
