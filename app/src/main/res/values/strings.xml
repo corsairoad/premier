@@ -94,5 +94,7 @@
     <string name="fee">Fee</string>
     <string name="drop_to">Drop di</string>
     <string name="set_as_default">Set as default</string>
+    <string name="time_arrived">Arrived Time</string>
+    <string name="set">Set</string>
 
 </resources>

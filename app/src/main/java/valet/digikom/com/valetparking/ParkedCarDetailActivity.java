@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -17,7 +18,9 @@ import com.google.gson.Gson;
 import com.orhanobut.dialogplus.DialogPlus;
 import com.orhanobut.dialogplus.GridHolder;
 import com.orhanobut.dialogplus.OnItemClickListener;
+import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 
+import java.util.Calendar;
 import java.util.List;
 
 import valet.digikom.com.valetparking.adapter.DropPointAdapter;
@@ -32,7 +35,7 @@ import valet.digikom.com.valetparking.domain.EntryCheckinResponse;
 import valet.digikom.com.valetparking.fragments.ReviewFragment;
 import valet.digikom.com.valetparking.util.ValetDbHelper;
 
-public class ParkedCarDetailActivity extends AppCompatActivity implements View.OnClickListener {
+public class ParkedCarDetailActivity extends AppCompatActivity implements View.OnClickListener, TimePickerDialog.OnTimeSetListener {
 
     FloatingActionButton fab;
     EntryCheckinResponse entry;
@@ -44,6 +47,8 @@ public class ParkedCarDetailActivity extends AppCompatActivity implements View.O
     TextView txtCheckin;
     TextView txtFee;
     TextView txtRunner;
+    TextView txtEta;
+    Button btnSetEta;
     EditText inputDropTo;
     DropPointMaster dropPointMaster;
     ImageButton btnDropPoint;
@@ -63,8 +68,11 @@ public class ParkedCarDetailActivity extends AppCompatActivity implements View.O
         txtCheckin = (TextView) findViewById(R.id.text_chekin_time);
         txtFee = (TextView) findViewById(R.id.text_fee);
         txtRunner = (TextView) findViewById(R.id.text_runner);
+        txtEta = (TextView) findViewById(R.id.text_arrived_time);
         inputDropTo = (EditText) findViewById(R.id.input_drop_point);
         btnDropPoint = (ImageButton) findViewById(R.id.btn_drop);
+        btnSetEta = (Button) findViewById(R.id.btn_set_time);
+        btnSetEta.setOnClickListener(this);
 
         btnDropPoint.setOnClickListener(this);
         dbHelper = new ValetDbHelper(this);
@@ -83,8 +91,8 @@ public class ParkedCarDetailActivity extends AppCompatActivity implements View.O
                 attribute.setIdRunner("1");
 
                 addCarCall.setAttribute(attribute);
-
                 addCarCallBody.setAddCarCall(addCarCall);
+
                 int id = entry.getData().getAttribute().getId();
                 CallDao callDao = CallDao.getInstance(id,addCarCallBody, ParkedCarDetailActivity.this);
                 Gson gson = new Gson();
@@ -120,7 +128,20 @@ public class ParkedCarDetailActivity extends AppCompatActivity implements View.O
 
     @Override
     public void onClick(View view) {
+        if (view == btnSetEta) {
+            Calendar calendar = Calendar.getInstance();
+            int hourOfDay = calendar.get(Calendar.HOUR_OF_DAY);
+            int minute = calendar.get(Calendar.MINUTE);
+            int second = calendar.get(Calendar.SECOND);
+            TimePickerDialog tpd = TimePickerDialog.newInstance(this, hourOfDay, minute, second, true);
+            tpd.show(getFragmentManager(),"timepicker");
+        }
+    }
 
+    @Override
+    public void onTimeSet(TimePickerDialog view, int hourOfDay, int minute, int second) {
+        String time = "" + hourOfDay + ":" + String.format("%02d", minute);
+        txtEta.setText(time);
     }
 
     private class LoadEntryTask extends AsyncTask<Integer, Void, EntryCheckinResponse> {

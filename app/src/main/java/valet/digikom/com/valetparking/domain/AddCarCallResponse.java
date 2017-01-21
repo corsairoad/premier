@@ -7,6 +7,7 @@ import com.google.gson.annotations.SerializedName;
  */
 
 public class AddCarCallResponse {
+
     @SerializedName("data")
     private Data data;
 
@@ -22,6 +23,7 @@ public class AddCarCallResponse {
     }
 
     public class Data {
+
         @SerializedName("type")
         String type;
         @SerializedName("id")

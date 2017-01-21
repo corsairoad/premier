@@ -3,6 +3,7 @@ package valet.digikom.com.valetparking.dao;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -107,27 +108,39 @@ public class DropDao implements ProcessRequest {
 
     public DropPointMaster getDropPointById(int idDropPoint) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
-        String[] args = new String[] {String.valueOf(idDropPoint)};
-        Cursor c = db.query(DropPointMaster.Table.TABLE_NAME,null,DropPointMaster.Table.COL_DROP_ID + "=?",args,null,null,null);
+        Cursor c = null;
         DropPointMaster dropPoint = new DropPointMaster();
         DropPointMaster.Attrib attrib = new DropPointMaster.Attrib();
-        if (c.moveToFirst()) {
-            do {
-                attrib.setDropId(c.getInt(c.getColumnIndex(DropPointMaster.Table.COL_DROP_ID)));
-                attrib.setDropName(c.getString(c.getColumnIndex(DropPointMaster.Table.COL_DROP_NAME)));
-                attrib.setDropDesc(c.getString(c.getColumnIndex(DropPointMaster.Table.COL_DROP_DESC)));
-                attrib.setLatitude(c.getDouble(c.getColumnIndex(DropPointMaster.Table.COL_LATITUDE)));
-                attrib.setLongitude(c.getDouble(c.getColumnIndex(DropPointMaster.Table.COL_LONGITUDE)));
+        try {
+            String[] args = new String[] {String.valueOf(idDropPoint)};
+            c = db.query(DropPointMaster.Table.TABLE_NAME,null,DropPointMaster.Table.COL_DROP_ID + "=?",args,null,null,null);
 
-                int id = c.getInt(c.getColumnIndex(DropPointMaster.Table.COL_ID));
+            if (c.moveToFirst()) {
+                do {
+                    attrib.setDropId(c.getInt(c.getColumnIndex(DropPointMaster.Table.COL_DROP_ID)));
+                    attrib.setDropName(c.getString(c.getColumnIndex(DropPointMaster.Table.COL_DROP_NAME)));
+                    attrib.setDropDesc(c.getString(c.getColumnIndex(DropPointMaster.Table.COL_DROP_DESC)));
+                    attrib.setLatitude(c.getDouble(c.getColumnIndex(DropPointMaster.Table.COL_LATITUDE)));
+                    attrib.setLongitude(c.getDouble(c.getColumnIndex(DropPointMaster.Table.COL_LONGITUDE)));
 
-                dropPoint.setId(String.valueOf(id));
-                dropPoint.setType(c.getString(c.getColumnIndex(DropPointMaster.Table.COL_TYPE)));
-                dropPoint.setAttrib(attrib);
-            }while (c.moveToNext());
+                    int id = c.getInt(c.getColumnIndex(DropPointMaster.Table.COL_ID));
+
+                    dropPoint.setId(String.valueOf(id));
+                    dropPoint.setType(c.getString(c.getColumnIndex(DropPointMaster.Table.COL_TYPE)));
+                    dropPoint.setAttrib(attrib);
+                }while (c.moveToNext());
+            }
+
+        }catch (SQLiteException e) {
+            e.printStackTrace();
+        }finally {
+            if (c != null) {
+                c.close();
+            }
+            if (db != null) {
+                db.close();
+            }
         }
-
-
 
         return dropPoint;
     }
