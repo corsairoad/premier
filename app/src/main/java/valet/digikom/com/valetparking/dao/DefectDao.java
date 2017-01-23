@@ -83,7 +83,7 @@ public class DefectDao implements ProcessRequest {
             }while (cursor.moveToNext());
         }
         cursor.close();
-        db.close();
+
         return defectMasters;
     }
 
@@ -108,8 +108,6 @@ public class DefectDao implements ProcessRequest {
 
             db.insert(DefectMaster.Table.TABLE_NAME, null, cv);
         }
-
-        db.close();
     }
 
 

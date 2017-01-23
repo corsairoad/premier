@@ -52,6 +52,17 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="valet.digikom.com.valetparking.Main2Activity" />
         </activity>
+
+        <receiver android:name="valet.digikom.com.valetparking.service.EntryCheckoutReceiver"
+            android:enabled="true">
+            <intent-filter>
+                <action android:name="com.valet.dki"/>
+            </intent-filter>
+        </receiver>
+
+        <service android:name="valet.digikom.com.valetparking.service.EntryCheckoutService"
+            android:enabled="true"
+            android:exported="false"></service>
     </application>
 
 </manifest>

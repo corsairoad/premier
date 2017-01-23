@@ -14,6 +14,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.google.gson.Gson;
+
+import cn.pedant.SweetAlert.SweetAlertDialog;
 import me.relex.circleindicator.CircleIndicator;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -114,7 +117,8 @@ public class AddCarActivity extends ActionBarActivity implements StepOneFragmet.
                 if (position == totalPages) {
                     ReviewFragment reviewFragment = ReviewFragment.reviewFragment;
                     if (reviewFragment.ispadSigned()) {
-                        submitCheckin(reviewFragment.getSignatureBmp(), reviewFragment.getCheckin(), reviewFragment.getEntryCheckinContainer());
+                        showConfirmDialog(reviewFragment);
+                        //submitCheckin(reviewFragment.getSignatureBmp(), reviewFragment.getCheckin(), reviewFragment.getEntryCheckinContainer());
                     }else {
                         Snackbar sb =  Snackbar.make(coordinatorLayout,"Signature can't be empty", Snackbar.LENGTH_SHORT);
                         View v = sb.getView();
@@ -242,5 +246,32 @@ public class AddCarActivity extends ActionBarActivity implements StepOneFragmet.
     @Override
     public void onDefectDrawing(boolean isPagingEnabled) {
         mPager.setPagingEnabled(isPagingEnabled);
+    }
+
+    private void showConfirmDialog(final ReviewFragment reviewFragment) {
+        new SweetAlertDialog(this, SweetAlertDialog.NORMAL_TYPE)
+                .setTitleText("Registration")
+                .setContentText("Submit Registration?")
+                .setConfirmText("Yes")
+                .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                    @Override
+                    public void onClick(SweetAlertDialog sweetAlertDialog) {
+                        submitCheckin(reviewFragment.getSignatureBmp(), reviewFragment.getCheckin(), reviewFragment.getEntryCheckinContainer());
+                        sweetAlertDialog.setTitleText("success!")
+                                .setContentText("Registration success")
+                                .setConfirmText("OK")
+                                .setConfirmClickListener(null)
+                                .changeAlertType(SweetAlertDialog.SUCCESS_TYPE);
+                    }
+                })
+                .setCancelText("Cancel")
+                .setCancelClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                    @Override
+                    public void onClick(SweetAlertDialog sweetAlertDialog) {
+                        sweetAlertDialog.cancel();
+                    }
+                })
+                .showCancelButton(true)
+                .show();
     }
 }

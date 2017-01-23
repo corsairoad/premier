@@ -268,8 +268,6 @@ public class ReviewFragment extends Fragment {
         return buildCheckinEntry();
     }
 
-
-
     private EntryCheckinContainer buildCheckinEntry() {
         EntryCheckin.Builder builder = new EntryCheckin.Builder();
         builder.setAttribute(dropPoint,textPlatNo.getText().toString(), carMaster, colorMaster,textEmail.getText().toString(),bitmapDefect, signPad.getSignatureBitmap());
@@ -277,10 +275,11 @@ public class ReviewFragment extends Fragment {
         EntryCheckin entryCheckin = builder.build();
         entryCheckinContainer = new EntryCheckinContainer();
         entryCheckinContainer.setEntryCheckin(entryCheckin);
-        Gson gson = new Gson();
-        String jsonEntryCheckin = gson.toJson(entryCheckinContainer);
-        exportToFile(jsonEntryCheckin);
-        Log.d("JSON CHECKIN", jsonEntryCheckin);
+
+        //Gson gson = new Gson();
+        //String jsonEntryCheckin = gson.toJson(entryCheckinContainer);
+        //exportToFile(jsonEntryCheckin);
+        //Log.d("JSON CHECKIN", jsonEntryCheckin);
         return entryCheckinContainer;
     }
 

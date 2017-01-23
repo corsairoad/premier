@@ -4,9 +4,7 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
-import android.util.Log;
 import android.widget.Toast;
-
 import java.util.ArrayList;
 import java.util.List;
 import retrofit2.Call;
@@ -74,7 +72,6 @@ public class DropDao implements ProcessRequest {
 
             db.insert(DropPointMaster.Table.TABLE_NAME, null, cv);
         }
-        db.close();
     }
 
     public List<DropPointMaster> fetchAllDropPoints() {
@@ -102,7 +99,7 @@ public class DropDao implements ProcessRequest {
         }
 
         c.close();
-        db.close();
+
         return dropPointList;
     }
 
@@ -136,9 +133,6 @@ public class DropDao implements ProcessRequest {
         }finally {
             if (c != null) {
                 c.close();
-            }
-            if (db != null) {
-                db.close();
             }
         }
 

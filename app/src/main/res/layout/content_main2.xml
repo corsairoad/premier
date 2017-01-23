@@ -1,33 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/content_main2"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="valet.digikom.com.valetparking.Main2Activity"
-    tools:showIn="@layout/app_bar_main2">
-
-    <LinearLayout
-        android:visibility="gone"
-        android:id="@+id/container_search"
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:paddingTop="10dp"
-        android:background="@color/color_layer_search"
-        android:paddingBottom="10dp"
-        android:paddingLeft="30dp"
-        android:paddingRight="30dp">
-
-        <EditText
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@drawable/bg_edittext_search"
-            android:paddingLeft="6dp"
-            android:drawableLeft="@drawable/ic_search_black_24dp"/>
-
-    </LinearLayout>
+    app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
     <TextView
         android:id="@+id/text_total_checkin"
@@ -35,6 +12,7 @@
         android:layout_height="wrap_content"
         android:paddingLeft="16dp"
         android:paddingTop="16dp"
+        android:visibility="gone"
         android:paddingBottom="16dp"
         android:paddingRight="16dp"
         android:textSize="16sp"

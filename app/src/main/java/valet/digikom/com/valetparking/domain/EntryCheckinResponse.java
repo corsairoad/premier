@@ -8,6 +8,8 @@ import com.google.gson.annotations.SerializedName;
 
 public class EntryCheckinResponse {
 
+    public static final int FLAG_CALL = 1;
+    public static final int FLAG_CANCEL_CALL = 0;
     public static final int FLAG_UPLOAD_SUCCESS = 1;
     public static final int FLAG_UPLOAD_FAILED = 0;
     public static final String ID_ENTRY_CHECKIN = "entry_id";
@@ -99,6 +101,8 @@ public class EntryCheckinResponse {
         private String namaAdminCheckin;
         @SerializedName("vthd_usms_name_rnnr_tkr_ci")
         private String namaRunner;
+        @SerializedName("vthd_valetfee")
+        private int fee;
 
         public Attribute() {
         }
@@ -245,6 +249,14 @@ public class EntryCheckinResponse {
 
         public void setNamaRunner(String namaRunner) {
             this.namaRunner = namaRunner;
+        }
+
+        public int getFee() {
+            return fee;
+        }
+
+        public void setFee(int fee) {
+            this.fee = fee;
         }
     }
 

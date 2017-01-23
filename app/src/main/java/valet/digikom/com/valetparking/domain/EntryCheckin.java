@@ -116,7 +116,7 @@ public class EntryCheckin {
         }
 
         public void setParaf(String paraf) {
-            this.paraf = "paraf";
+            this.paraf = paraf;
         }
 
         public String getDefect() {
@@ -124,7 +124,7 @@ public class EntryCheckin {
         }
 
         public void setDefect(String defect) {
-            this.defect = "defect";
+            this.defect = defect;
         }
 
     }
@@ -288,7 +288,13 @@ public class EntryCheckin {
             attrib.setDropMasterId(String.valueOf(dropPointMaster.getAttrib().getDropId()));
             attrib.setPlatNo(platNo);
             attrib.setCarType(String.valueOf(carMaster.getAttrib().getId_attrib()));
-            attrib.setColorId(String.valueOf(colorMaster.getAttrib().getId_color()));
+
+            if (colorMaster != null) {
+                attrib.setColorId(String.valueOf(colorMaster.getAttrib().getId_color()));
+            }else  {
+                attrib.setColorId("");
+            }
+
             attrib.setEmailCustomer(email);
             attrib.setDefect(BitmapToString.create(bmpDefects));
             attrib.setParaf(BitmapToString.create(bmpSignature));

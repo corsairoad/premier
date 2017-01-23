@@ -72,7 +72,6 @@ public class ColorDao implements ProcessRequest {
 
             db.insert(ColorMaster.Table.TABLE_NAME, null, cv);
         }
-        db.close();
     }
 
     public List<ColorMaster> fetchColors() {
@@ -95,7 +94,7 @@ public class ColorDao implements ProcessRequest {
         }
 
         cursor.close();
-        db.close();
+
         return colorMasterList;
     }
 

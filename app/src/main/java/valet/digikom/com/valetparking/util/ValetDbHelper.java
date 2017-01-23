@@ -12,6 +12,7 @@ import valet.digikom.com.valetparking.domain.ColorMaster;
 import valet.digikom.com.valetparking.domain.DefectMaster;
 import valet.digikom.com.valetparking.domain.DropPointMaster;
 import valet.digikom.com.valetparking.domain.EntryCheckinResponse;
+import valet.digikom.com.valetparking.domain.EntryCheckoutCont;
 
 /**
  * Created by DIGIKOM-EX4 on 12/20/2016.
@@ -39,6 +40,7 @@ public class ValetDbHelper extends SQLiteOpenHelper {
         db.execSQL(DropPointMaster.Table.CREATE);
         db.execSQL(EntryDao.Table.CREATE);
         db.execSQL(EntryCheckinResponse.Table.CREATE);
+        db.execSQL(EntryCheckoutCont.Table.CREATE);
     }
 
     @Override
@@ -51,6 +53,7 @@ public class ValetDbHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + DropPointMaster.Table.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + EntryDao.Table.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + EntryCheckinResponse.Table.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + EntryCheckoutCont.Table.TABLE_NAME);
 
         onCreate(db);
     }

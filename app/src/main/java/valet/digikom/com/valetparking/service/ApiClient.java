@@ -1,6 +1,14 @@
 package valet.digikom.com.valetparking.service;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
+import android.os.SystemClock;
+
 import java.io.IOException;
+import java.util.Calendar;
+
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -47,6 +55,16 @@ public class ApiClient {
         OkHttpClient client = httpClient.build();
         Retrofit retrofit = builder.client(client).build();
         return retrofit.create(serviceClass);
+    }
+
+    public static void startCheckoutEntryAlarm(Context context) {
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        //Intent intent = new Intent(context, EntryCheckoutService.class);
+        Intent intent = new Intent(context, EntryCheckoutReceiver.class);
+        intent.setAction("com.valet.dki");
+        PendingIntent alarmIntent = PendingIntent.getService(context,0,intent,0);
+        Calendar cal = Calendar.getInstance();
+        alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime(),15 * 1000,alarmIntent);
     }
 
 }

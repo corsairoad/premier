@@ -70,7 +70,7 @@ public class ItemsDao implements ProcessRequest{
 
             db.insert(AdditionalItems.Table.TABLE_NAME,null, cv);
         }
-        db.close();
+
     }
 
     @Override
@@ -100,7 +100,7 @@ public class ItemsDao implements ProcessRequest{
             } while (cursor.moveToNext());
         }
         cursor.close();
-        db.close();
+
         return itemsList;
     }
 }

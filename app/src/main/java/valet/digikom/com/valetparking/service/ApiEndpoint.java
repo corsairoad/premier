@@ -17,6 +17,7 @@ import valet.digikom.com.valetparking.domain.DefectResponse;
 import valet.digikom.com.valetparking.domain.DropPointMasterResponse;
 import valet.digikom.com.valetparking.domain.EntryCheckinContainer;
 import valet.digikom.com.valetparking.domain.EntryCheckinResponse;
+import valet.digikom.com.valetparking.domain.EntryCheckoutCont;
 import valet.digikom.com.valetparking.domain.TokenResponse;
 
 /**
@@ -49,4 +50,7 @@ public interface ApiEndpoint {
 
     @PUT("ad_car_call/{id}")
     Call<AddCarCallResponse> postCallCar(@Path("id") int id, @Body AddCarCallBody addCarCallBody);
+
+    @GET("kg_entry_checkout")
+    Call<EntryCheckoutCont> getCheckouts();
 }

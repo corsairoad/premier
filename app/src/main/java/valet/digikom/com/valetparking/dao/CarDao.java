@@ -63,7 +63,6 @@ public class CarDao implements ProcessRequest {
             e.printStackTrace();
         }finally {
             cursor.close();
-            db.close();
         }
 
         return carMasterList;
@@ -100,7 +99,6 @@ public class CarDao implements ProcessRequest {
 
             db.insert(CarMaster.Table.TABLE_NAME, null, cv);
         }
-        db.close();
     }
 
     @Override

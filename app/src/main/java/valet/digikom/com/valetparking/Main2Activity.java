@@ -1,66 +1,52 @@
 package valet.digikom.com.valetparking;
 
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.TabLayout;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.TextView;
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.List;
-import valet.digikom.com.valetparking.adapter.ListCheckinAdapter;
+import valet.digikom.com.valetparking.adapter.ParkedCarPagerAdapter;
 import valet.digikom.com.valetparking.dao.CarDao;
-import valet.digikom.com.valetparking.dao.CheckinDao;
 import valet.digikom.com.valetparking.dao.ColorDao;
 import valet.digikom.com.valetparking.dao.DefectDao;
 import valet.digikom.com.valetparking.dao.DropDao;
-import valet.digikom.com.valetparking.dao.EntryDao;
 import valet.digikom.com.valetparking.dao.ItemsDao;
 import valet.digikom.com.valetparking.dao.TokenDao;
-import valet.digikom.com.valetparking.domain.Checkin;
-import valet.digikom.com.valetparking.domain.EntryCheckin;
-import valet.digikom.com.valetparking.domain.EntryCheckinResponse;
+import valet.digikom.com.valetparking.fragments.CalledCarFragment;
+import valet.digikom.com.valetparking.fragments.ParkedCarFragment;
+import valet.digikom.com.valetparking.service.ApiClient;
 import valet.digikom.com.valetparking.util.ValetDbHelper;
 
 public class Main2Activity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, ListCheckinAdapter.OnItemCheckinListener {
+        implements NavigationView.OnNavigationItemSelectedListener{
 
-    RecyclerView listCheckin;
-    ListCheckinAdapter adapter;
-    ArrayList<Checkin> checkins = new ArrayList<>();
-    List<EntryCheckinResponse> responseList = new ArrayList<>();
-    TextView textEmpty;
-    TextView textTotalCheckin;
-
+    ViewPager viewPager;
+    ParkedCarPagerAdapter pagerAdapter;
+    TabLayout tabLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main2);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        ValetDbHelper dbHelper = new ValetDbHelper(this);
-        textTotalCheckin = (TextView) findViewById(R.id.text_total_checkin);
-        listCheckin = (RecyclerView) findViewById(R.id.list_checkin);
-        textEmpty = (TextView) findViewById(R.id.text_empty);
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
-        listCheckin.setHasFixedSize(true);
-        listCheckin.setLayoutManager(layoutManager);
-        adapter = new ListCheckinAdapter(checkins, responseList,this, this);
-        listCheckin.setAdapter(adapter);
+        tabLayout = (TabLayout) findViewById(R.id.tabs);
+        viewPager = (ViewPager) findViewById(R.id.viewpager);
+        // set up pager parked car and called cars
+        setupPagers();
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab_entry);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -79,15 +65,22 @@ public class Main2Activity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        // load checkin on database
-        new LoadCheckinTask().execute();
-
-        DefectDao defectDao = DefectDao.getInstance(dbHelper);
-        TokenDao.getToken(defectDao);
+        ValetDbHelper dbHelper = new ValetDbHelper(this);
+        TokenDao.getToken(DefectDao.getInstance(dbHelper));
         TokenDao.getToken(ItemsDao.getInstance(dbHelper));
         TokenDao.getToken(CarDao.getInstance(dbHelper));
         TokenDao.getToken(ColorDao.getInstance(dbHelper));
         TokenDao.getToken(DropDao.getInstance(dbHelper));
+
+        ApiClient.startCheckoutEntryAlarm(this);
+    }
+
+    private void setupPagers() {
+        pagerAdapter = new ParkedCarPagerAdapter(getSupportFragmentManager());
+        pagerAdapter.addFragments(new ParkedCarFragment(), "Parked Car");
+        pagerAdapter.addFragments(new CalledCarFragment(), "Called Car");
+        viewPager.setAdapter(pagerAdapter);
+        tabLayout.setupWithViewPager(viewPager);
     }
 
     @Override
@@ -146,65 +139,5 @@ public class Main2Activity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
-    }
-
-    @Override
-    public void onItemCheckinClick(int id) {
-        Intent intent = new Intent(this, ParkedCarDetailActivity.class);
-        intent.putExtra(EntryCheckinResponse.ID_ENTRY_CHECKIN, id);
-        startActivity(intent);
-    }
-
-    private class LoadCheckin extends AsyncTask<String, Void, List<Checkin>> {
-
-        @Override
-        protected List<Checkin> doInBackground(String... strings) {
-            CheckinDao dao = CheckinDao.newInstance(new ValetDbHelper(Main2Activity.this),Main2Activity.this);
-            List<Checkin> checkinList = null;
-            try {
-                checkinList = dao.getAllListCheckIn();
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-            return checkinList;
-        }
-
-        @Override
-        protected void onPostExecute(List<Checkin> checkinsx) {
-            if (checkinsx != null && !checkinsx.isEmpty()) {
-                checkins.clear();
-                checkins.addAll(checkinsx);
-                adapter.notifyDataSetChanged();
-                textEmpty.setVisibility(View.GONE);
-                textTotalCheckin.setText(getResources().getString(R.string.total_checkin) + " " + checkinsx.size());
-            }else {
-                textTotalCheckin.setVisibility(View.INVISIBLE);
-                textEmpty.setVisibility(View.VISIBLE);
-            }
-        }
-    }
-
-    private class LoadCheckinTask extends AsyncTask<Void, Void, List<EntryCheckinResponse>> {
-
-        @Override
-        protected List<EntryCheckinResponse> doInBackground(Void... voids) {
-            EntryDao entryDao = EntryDao.getInstance(Main2Activity.this);
-            return entryDao.fetchAllCheckinResponse();
-        }
-
-        @Override
-        protected void onPostExecute(List<EntryCheckinResponse> entryCheckinResponses) {
-            super.onPostExecute(entryCheckinResponses);
-            if (entryCheckinResponses != null && !entryCheckinResponses.isEmpty()) {
-                responseList.clear();
-                responseList.addAll(entryCheckinResponses);
-                adapter.notifyDataSetChanged();
-                textEmpty.setVisibility(View.GONE);
-                textTotalCheckin.setText(getResources().getString(R.string.total_checkin) + " " + entryCheckinResponses.size());
-            }else {
-                textTotalCheckin.setVisibility(View.INVISIBLE);
-                textEmpty.setVisibility(View.VISIBLE);
-            }
-        }
     }
 }

@@ -1,6 +1,7 @@
 package valet.digikom.com.valetparking.adapter;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,42 +11,32 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import de.hdodenhof.circleimageview.CircleImageView;
 import valet.digikom.com.valetparking.R;
 import valet.digikom.com.valetparking.domain.Checkin;
 import valet.digikom.com.valetparking.domain.EntryCheckinResponse;
 
 /**
- * Created by DIGIKOM-EX4 on 1/5/2017.
+ * Created by DIGIKOM-EX4 on 1/23/2017.
  */
 
-public class ListCheckinAdapter extends RecyclerView.Adapter<ListCheckinAdapter.ViewHolder>{
+public class ListCalledCarAdapter extends RecyclerView.Adapter<ListCalledCarAdapter.ViewHolder> {
 
-    List<Checkin> checkinList;
+
     Context context;
     List<EntryCheckinResponse> responsesList;
-    OnItemCheckinListener onItemCheckinListener;
+    OnCalledCarClickListener onCalledCarClickListener;
 
-    public ListCheckinAdapter(List<Checkin> checkinList, List<EntryCheckinResponse> responseList, Context context, OnItemCheckinListener onItemCheckinListener) {
-        this.checkinList = checkinList;
+    public ListCalledCarAdapter(List<EntryCheckinResponse> responseList, Context context, OnCalledCarClickListener onCalledCarClickListener) {
         this.context = context;
         this.responsesList = responseList;
-        this.onItemCheckinListener = onItemCheckinListener;
+        this.onCalledCarClickListener = onCalledCarClickListener;
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ListCalledCarAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_checkin,parent, false);
-        return new ViewHolder(view);
-    }
-
-    @Override
-    public long getItemId(int position) {
-        return responsesList.get(position).getData().getAttribute().getId();
-    }
-
-    @Override
-    public int getItemViewType(int position) {
-        return super.getItemViewType(position);
+        return new ListCalledCarAdapter.ViewHolder(view);
     }
 
     @Override
@@ -61,16 +52,29 @@ public class ListCheckinAdapter extends RecyclerView.Adapter<ListCheckinAdapter.
         holder.layoutContainer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                onItemCheckinListener.onItemCheckinClick((int) getItemId(position));
+                onCalledCarClickListener.onItemClick((int) getItemId(position));
             }
         });
 
         holder.textPlatNo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                onItemCheckinListener.onItemCheckinClick((int)getItemId(position));
+                onCalledCarClickListener.onItemClick((int)getItemId(position));
             }
         });
+
+        holder.circleImageView.setImageResource(R.drawable.call_car2);
+        holder.layoutContainer.setBackgroundColor(Color.parseColor("#ffebee"));
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return responsesList.get(position).getData().getAttribute().getId();
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return super.getItemViewType(position);
     }
 
     @Override
@@ -83,6 +87,7 @@ public class ListCheckinAdapter extends RecyclerView.Adapter<ListCheckinAdapter.
         TextView textPlatNo;
         TextView textRunnerName;
         TextView textIdCheckin;
+        CircleImageView circleImageView;
 
         public ViewHolder(View view) {
             super(view);
@@ -90,10 +95,12 @@ public class ListCheckinAdapter extends RecyclerView.Adapter<ListCheckinAdapter.
             textRunnerName = (TextView) view.findViewById(R.id.text_runner);
             textIdCheckin = (TextView) view.findViewById(R.id.id_checkin);
             layoutContainer = (LinearLayout) view.findViewById(R.id.container_checkin);
+            circleImageView = (CircleImageView) view.findViewById(R.id.img_car);
         }
     }
 
-    public interface OnItemCheckinListener {
-        void onItemCheckinClick(int id);
+    public interface OnCalledCarClickListener {
+        void onItemClick(int id);
     }
+
 }

@@ -31,8 +31,8 @@ public class AddCarCall {
 
         @SerializedName("vthdDrmsIdCO")
         private String idDropTo;
-        @SerializedName("vthdUsmsIdRnnrTkrCO")
-        private String idRunner;
+        @SerializedName("vthdDateCarDriving")
+        private String arrivedTime;
 
         public Attribute() {
         }
@@ -45,12 +45,12 @@ public class AddCarCall {
             this.idDropTo = idDropTo;
         }
 
-        public String getIdRunner() {
-            return idRunner;
+        public String getArrivedTime() {
+            return arrivedTime;
         }
 
-        public void setIdRunner(String idRunner) {
-            this.idRunner = idRunner;
+        public void setArrivedTime(String arrivedTime) {
+            this.arrivedTime = arrivedTime;
         }
     }
 }
