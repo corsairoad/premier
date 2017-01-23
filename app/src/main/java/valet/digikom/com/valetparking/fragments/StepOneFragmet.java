@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.text.InputFilter;
+import android.text.Spanned;
 import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -58,7 +59,7 @@ public class StepOneFragmet extends Fragment {
     private EditText inputMerk;
     private EditText inputEmail;
     private EditText inputColor;
-    InputFilter[] filters = new InputFilter[]{new InputFilter.AllCaps()};
+    InputFilter[] filters;
     private OnRegsitrationValid onRegsitrationValid;
     private ValetDbHelper dbHelper;
     private List<DropPointMaster> dpMasters = new ArrayList<>();
@@ -96,6 +97,8 @@ public class StepOneFragmet extends Fragment {
         dbHelper = new ValetDbHelper(getContext());
         adapter = new DropPointAdapter(getContext(), dpMasters);
 
+        filters = new InputFilter[]{new InputFilter.AllCaps()};
+
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
@@ -111,7 +114,7 @@ public class StepOneFragmet extends Fragment {
         inputDropPoint = (EditText) view.findViewById(R.id.input_drop_point);
         inputDropPoint.setFilters(filters);
         inputPlatNo = (EditText) view.findViewById(R.id.input_plat_no);
-        inputPlatNo.setFilters(filters);
+        inputPlatNo.setFilters(new InputFilter[] {new InputFilter.AllCaps(), getInputFilterPlate()});
         inputCartype = (EditText) view.findViewById(R.id.input_car_type);
         inputCartype.setFilters(filters);
         inputMerk = (EditText) view.findViewById(R.id.input_merk_mobil);
@@ -119,7 +122,6 @@ public class StepOneFragmet extends Fragment {
         inputEmail = (EditText) view.findViewById(R.id.input_email);
         inputColor = (EditText) view.findViewById(R.id.input_color);
         inputColor.setFilters(filters);
-
 
         btnCarType = (ImageButton) view.findViewById(R.id.btn_dropdown_cartype);
         btnColorType = (ImageButton) view.findViewById(R.id.btn_dropdown_color);
@@ -131,6 +133,7 @@ public class StepOneFragmet extends Fragment {
                 new FetchDropPointTask().execute();
             }
         });
+
 
         initData();
         return view;
@@ -341,4 +344,47 @@ public class StepOneFragmet extends Fragment {
             }
         }).run();
     }
+
+    private InputFilter getInputFilterPlate() {
+        InputFilter filter = new InputFilter() {
+            @Override
+            public CharSequence filter(CharSequence character, int start, int end, Spanned spanned, int dStart, int dEnd) {
+
+                for (int a=start; a<end; a++ ) {
+
+                    if (!Character.isLetterOrDigit(character.charAt(a))) {
+                        return "";
+                    }
+
+                   if (character.length()>1) {
+
+                       if (Character.isLetter(character.charAt(0)) && Character.isDigit(character.charAt(1))) {
+                           return character.subSequence(0, 1).toString() + " " + character.charAt(1);
+                       }
+
+                       if (Character.isLetter(character.charAt(a)) && Character.isDigit(character.charAt(a+1))) {
+                           return "";
+                       }
+
+                       if (Character.isLetter(character.charAt(0)) && Character.isLetter(character.charAt(1))){
+                           return character.subSequence(0, 2).toString() + " ";
+                       }
+
+                   }
+
+                    if (Character.isLetter(character.charAt(a))) {
+                        if (spanned.length() >= 1) {
+                            if (Character.isDigit(spanned.charAt(spanned.length()-1))) {
+                                return "";
+                            }
+                        }
+                    }
+
+                }
+                return null;
+            }
+        };
+        return filter;
+    }
+
 }
