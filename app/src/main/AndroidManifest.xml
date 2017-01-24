@@ -6,6 +6,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
         android:allowBackup="true"
@@ -53,16 +54,18 @@
                 android:value="valet.digikom.com.valetparking.Main2Activity" />
         </activity>
 
-        <receiver android:name="valet.digikom.com.valetparking.service.EntryCheckoutReceiver"
-            android:enabled="true">
-            <intent-filter>
-                <action android:name="com.valet.dki"/>
-            </intent-filter>
-        </receiver>
+        <receiver android:name=".EntryCheckoutReceiver" />
+        <receiver android:name=".CheckoutReceiver" />
 
-        <service android:name="valet.digikom.com.valetparking.service.EntryCheckoutService"
-            android:enabled="true"
-            android:exported="false"></service>
+        <activity
+            android:name=".CheckoutActivity"
+            android:label="@string/title_activity_checkout"
+            android:parentActivityName=".Main2Activity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="valet.digikom.com.valetparking.Main2Activity" />
+        </activity>
     </application>
 
 </manifest>

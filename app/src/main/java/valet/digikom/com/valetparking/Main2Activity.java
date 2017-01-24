@@ -1,11 +1,18 @@
 package valet.digikom.com.valetparking;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
@@ -15,8 +22,12 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+
+import java.util.Calendar;
+
 import valet.digikom.com.valetparking.adapter.ParkedCarPagerAdapter;
 import valet.digikom.com.valetparking.dao.CarDao;
+import valet.digikom.com.valetparking.dao.CheckoutDao;
 import valet.digikom.com.valetparking.dao.ColorDao;
 import valet.digikom.com.valetparking.dao.DefectDao;
 import valet.digikom.com.valetparking.dao.DropDao;
@@ -24,7 +35,6 @@ import valet.digikom.com.valetparking.dao.ItemsDao;
 import valet.digikom.com.valetparking.dao.TokenDao;
 import valet.digikom.com.valetparking.fragments.CalledCarFragment;
 import valet.digikom.com.valetparking.fragments.ParkedCarFragment;
-import valet.digikom.com.valetparking.service.ApiClient;
 import valet.digikom.com.valetparking.util.ValetDbHelper;
 
 public class Main2Activity extends AppCompatActivity
@@ -72,7 +82,7 @@ public class Main2Activity extends AppCompatActivity
         TokenDao.getToken(ColorDao.getInstance(dbHelper));
         TokenDao.getToken(DropDao.getInstance(dbHelper));
 
-        ApiClient.startCheckoutEntryAlarm(this);
+        //startCheckoutEntryAlarm(this);
     }
 
     private void setupPagers() {
@@ -113,6 +123,14 @@ public class Main2Activity extends AppCompatActivity
             return true;
         }
 
+        // checking ready checkout car
+        if (id == R.id.action_refresh) {
+            Fragment fragment = pagerAdapter.getItem(1);
+            CheckoutDao checkoutDao = CheckoutDao.getInstance(this, fragment);
+            TokenDao.getToken(checkoutDao);
+            return true;
+        }
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -139,5 +157,19 @@ public class Main2Activity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void startCheckoutEntryAlarm(Context context) {
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        //Intent intent = new Intent(context, EntryCheckoutService.class);
+        Intent intent = new Intent();
+        intent.setClass(this,valet.digikom.com.valetparking.CheckoutReceiver.class);
+        intent.setAction("com.valet.dki");
+
+        //this.sendBroadcast(intent);
+
+        PendingIntent alarmIntent = PendingIntent.getService(context,0,intent,0);
+        Calendar cal = Calendar.getInstance();
+        alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, cal.getTimeInMillis(),1000,alarmIntent);
     }
 }

@@ -7,4 +7,11 @@
         android:title="@string/action_search"
         android:icon="@drawable/ic_search_white_24dp"
         app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_refresh"
+        android:orderInCategory="100"
+        android:title="@string/action_search"
+        android:icon="@drawable/restart"
+        app:showAsAction="ifRoom" />
 </menu>

@@ -43,6 +43,12 @@ public class ListCalledCarAdapter extends RecyclerView.Adapter<ListCalledCarAdap
     public void onBindViewHolder(ViewHolder holder, final int position) {
         EntryCheckinResponse response = responsesList.get(position);
 
+        if (response.isReadyToCheckout()) {
+            holder.textReady.setVisibility(View.VISIBLE);
+        }else {
+            holder.textReady.setVisibility(View.GONE);
+        }
+
         String platNo = response.getData().getAttribute().getIdTransaksi() + " - " + response.getData().getAttribute().getPlatNo();
         String checkinTime = response.getData().getAttribute().getCheckinTime();
 
@@ -88,6 +94,7 @@ public class ListCalledCarAdapter extends RecyclerView.Adapter<ListCalledCarAdap
         TextView textRunnerName;
         TextView textIdCheckin;
         CircleImageView circleImageView;
+        TextView textReady;
 
         public ViewHolder(View view) {
             super(view);
@@ -96,6 +103,7 @@ public class ListCalledCarAdapter extends RecyclerView.Adapter<ListCalledCarAdap
             textIdCheckin = (TextView) view.findViewById(R.id.id_checkin);
             layoutContainer = (LinearLayout) view.findViewById(R.id.container_checkin);
             circleImageView = (CircleImageView) view.findViewById(R.id.img_car);
+            textReady = (TextView) view.findViewById(R.id.text_ready);
         }
     }
 

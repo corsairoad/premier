@@ -57,14 +57,5 @@ public class ApiClient {
         return retrofit.create(serviceClass);
     }
 
-    public static void startCheckoutEntryAlarm(Context context) {
-        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        //Intent intent = new Intent(context, EntryCheckoutService.class);
-        Intent intent = new Intent(context, EntryCheckoutReceiver.class);
-        intent.setAction("com.valet.dki");
-        PendingIntent alarmIntent = PendingIntent.getService(context,0,intent,0);
-        Calendar cal = Calendar.getInstance();
-        alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime(),15 * 1000,alarmIntent);
-    }
 
 }

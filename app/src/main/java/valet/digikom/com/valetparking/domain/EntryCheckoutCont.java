@@ -10,6 +10,8 @@ import java.util.List;
 
 public class EntryCheckoutCont {
 
+    public static final String KEY_ENTRY_CHECKOUT = "checkout";
+
     @SerializedName("data")
     List<EntryChekout> chekoutList;
 

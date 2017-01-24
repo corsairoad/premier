@@ -26,7 +26,8 @@
             android:layout_height="45dp" />
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
+            android:layout_weight="7"
             android:layout_height="match_parent"
             android:paddingLeft="@dimen/activity_horizontal_margin"
             android:orientation="vertical">
@@ -54,6 +55,18 @@
                 android:layout_weight="1"/>
 
         </LinearLayout>
+
+        <TextView
+            android:id="@+id/text_ready"
+            android:text="@string/ready"
+            android:textSize="16dp"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:visibility="gone"
+            android:textColor="@android:color/holo_green_light"
+            android:textAlignment="center"
+            android:gravity="center_vertical"
+            android:layout_height="match_parent" />
 
     </LinearLayout>
 

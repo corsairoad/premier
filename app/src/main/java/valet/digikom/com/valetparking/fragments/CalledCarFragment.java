@@ -1,6 +1,7 @@
 package valet.digikom.com.valetparking.fragments;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -15,12 +16,16 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
+import valet.digikom.com.valetparking.CheckoutActivity;
+import valet.digikom.com.valetparking.ParkedCarDetailActivity;
 import valet.digikom.com.valetparking.R;
 import valet.digikom.com.valetparking.adapter.ListCalledCarAdapter;
 import valet.digikom.com.valetparking.dao.CallDao;
+import valet.digikom.com.valetparking.dao.CheckoutDao;
 import valet.digikom.com.valetparking.domain.EntryCheckinResponse;
+import valet.digikom.com.valetparking.domain.EntryCheckoutCont;
 
-public class CalledCarFragment extends Fragment implements ListCalledCarAdapter.OnCalledCarClickListener {
+public class CalledCarFragment extends Fragment implements ListCalledCarAdapter.OnCalledCarClickListener, CheckoutDao.OnCarReadyListener {
 
     private List<EntryCheckinResponse> responseList = new ArrayList<>();
     private ListCalledCarAdapter calledCarAdapter;
@@ -74,7 +79,14 @@ public class CalledCarFragment extends Fragment implements ListCalledCarAdapter.
 
     @Override
     public void onItemClick(int id) {
+        Intent intent = new Intent(getContext(), CheckoutActivity.class);
+        intent.putExtra(EntryCheckoutCont.KEY_ENTRY_CHECKOUT, id);
+        startActivity(intent);
+    }
 
+    @Override
+    public void onCheckoutReady() {
+        new FetchCalledCarTask().execute();
     }
 
     private class FetchCalledCarTask extends AsyncTask<Void, Void, List<EntryCheckinResponse>> {
@@ -86,12 +98,16 @@ public class CalledCarFragment extends Fragment implements ListCalledCarAdapter.
 
         @Override
         protected void onPostExecute(List<EntryCheckinResponse> responseListx) {
-            if (!responseListx.isEmpty()) {
-                responseList.clear();
-                responseList.addAll(responseListx);
-                calledCarAdapter.notifyDataSetChanged();
-                textEmpty.setVisibility(View.GONE);
-            }
+            initList(responseListx);
+        }
+    }
+
+    private void initList(List<EntryCheckinResponse> responseListx) {
+        if (!responseListx.isEmpty()) {
+            responseList.clear();
+            responseList.addAll(responseListx);
+            calledCarAdapter.notifyDataSetChanged();
+            textEmpty.setVisibility(View.GONE);
         }
     }
 }

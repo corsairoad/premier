@@ -17,6 +17,8 @@ public class EntryCheckinResponse {
     @SerializedName("data")
     private Data data;
 
+    private boolean isReadyToCheckout = false;
+
     public EntryCheckinResponse() {
     }
 
@@ -26,6 +28,14 @@ public class EntryCheckinResponse {
 
     public void setData(Data data) {
         this.data = data;
+    }
+
+    public boolean isReadyToCheckout() {
+        return isReadyToCheckout;
+    }
+
+    public void setReadyToCheckout(boolean readyToCheckout) {
+        isReadyToCheckout = readyToCheckout;
     }
 
     public class Data {
@@ -269,13 +279,15 @@ public class EntryCheckinResponse {
         public static final String COL_IS_UPLOADED = "is_uploaded";
         public static final String COL_IS_CHECKOUT = "is_checkout";
         public static final String COL_IS_CALLED = "is_called";
+        public static final String COL_IS_READY_CHECKOUT = "is_ready";
 
         public static final String CREATE = "CREATE TABLE " + TABLE_NAME + "( " + COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 COL_RESPONSE_ID + " INTEGER, " +
                 COL_JSON_RESPONSE + " TEXT, " +
                 COL_IS_UPLOADED + " INTEGER, " +
                 COL_IS_CHECKOUT + " INTEGER DEFAULT 0, " +
-                COL_IS_CALLED + " INTEGER DEFAULT 0);";
+                COL_IS_CALLED + " INTEGER DEFAULT 0, " +
+                COL_IS_READY_CHECKOUT + " INTEGER DEFAULT 0);";
     }
 
 }

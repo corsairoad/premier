@@ -53,12 +53,12 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Registration</string>
-    <string name="drop_point">Drop Point</string>
+    <string name="drop_point">DROP POINT</string>
     <string name="plat_no">License Plate</string>
     <string name="car_type">Car Type</string>
     <string name="color">Color</string>
     <string name="merk_mobil">Car Brand</string>
-    <string name="checkin">Checkin</string>
+    <string name="checkin">CHECKIN</string>
     <string name="defects">Defects</string>
     <string name="stuff">Stuffs</string>
     <string name="additional_info">Additional stuff</string>
@@ -89,12 +89,18 @@
 
     </string-array>
     <string name="title_activity_parked_car_detail">Parked Car</string>
-    <string name="trans_code">No. Transaksi</string>
-    <string name="runner">Runner</string>
-    <string name="fee">Fee</string>
-    <string name="drop_to">Drop to</string>
+    <string name="trans_code">TRANSACTION NO.</string>
+    <string name="runner">RUNNER</string>
+    <string name="fee">FEE</string>
+    <string name="drop_to">DROP TO</string>
     <string name="set_as_default">Set as default</string>
-    <string name="time_arrived">Arrived Time</string>
+    <string name="time_arrived">PICK TIME</string>
     <string name="set">Set</string>
+    <string name="title_activity_checkout">Checkout</string>
+    <string name="drop_point_checkout">CHECK IN</string>
+    <string name="lost_ticket">LOST TICKET</string>
+    <string name="total_pay">TOTAL</string>
+    <string name="checkout">CHECKOUT</string>
+    <string name="ready">READY</string>
 
 </resources>

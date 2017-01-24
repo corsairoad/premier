@@ -52,5 +52,17 @@ public class AddCarCall {
         public void setArrivedTime(String arrivedTime) {
             this.arrivedTime = arrivedTime;
         }
+
+        public static class Table {
+            public static final String TABLE_NAME = "called_car";
+
+            public static final String COL_ID = "_id";
+            public static final String COL_RESPONSE_ID = "response_id";
+            public static final String COL_JSON_RESPONSE = "json_response";
+
+            public static final String CREATE = "CREATE TABLE " + TABLE_NAME + "( " + COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    COL_RESPONSE_ID + " INTEGER, " +
+                    COL_JSON_RESPONSE + " TEXT);";
+        }
     }
 }

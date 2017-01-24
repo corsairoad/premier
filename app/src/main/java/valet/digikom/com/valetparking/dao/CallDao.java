@@ -9,6 +9,7 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 
+import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,6 +30,9 @@ import valet.digikom.com.valetparking.util.ValetDbHelper;
  */
 
 public class CallDao implements ProcessRequest {
+
+    public static final int FLAG_READY = 1;
+    public static final int FLAG_NOT_READY = 0;
 
     private int id;
     private AddCarCallBody addCarCallBody;
@@ -83,17 +87,57 @@ public class CallDao implements ProcessRequest {
         db.close();
     }
 
+    public void setCheckoutReady(int id, int isReady) {
+        ValetDbHelper dbHelper = new ValetDbHelper(context);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        String[] args = new String[] {String.valueOf(id)};
+        ContentValues cv = new ContentValues();
+        cv.put(EntryCheckinResponse.Table.COL_IS_READY_CHECKOUT, isReady);
+        db.update(EntryCheckinResponse.Table.TABLE_NAME,cv, EntryCheckinResponse.Table.COL_RESPONSE_ID + "=?", args);
+
+        db.close();
+    }
+
     @Override
     public void process(String token) {
         callCar(token);
     }
 
+    // for listing
     public List<EntryCheckinResponse> fetchAllCalledCars () {
         List<EntryCheckinResponse> responseList = new ArrayList<>();
         Gson gson = new Gson();
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         String[] args = new String[] {"1"};
         Cursor c = db.query(EntryCheckinResponse.Table.TABLE_NAME,null, EntryCheckinResponse.Table.COL_IS_CALLED + "=?", args,null,null,EntryCheckinResponse.Table.COL_RESPONSE_ID + " DESC");
+
+        if (c.moveToFirst()) {
+            do {
+
+                String jsonResponse = c.getString(c.getColumnIndex(EntryCheckinResponse.Table.COL_JSON_RESPONSE));
+                EntryCheckinResponse response = gson.fromJson(jsonResponse, EntryCheckinResponse.class);
+                if (response != null) {
+                    responseList.add(response);
+                    int isReady = c.getInt(c.getColumnIndex(EntryCheckinResponse.Table.COL_IS_READY_CHECKOUT));
+                    if (isReady == 0) {
+                        response.setReadyToCheckout(false);
+                    }else {
+                        response.setReadyToCheckout(true);
+                    }
+                }
+            }while (c.moveToNext());
+        }
+        return responseList;
+    }
+
+    // for notification
+    public List<EntryCheckinResponse> fetchAllCalledCarsNotReady () {
+        List<EntryCheckinResponse> responseList = new ArrayList<>();
+        Gson gson = new Gson();
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        String[] args = new String[] {"1"};
+        Cursor c = db.query(EntryCheckinResponse.Table.TABLE_NAME,null, EntryCheckinResponse.Table.COL_IS_CALLED + "=? AND " + EntryCheckinResponse.Table.COL_IS_READY_CHECKOUT + "=0", args,null,null,EntryCheckinResponse.Table.COL_RESPONSE_ID + " DESC");
 
         if (c.moveToFirst()) {
             do {
@@ -104,7 +148,6 @@ public class CallDao implements ProcessRequest {
                 }
             }while (c.moveToNext());
         }
-
         return responseList;
     }
 }

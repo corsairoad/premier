@@ -1,4 +1,4 @@
-package valet.digikom.com.valetparking.service;
+package valet.digikom.com.valetparking;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -17,8 +17,6 @@ public class EntryCheckoutReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.d("Entry Checkout", "Entry checkout receiver called");
-        CheckoutDao checkoutDao = CheckoutDao.getInstance(context);
-        TokenDao.getToken(checkoutDao);
+
     }
 }

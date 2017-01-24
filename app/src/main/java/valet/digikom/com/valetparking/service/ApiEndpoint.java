@@ -8,6 +8,7 @@ import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 import valet.digikom.com.valetparking.domain.AddCarCallBody;
 import valet.digikom.com.valetparking.domain.AddCarCallResponse;
 import valet.digikom.com.valetparking.domain.AdditionalItemsResponse;
@@ -52,5 +53,5 @@ public interface ApiEndpoint {
     Call<AddCarCallResponse> postCallCar(@Path("id") int id, @Body AddCarCallBody addCarCallBody);
 
     @GET("kg_entry_checkout")
-    Call<EntryCheckoutCont> getCheckouts();
+    Call<EntryCheckoutCont> getCheckouts(@Query("page[size]")int pageSize);
 }
