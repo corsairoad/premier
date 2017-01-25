@@ -19,6 +19,9 @@ import valet.digikom.com.valetparking.domain.DropPointMasterResponse;
 import valet.digikom.com.valetparking.domain.EntryCheckinContainer;
 import valet.digikom.com.valetparking.domain.EntryCheckinResponse;
 import valet.digikom.com.valetparking.domain.EntryCheckoutCont;
+import valet.digikom.com.valetparking.domain.FineFee;
+import valet.digikom.com.valetparking.domain.FinishCheckOut;
+import valet.digikom.com.valetparking.domain.FinishCheckoutResponse;
 import valet.digikom.com.valetparking.domain.TokenResponse;
 
 /**
@@ -54,4 +57,10 @@ public interface ApiEndpoint {
 
     @GET("kg_entry_checkout")
     Call<EntryCheckoutCont> getCheckouts(@Query("page[size]")int pageSize);
+
+    @GET("finefee_site_detail")
+    Call<FineFee> getFineFees();
+
+    @PUT("ad_checkout_finish_fine/{id}")
+    Call<FinishCheckoutResponse> submitCheckout(@Path("id") int id, @Body FinishCheckOut finishCheckOut);
 }

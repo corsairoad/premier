@@ -22,7 +22,6 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import valet.digikom.com.valetparking.CheckoutActivity;
-import valet.digikom.com.valetparking.Main2Activity;
 import valet.digikom.com.valetparking.R;
 import valet.digikom.com.valetparking.domain.EntryCheckinResponse;
 import valet.digikom.com.valetparking.domain.EntryCheckoutCont;
@@ -43,17 +42,26 @@ public class CheckoutDao implements ProcessRequest {
     private ValetDbHelper dbHelper;
     private static CheckoutDao checkoutDao;
     private static OnCarReadyListener listener;
+    private static OnCarReadyListener listenerOnParkedCark;
 
     private CheckoutDao(Context context) {
         this.context = context;
         this.dbHelper = new ValetDbHelper(context);
     }
 
-    public static CheckoutDao getInstance(Context context, Fragment fragment) {
+
+    public static CheckoutDao getInstance(Context context, Fragment fragment, Fragment fragmentParkedCar) {
         if (checkoutDao == null) {
             checkoutDao = new CheckoutDao(context);
+        }
+
+        if (fragment != null) {
             listener = (OnCarReadyListener) fragment;
         }
+        if (fragmentParkedCar != null) {
+            listenerOnParkedCark = (OnCarReadyListener) fragmentParkedCar;
+        }
+
         return checkoutDao;
     }
 
@@ -104,7 +112,7 @@ public class CheckoutDao implements ProcessRequest {
             String jsonCheckout = c.getString(c.getColumnIndex(EntryCheckoutCont.Table.COL_JSON_ENTRY_CHECKOUT));
             entryChekout = gson.fromJson(jsonCheckout,EntryCheckoutCont.EntryChekout.class);
         }
-
+        c.close();
         return entryChekout;
     }
 
@@ -113,7 +121,7 @@ public class CheckoutDao implements ProcessRequest {
         downloadCheckouts(token);
     }
 
-    class FindCheckoutCar extends AsyncTask<EntryCheckoutCont, Void, List<EntryCheckinResponse>> {
+    private class FindCheckoutCar extends AsyncTask<EntryCheckoutCont, Void, List<EntryCheckinResponse>> {
 
         @Override
         protected List<EntryCheckinResponse> doInBackground(EntryCheckoutCont... entryCheckoutConts) {
@@ -139,18 +147,17 @@ public class CheckoutDao implements ProcessRequest {
             if (!responseList.isEmpty()){
                 notifyApp(responseList);
             }
-
         }
     }
 
     private void notifyApp(List<EntryCheckinResponse> responseList) {
 
         listener.onCheckoutReady();
+        listenerOnParkedCark.onCheckoutReady();
 
         for (EntryCheckinResponse e : responseList) {
             notify(e);
         }
-
     }
 
     public interface OnCarReadyListener {
@@ -204,4 +211,5 @@ public class CheckoutDao implements ProcessRequest {
         // Build Notification with Notification Manager
         notificationmanager.notify(0, builder.build());
     }
+
 }

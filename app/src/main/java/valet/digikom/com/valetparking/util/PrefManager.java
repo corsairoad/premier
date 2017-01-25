@@ -9,12 +9,15 @@ import android.content.SharedPreferences;
 
 public class PrefManager {
 
+    public static final String KEY_DEFAULT_DROPPOINT = "drop_pint";
+    public static final String KEY_PRINTER_ADDRESS = "mac_addres";
+
     private Context context;
     private static PrefManager prefManager;
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
     private  final String PREF_NAME = PrefManager.class.getSimpleName();
-    public static final String KEY_DEFAULT_DROPPOINT = "drop_pint";
+
 
     private PrefManager(Context context) {
         this.context = context;
@@ -37,5 +40,14 @@ public class PrefManager {
     public int getIdDefaultDropPoint() {
         int id = sharedPreferences.getInt(KEY_DEFAULT_DROPPOINT, -1);
         return id;
+    }
+
+    public void setPrinterMacAddress(String macAddress) {
+        editor.putString(KEY_PRINTER_ADDRESS,macAddress);
+        editor.commit();
+    }
+
+    public String getPrinterMacAddress() {
+        return sharedPreferences.getString(KEY_PRINTER_ADDRESS,null);
     }
 }

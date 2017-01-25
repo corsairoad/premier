@@ -68,7 +68,7 @@ public class EntryDao {
     public List<EntryCheckinResponse> fetchAllCheckinResponse() {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         // Cursor c = db.query(EntryCheckinResponse.Table.TABLE_NAME,null, EntryCheckinResponse.Table.COL_IS_CHECKOUT + "=? AND " + EntryCheckinResponse.Table.COL_IS_CALLED + "=0",new String[]{"0"},null,null,EntryCheckinResponse.Table.COL_RESPONSE_ID + " DESC");
-        Cursor c = db.query(EntryCheckinResponse.Table.TABLE_NAME,null, EntryCheckinResponse.Table.COL_IS_CHECKOUT + "=?",new String[]{"0"},null,null,EntryCheckinResponse.Table.COL_RESPONSE_ID + " DESC");
+        Cursor c = db.query(EntryCheckinResponse.Table.TABLE_NAME,null, EntryCheckinResponse.Table.COL_IS_CHECKOUT + "=? AND " + EntryCheckinResponse.Table.COL_IS_READY_CHECKOUT + "=0",new String[]{"0"},null,null,EntryCheckinResponse.Table.COL_RESPONSE_ID + " DESC");
         List<EntryCheckinResponse> responseList = new ArrayList<>();
 
         if (c.moveToFirst()) {
@@ -90,7 +90,7 @@ public class EntryDao {
         EntryCheckinResponse checkinResponse = null;
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         String[] args = new String[] {String.valueOf(id)};
-        Cursor c = db.query(EntryCheckinResponse.Table.TABLE_NAME,null, EntryCheckinResponse.Table.COL_RESPONSE_ID + "=?",args,null,null,null);
+        Cursor c = db.query(EntryCheckinResponse.Table.TABLE_NAME,null, EntryCheckinResponse.Table.COL_RESPONSE_ID + "=? AND " + EntryCheckinResponse.Table.COL_IS_CHECKOUT + " =0",args,null,null,null);
         if (c.moveToFirst()) {
             do {
                 String jsonResponse = c.getString(c.getColumnIndex(EntryCheckinResponse.Table.COL_JSON_RESPONSE));

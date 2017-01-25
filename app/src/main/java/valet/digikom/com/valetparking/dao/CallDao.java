@@ -40,26 +40,26 @@ public class CallDao implements ProcessRequest {
     private Context context;
     private ValetDbHelper dbHelper;
 
-    private CallDao(int id, AddCarCallBody addCarCallBody, Context context) {
-        this.id = id;
-        this.addCarCallBody = addCarCallBody;
+    private CallDao(Context context) {
         this.context = context;
-        dbHelper = new ValetDbHelper(context);
+        dbHelper = ValetDbHelper.getInstance(context.getApplicationContext());
     }
 
     public static CallDao getInstance(Context context) {
-        return getInstance(0,null,context);
-    }
-
-    public static CallDao getInstance(int id, AddCarCallBody addCarCallBody, Context context) {
         if (callDao == null) {
-            callDao = new CallDao(id,addCarCallBody,context);
+            callDao = new CallDao(context);
         }
         return callDao;
     }
 
+
+
     private void callCar(String token) {
         ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class, token);
+
+        Gson gson = new Gson();
+        String jsonBody = gson.toJson(addCarCallBody);
+
         Call<AddCarCallResponse> call = apiEndpoint.postCallCar(id,addCarCallBody);
         call.enqueue(new Callback<AddCarCallResponse>() {
             @Override
@@ -110,7 +110,7 @@ public class CallDao implements ProcessRequest {
         Gson gson = new Gson();
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         String[] args = new String[] {"1"};
-        Cursor c = db.query(EntryCheckinResponse.Table.TABLE_NAME,null, EntryCheckinResponse.Table.COL_IS_CALLED + "=?", args,null,null,EntryCheckinResponse.Table.COL_RESPONSE_ID + " DESC");
+        Cursor c = db.query(EntryCheckinResponse.Table.TABLE_NAME,null, EntryCheckinResponse.Table.COL_IS_CALLED + " =? AND " + EntryCheckinResponse.Table.COL_IS_CHECKOUT + " =0", args,null,null,EntryCheckinResponse.Table.COL_RESPONSE_ID + " DESC");
 
         if (c.moveToFirst()) {
             do {
@@ -149,5 +149,21 @@ public class CallDao implements ProcessRequest {
             }while (c.moveToNext());
         }
         return responseList;
+    }
+
+    public AddCarCallBody getAddCarCallBody() {
+        return addCarCallBody;
+    }
+
+    public void setAddCarCallBody(AddCarCallBody addCarCallBody) {
+        this.addCarCallBody = addCarCallBody;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 }

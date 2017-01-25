@@ -20,13 +20,14 @@
 
         <item
             android:id="@+id/nav_history"
+            android:visible="false"
             android:icon="@drawable/ic_history_black_24dp"
             android:title="History" />
 
         <item
             android:id="@+id/nav_manage"
             android:icon="@drawable/ic_menu_manage"
-            android:title="Setting" />
+            android:title="Setting Printer" />
     </group>
 
     <item android:title="Communicate" android:visible="false">

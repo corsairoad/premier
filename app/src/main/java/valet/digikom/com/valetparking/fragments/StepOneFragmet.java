@@ -114,7 +114,7 @@ public class StepOneFragmet extends Fragment {
         inputDropPoint = (EditText) view.findViewById(R.id.input_drop_point);
         inputDropPoint.setFilters(filters);
         inputPlatNo = (EditText) view.findViewById(R.id.input_plat_no);
-        inputPlatNo.setFilters(new InputFilter[] {new InputFilter.AllCaps(), getInputFilterPlate()});
+        inputPlatNo.setFilters(new InputFilter[] {new InputFilter.AllCaps()});
         inputCartype = (EditText) view.findViewById(R.id.input_car_type);
         inputCartype.setFilters(filters);
         inputMerk = (EditText) view.findViewById(R.id.input_merk_mobil);
@@ -133,7 +133,6 @@ public class StepOneFragmet extends Fragment {
                 new FetchDropPointTask().execute();
             }
         });
-
 
         initData();
         return view;

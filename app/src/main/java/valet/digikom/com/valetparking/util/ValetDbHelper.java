@@ -13,6 +13,7 @@ import valet.digikom.com.valetparking.domain.DefectMaster;
 import valet.digikom.com.valetparking.domain.DropPointMaster;
 import valet.digikom.com.valetparking.domain.EntryCheckinResponse;
 import valet.digikom.com.valetparking.domain.EntryCheckoutCont;
+import valet.digikom.com.valetparking.domain.FineFee;
 
 /**
  * Created by DIGIKOM-EX4 on 12/20/2016.
@@ -23,11 +24,19 @@ public class ValetDbHelper extends SQLiteOpenHelper {
     private Context context;
     private static final String DB_NAME  = "valetdb";
     private static final int DB_VERSION = 1;
+    private static ValetDbHelper dbHelper;
 
 
     public ValetDbHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
         this.context = context;
+    }
+
+    public static ValetDbHelper getInstance(Context context) {
+        if (dbHelper == null) {
+            dbHelper = new ValetDbHelper(context);
+        }
+        return dbHelper;
     }
 
     @Override
@@ -41,6 +50,7 @@ public class ValetDbHelper extends SQLiteOpenHelper {
         db.execSQL(EntryDao.Table.CREATE);
         db.execSQL(EntryCheckinResponse.Table.CREATE);
         db.execSQL(EntryCheckoutCont.Table.CREATE);
+        db.execSQL(FineFee.Table.CREATE);
     }
 
     @Override
@@ -54,6 +64,7 @@ public class ValetDbHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + EntryDao.Table.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + EntryCheckinResponse.Table.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + EntryCheckoutCont.Table.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + FineFee.Table.TABLE_NAME);
 
         onCreate(db);
     }

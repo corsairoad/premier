@@ -3,6 +3,7 @@ package valet.digikom.com.valetparking;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
@@ -30,6 +31,7 @@ import valet.digikom.com.valetparking.domain.Checkin;
 import valet.digikom.com.valetparking.domain.DefectMaster;
 import valet.digikom.com.valetparking.domain.EntryCheckinContainer;
 import valet.digikom.com.valetparking.domain.EntryCheckinResponse;
+import valet.digikom.com.valetparking.domain.PrintCheckin;
 import valet.digikom.com.valetparking.fragments.DefectFragment;
 import valet.digikom.com.valetparking.fragments.ReviewFragment;
 import valet.digikom.com.valetparking.fragments.StepOneFragmet;
@@ -157,6 +159,9 @@ public class AddCarActivity extends ActionBarActivity implements StepOneFragmet.
                             EntryCheckinResponse res = response.body();
                             EntryDao entryDao = EntryDao.getInstance(AddCarActivity.this);
                             entryDao.insertEntryResponse(res, EntryCheckinResponse.FLAG_UPLOAD_SUCCESS);
+
+                            new PrintDataTask().execute(res);
+
                             startActivity(new Intent(AddCarActivity.this, Main2Activity.class));
                             finish();
                             //Log.d("Post checkin success: ", res.getData().getType());
@@ -256,7 +261,9 @@ public class AddCarActivity extends ActionBarActivity implements StepOneFragmet.
                 .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
                     @Override
                     public void onClick(SweetAlertDialog sweetAlertDialog) {
+
                         submitCheckin(reviewFragment.getSignatureBmp(), reviewFragment.getCheckin(), reviewFragment.getEntryCheckinContainer());
+
                         sweetAlertDialog.setTitleText("success!")
                                 .setContentText("Registration success")
                                 .setConfirmText("OK")
@@ -273,5 +280,15 @@ public class AddCarActivity extends ActionBarActivity implements StepOneFragmet.
                 })
                 .showCancelButton(true)
                 .show();
+    }
+
+    private class PrintDataTask extends AsyncTask<EntryCheckinResponse, Void, String> {
+
+        @Override
+        protected String doInBackground(EntryCheckinResponse... reses) {
+            PrintCheckin printCheckin = new PrintCheckin(AddCarActivity.this,reses[0]);
+            printCheckin.print();
+            return null;
+        }
     }
 }

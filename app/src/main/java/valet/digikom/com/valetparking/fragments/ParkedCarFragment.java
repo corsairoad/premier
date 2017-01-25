@@ -17,11 +17,12 @@ import java.util.List;
 import valet.digikom.com.valetparking.ParkedCarDetailActivity;
 import valet.digikom.com.valetparking.R;
 import valet.digikom.com.valetparking.adapter.ListCheckinAdapter;
+import valet.digikom.com.valetparking.dao.CheckoutDao;
 import valet.digikom.com.valetparking.dao.EntryDao;
 import valet.digikom.com.valetparking.domain.Checkin;
 import valet.digikom.com.valetparking.domain.EntryCheckinResponse;
 
-public class ParkedCarFragment extends Fragment implements ListCheckinAdapter.OnItemCheckinListener {
+public class ParkedCarFragment extends Fragment implements ListCheckinAdapter.OnItemCheckinListener, CheckoutDao.OnCarReadyListener {
 
     RecyclerView listCheckin;
     ListCheckinAdapter adapter;
@@ -84,6 +85,11 @@ public class ParkedCarFragment extends Fragment implements ListCheckinAdapter.On
         Intent intent = new Intent(getContext(), ParkedCarDetailActivity.class);
         intent.putExtra(EntryCheckinResponse.ID_ENTRY_CHECKIN, id);
         startActivity(intent);
+    }
+
+    @Override
+    public void onCheckoutReady() {
+        new LoadCheckinTask().execute();
     }
 
     private class LoadCheckinTask extends AsyncTask<Void, Void, List<EntryCheckinResponse>> {

@@ -31,6 +31,7 @@ import valet.digikom.com.valetparking.dao.CheckoutDao;
 import valet.digikom.com.valetparking.dao.ColorDao;
 import valet.digikom.com.valetparking.dao.DefectDao;
 import valet.digikom.com.valetparking.dao.DropDao;
+import valet.digikom.com.valetparking.dao.FineFeeDao;
 import valet.digikom.com.valetparking.dao.ItemsDao;
 import valet.digikom.com.valetparking.dao.TokenDao;
 import valet.digikom.com.valetparking.fragments.CalledCarFragment;
@@ -75,12 +76,13 @@ public class Main2Activity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        ValetDbHelper dbHelper = new ValetDbHelper(this);
+        ValetDbHelper dbHelper = ValetDbHelper.getInstance(this);
         TokenDao.getToken(DefectDao.getInstance(dbHelper));
         TokenDao.getToken(ItemsDao.getInstance(dbHelper));
         TokenDao.getToken(CarDao.getInstance(dbHelper));
         TokenDao.getToken(ColorDao.getInstance(dbHelper));
         TokenDao.getToken(DropDao.getInstance(dbHelper));
+        TokenDao.getToken(FineFeeDao.getInstance(this));
 
         //startCheckoutEntryAlarm(this);
     }
@@ -90,6 +92,26 @@ public class Main2Activity extends AppCompatActivity
         pagerAdapter.addFragments(new ParkedCarFragment(), "Parked Car");
         pagerAdapter.addFragments(new CalledCarFragment(), "Called Car");
         viewPager.setAdapter(pagerAdapter);
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                Fragment fragMentParkedCar = pagerAdapter.getItem(0);
+                Fragment fragmentCalledCar = pagerAdapter.getItem(1);
+
+                CheckoutDao checkoutDao = CheckoutDao.getInstance(Main2Activity.this, fragmentCalledCar, fragMentParkedCar);
+                TokenDao.getToken(checkoutDao);
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
         tabLayout.setupWithViewPager(viewPager);
     }
 
@@ -125,9 +147,7 @@ public class Main2Activity extends AppCompatActivity
 
         // checking ready checkout car
         if (id == R.id.action_refresh) {
-            Fragment fragment = pagerAdapter.getItem(1);
-            CheckoutDao checkoutDao = CheckoutDao.getInstance(this, fragment);
-            TokenDao.getToken(checkoutDao);
+
             return true;
         }
 
@@ -147,7 +167,8 @@ public class Main2Activity extends AppCompatActivity
         } else if (id == R.id.nav_slideshow) {
 
         } else if (id == R.id.nav_manage) {
-
+            Intent intent = new Intent(this, PrinterActivity.class);
+            startActivity(intent);
         } else if (id == R.id.nav_share) {
 
         } else if (id == R.id.nav_send) {
