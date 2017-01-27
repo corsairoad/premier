@@ -23,6 +23,7 @@ import valet.digikom.com.valetparking.domain.FineFee;
 import valet.digikom.com.valetparking.domain.FinishCheckOut;
 import valet.digikom.com.valetparking.domain.FinishCheckoutResponse;
 import valet.digikom.com.valetparking.domain.TokenResponse;
+import valet.digikom.com.valetparking.domain.ValetTypeJson;
 
 /**
  * Created by dev on 1/7/17.
@@ -63,4 +64,7 @@ public interface ApiEndpoint {
 
     @PUT("ad_checkout_finish_fine/{id}")
     Call<FinishCheckoutResponse> submitCheckout(@Path("id") int id, @Body FinishCheckOut finishCheckOut);
+
+    @GET("valetfee_site_detail")
+    Call<ValetTypeJson> getValetType();
 }

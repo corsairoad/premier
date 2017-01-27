@@ -1,62 +1,98 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/coordinatorLayout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:layout_height="match_parent">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/action_bar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="?attr/colorPrimary"
-            app:titleTextColor="@android:color/white"
-            android:minHeight="?attr/actionBarSize" />
-
-
         <LinearLayout
+            android:id="@+id/cont"
+            android:layout_alignParentTop="true"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
             android:orientation="horizontal">
 
-            <fragment
-                android:id="@+id/step_one_fragment"
+            <LinearLayout
                 android:layout_width="0dp"
-                android:layout_weight="1"
                 android:layout_height="match_parent"
-                android:name="valet.digikom.com.valetparking.fragments.StepOneFragmet"/>
+                android:layout_weight="1"
+                android:orientation="vertical">
 
-            <fragment
-                android:id="@+id/step_two_fragment"
+                <fragment
+                    android:id="@+id/step_one_fragment"
+                    android:layout_width="match_parent"
+                    android:layout_weight="1"
+                    android:layout_height="0dp"
+                    android:name="valet.digikom.com.valetparking.fragments.StepOneFragmet"/>
+
+                <fragment
+                    android:id="@+id/defect_fragment"
+                    android:layout_width="match_parent"
+                    android:layout_weight="1"
+                    android:layout_height="0dp"
+                    android:name="valet.digikom.com.valetparking.fragments.DefectFragment"/>
+
+
+            </LinearLayout>
+
+            <LinearLayout
                 android:layout_width="0dp"
-                android:layout_weight="1"
                 android:layout_height="match_parent"
-                android:name="valet.digikom.com.valetparking.fragments.StepTwoFragment"/>
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <fragment
+                    android:id="@+id/stuff_fragment"
+                    android:layout_width="match_parent"
+                    android:layout_weight="1"
+                    android:layout_height="0dp"
+                    android:name="valet.digikom.com.valetparking.fragments.StepThreeFragment"/>
+
+                <fragment
+                    android:id="@+id/review_fragment"
+                    android:layout_width="match_parent"
+                    android:layout_weight="1"
+                    android:name="valet.digikom.com.valetparking.fragments.ReviewFragment"
+                    android:layout_height="0dp"/>
+
+            </LinearLayout>
 
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1">
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_alignParentBottom="true">
 
-            <fragment
-                android:id="@+id/defect_fragment"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:name="valet.digikom.com.valetparking.fragments.DefectFragment"/>
+            <Button
+                android:id="@+id/btn_cancel_reg"
+                style="@style/ButtonBarButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/buttonshape"
+                android:text="@string/cancel"/>
+
+            <Button
+                android:id="@+id/btn_registration"
+                style="@style/ButtonBarButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/buttonshape"
+                android:text="@string/submitprint"/>
 
         </LinearLayout>
+
 
     </LinearLayout>
 
 
 
-</android.support.design.widget.CoordinatorLayout>
+</RelativeLayout>

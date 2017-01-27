@@ -13,26 +13,39 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.Spinner;
 import android.widget.Toast;
 import com.orhanobut.dialogplus.DialogPlus;
 import com.orhanobut.dialogplus.GridHolder;
 import com.orhanobut.dialogplus.OnItemClickListener;
 import java.util.ArrayList;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import valet.digikom.com.valetparking.R;
 import valet.digikom.com.valetparking.adapter.CarTypeAdapter;
 import valet.digikom.com.valetparking.adapter.ColorTypeAdapter;
 import valet.digikom.com.valetparking.adapter.DropPointAdapter;
+import valet.digikom.com.valetparking.adapter.ListValetTypeAdapter;
 import valet.digikom.com.valetparking.dao.CarDao;
 import valet.digikom.com.valetparking.dao.ColorDao;
 import valet.digikom.com.valetparking.dao.DropDao;
+import valet.digikom.com.valetparking.dao.TokenDao;
 import valet.digikom.com.valetparking.domain.CarMaster;
 import valet.digikom.com.valetparking.domain.ColorMaster;
 import valet.digikom.com.valetparking.domain.DropPointMaster;
+import valet.digikom.com.valetparking.domain.ValetTypeJson;
+import valet.digikom.com.valetparking.service.ApiClient;
+import valet.digikom.com.valetparking.service.ApiEndpoint;
+import valet.digikom.com.valetparking.service.ProcessRequest;
 import valet.digikom.com.valetparking.util.PrefManager;
 import valet.digikom.com.valetparking.util.ValetDbHelper;
 
@@ -66,6 +79,11 @@ public class StepOneFragmet extends Fragment {
     private DropPointAdapter adapter;
     private boolean isDefaultDropSet;
     PrefManager prefManager;
+    List<ValetTypeJson.Data> valetTypeJsonList = new ArrayList<>();
+    Spinner spValetType;
+    ListValetTypeAdapter valetTypeAdapter;
+
+    OnValetTypeSelectedListener valetTypeSelectedListener;
 
     public StepOneFragmet() {
         // Required empty public constructor
@@ -122,6 +140,18 @@ public class StepOneFragmet extends Fragment {
         inputEmail = (EditText) view.findViewById(R.id.input_email);
         inputColor = (EditText) view.findViewById(R.id.input_color);
         inputColor.setFilters(filters);
+        spValetType = (Spinner) view.findViewById(R.id.spinner_valet_type_x);
+        spValetType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                valetTypeSelectedListener.onValetTypeSelected(valetTypeJsonList.get(i));
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
 
         btnCarType = (ImageButton) view.findViewById(R.id.btn_dropdown_cartype);
         btnColorType = (ImageButton) view.findViewById(R.id.btn_dropdown_color);
@@ -135,6 +165,7 @@ public class StepOneFragmet extends Fragment {
         });
 
         initData();
+        downloadValetType();
         return view;
     }
 
@@ -142,6 +173,7 @@ public class StepOneFragmet extends Fragment {
     public void onAttach(Context context) {
         super.onAttach(context);
         onRegsitrationValid = (OnRegsitrationValid) context;
+        valetTypeSelectedListener = (OnValetTypeSelectedListener) context;
     }
 
     @Override
@@ -384,6 +416,38 @@ public class StepOneFragmet extends Fragment {
             }
         };
         return filter;
+    }
+
+    private void downloadValetType() {
+        TokenDao.getToken(new ProcessRequest() {
+            @Override
+            public void process(String token) {
+                ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class, token);
+                Call<ValetTypeJson> call = apiEndpoint.getValetType();
+                call.enqueue(new Callback<ValetTypeJson>() {
+                    @Override
+                    public void onResponse(Call<ValetTypeJson> call, Response<ValetTypeJson> response) {
+                        if (response != null && response.body() != null) {
+                            valetTypeSelectedListener.onValetTypeSelected(response.body().getListData().get(0));
+
+                            valetTypeJsonList.clear();
+                            valetTypeJsonList.addAll(response.body().getListData());
+                            valetTypeAdapter = new ListValetTypeAdapter(getContext(),valetTypeJsonList);
+                            spValetType.setAdapter(valetTypeAdapter);
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<ValetTypeJson> call, Throwable t) {
+
+                    }
+                });
+            }
+        });
+    }
+
+    public interface OnValetTypeSelectedListener{
+        void onValetTypeSelected(ValetTypeJson.Data data);
     }
 
 }

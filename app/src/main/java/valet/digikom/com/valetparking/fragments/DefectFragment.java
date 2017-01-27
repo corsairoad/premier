@@ -70,15 +70,6 @@ public class DefectFragment extends Fragment implements View.OnTouchListener, Vi
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment DefectFragment.
-     */
-    // TODO: Rename and change types and number of parameters
     public static DefectFragment newInstance(String param1, String param2) {
         DefectFragment fragment = new DefectFragment();
         Bundle args = new Bundle();
@@ -110,7 +101,6 @@ public class DefectFragment extends Fragment implements View.OnTouchListener, Vi
         container.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
-                 onDefectDrawingListener.onDefectDrawing(true);
                 return false;
             }
         });
@@ -129,8 +119,7 @@ public class DefectFragment extends Fragment implements View.OnTouchListener, Vi
 
     @Override
     public boolean onTouch(View view, MotionEvent event) {
-        onDefectDrawingListener.onDefectDrawing(false);
-
+        //onDefectDrawingListener.onDefectDrawing(false);
         float[] i = getPointerCoords(choosenImageView, event);
         int action = event.getAction();
         switch (action) {
@@ -138,7 +127,8 @@ public class DefectFragment extends Fragment implements View.OnTouchListener, Vi
                 downx = i[0];
                 downy = i[1];
                 //getDefect(event.getX(), (event.getY()));
-                ReviewFragment.reviewFragment.setDefectMasterList(getDefectMaster((int) event.getX(), (int) (event.getY())));
+                //ReviewFragment.reviewFragment.setDefectMasterList(getDefectMaster((int) event.getX(), (int) (event.getY())));
+                onDefectDrawingListener.onDefectDrawing(getDefectMaster((int) event.getX(), (int) (event.getY())));
                 break;
             case MotionEvent.ACTION_MOVE:
                 upx = i[0];
@@ -160,7 +150,8 @@ public class DefectFragment extends Fragment implements View.OnTouchListener, Vi
                 break;
         }
 
-        ReviewFragment.reviewFragment.setImageDefect(alteredBitmap);
+        //ReviewFragment.reviewFragment.setImageDefect(alteredBitmap);
+        onDefectDrawingListener.setImageDefect(alteredBitmap);
         return true;
     }
 
@@ -212,7 +203,8 @@ public class DefectFragment extends Fragment implements View.OnTouchListener, Vi
     }
 
     public interface OnDefectDrawingListener {
-        void onDefectDrawing(boolean isPagingEnabled);
+        void onDefectDrawing(List<DefectMaster> defectMasters);
+        void setImageDefect(Bitmap bitmap);
     }
 
     final float[] getPointerCoords(ImageView view, MotionEvent e) {
@@ -223,19 +215,6 @@ public class DefectFragment extends Fragment implements View.OnTouchListener, Vi
         matrix.postTranslate(view.getScrollX(), view.getScrollY());
         matrix.mapPoints(coords);
         return coords;
-    }
-
-    private void getImageDimensions(ImageView imageView) {
-        BitmapDrawable drawable = (BitmapDrawable)imageView.getDrawable();
-        this.imageWidthInPx = (int)((float)drawable.getBitmap().getWidth() / Resources.getSystem().getDisplayMetrics().density);
-        this.imageHeightInPx = (int)((float)drawable.getBitmap().getHeight() / Resources.getSystem().getDisplayMetrics().density);
-    }
-
-    private void getDefect(float x, float y) {
-        PixelPosition pixel = ImageUtils.getPixelPosition(x,y,this.imageWidthInPx, this.imageHeightInPx);
-        int pX = pixel.getX();
-        int py = pixel.getY();
-        List<DefectMaster> dmList = getDefectMaster(pX, py);
     }
 
     private List<DefectMaster> getDefectMaster(int mX, int mY) {

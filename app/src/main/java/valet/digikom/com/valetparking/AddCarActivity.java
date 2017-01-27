@@ -2,28 +2,22 @@ package valet.digikom.com.valetparking;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.Snackbar;
-import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.widget.Toolbar;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
 
-import com.google.gson.Gson;
+import java.util.ArrayList;
+import java.util.List;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
-import me.relex.circleindicator.CircleIndicator;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import valet.digikom.com.valetparking.adapter.PagerCheckinAdapter;
-import valet.digikom.com.valetparking.dao.CheckinDao;
 import valet.digikom.com.valetparking.dao.EntryDao;
 import valet.digikom.com.valetparking.dao.TokenDao;
 import valet.digikom.com.valetparking.domain.AdditionalItems;
@@ -31,7 +25,7 @@ import valet.digikom.com.valetparking.domain.Checkin;
 import valet.digikom.com.valetparking.domain.DefectMaster;
 import valet.digikom.com.valetparking.domain.EntryCheckinContainer;
 import valet.digikom.com.valetparking.domain.EntryCheckinResponse;
-import valet.digikom.com.valetparking.domain.PrintCheckin;
+import valet.digikom.com.valetparking.domain.ValetTypeJson;
 import valet.digikom.com.valetparking.fragments.DefectFragment;
 import valet.digikom.com.valetparking.fragments.ReviewFragment;
 import valet.digikom.com.valetparking.fragments.StepOneFragmet;
@@ -40,113 +34,35 @@ import valet.digikom.com.valetparking.fragments.StepTwoFragment;
 import valet.digikom.com.valetparking.service.ApiClient;
 import valet.digikom.com.valetparking.service.ApiEndpoint;
 import valet.digikom.com.valetparking.service.ProcessRequest;
-import valet.digikom.com.valetparking.util.CustomViewPager;
-import valet.digikom.com.valetparking.util.ValetDbHelper;
 
-public class AddCarActivity extends ActionBarActivity implements StepOneFragmet.OnRegsitrationValid, StepTwoFragment.OnDefectSelectedListener,
-                StepThreeFragment.OnStuffSelectedListener, DefectFragment.OnDefectDrawingListener{
+public class AddCarActivity extends FragmentActivity implements StepOneFragmet.OnRegsitrationValid, StepTwoFragment.OnDefectSelectedListener,
+                StepThreeFragment.OnStuffSelectedListener, DefectFragment.OnDefectDrawingListener, View.OnClickListener, StepOneFragmet.OnValetTypeSelectedListener {
 
-    //private ViewPager mPager;
-    CustomViewPager mPager;
-    private Button mNextButton;
-    private Button mPrevButton;
-    CircleIndicator indicator;
-    private PagerCheckinAdapter checkinAdapter;
-    int position = -1;
-    int totalPages = -1;
-    boolean isCanScroll;
-    Checkin checkin = new Checkin();
-    CoordinatorLayout coordinatorLayout;
+    Button btnSubmit;
+    Button btnCancel;
+    StepOneFragmet fragmentRegFirst;
+    DefectFragment fragmentDefect;
+    StepThreeFragment fragmentStuff;
+    ReviewFragment fragmentReview;
+
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_car);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.action_bar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayout);
-        mPager = (CustomViewPager) findViewById(R.id.pager);
-        mPager.setOffscreenPageLimit(4);
-        checkinAdapter = new PagerCheckinAdapter(getSupportFragmentManager());
-        checkinAdapter.addFragment(StepOneFragmet.newInstance(null, null), "" );
-        //checkinAdapter.addFragment(StepTwoFragment.newInstance(null, null), "");
-        checkinAdapter.addFragment(DefectFragment.newInstance(null,null),"");
-        checkinAdapter.addFragment(StepThreeFragment.newInstance(null, null), "");
-        checkinAdapter.addFragment(valet.digikom.com.valetparking.fragments.ReviewFragment.newInstance(null, null, checkin), "");
-        mPager.setAdapter(checkinAdapter);
+        btnSubmit = (Button) findViewById(R.id.btn_registration);
+        btnCancel = (Button) findViewById(R.id.btn_cancel_reg);
+        btnCancel.setOnClickListener(this);
+        btnSubmit.setOnClickListener(this);
 
-        indicator = (CircleIndicator) findViewById(R.id.indicator);
-        indicator.setViewPager(mPager);
-
-        mPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                StepOneFragmet oneFragmet = (StepOneFragmet) checkinAdapter.getItem(0);
-                if (position == 1) {
-                        if (!oneFragmet.isFormValid()) {
-                            mPager.setCurrentItem(0);
-                        }else {
-                            oneFragmet.setCheckIn();
-                        }
-                }
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-                updateBottomBar();
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-                if (state == ViewPager.SCROLL_STATE_DRAGGING){
-                    if (mPager.getCurrentItem() == 0) {
-                        StepOneFragmet oneFragmet = (StepOneFragmet) checkinAdapter.getItem(0);
-                        isCanScroll = oneFragmet.isFormValid();
-                    }
-                }
-            }
-        });
-
-        mNextButton = (Button) findViewById(R.id.next_button);
-        mPrevButton = (Button) findViewById(R.id.prev_button);
-
-        mNextButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                onDefectDrawing(true);
-                if (position == totalPages) {
-                    ReviewFragment reviewFragment = ReviewFragment.reviewFragment;
-                    if (reviewFragment.ispadSigned()) {
-                        showConfirmDialog(reviewFragment);
-                        //submitCheckin(reviewFragment.getSignatureBmp(), reviewFragment.getCheckin(), reviewFragment.getEntryCheckinContainer());
-                    }else {
-                        Snackbar sb =  Snackbar.make(coordinatorLayout,"Signature can't be empty", Snackbar.LENGTH_SHORT);
-                        View v = sb.getView();
-                        TextView text = (TextView) v.findViewById(android.support.design.R.id.snackbar_text);
-                        text.setTextColor(Color.RED);
-                        sb.show();
-                    }
-                } else {
-                    mPager.setCurrentItem(position + 1);
-                }
-            }
-        });
-
-        mPrevButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                onDefectDrawing(true);
-                mPager.setCurrentItem(position - 1);
-            }
-        });
-
-        updateBottomBar();
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentRegFirst = (StepOneFragmet) fragmentManager.findFragmentById(R.id.step_one_fragment);
+        fragmentDefect = (DefectFragment) fragmentManager.findFragmentById(R.id.defect_fragment);
+        fragmentStuff = (StepThreeFragment) fragmentManager.findFragmentById(R.id.stuff_fragment);
+        fragmentReview = (ReviewFragment) fragmentManager.findFragmentById(R.id.review_fragment);
     }
 
     private void submitCheckin(final Bitmap bmp, final Checkin checkin, final EntryCheckinContainer checkinContainer) {
-
         TokenDao.getToken(new ProcessRequest() {
             @Override
             public void process(String token) {
@@ -160,7 +76,7 @@ public class AddCarActivity extends ActionBarActivity implements StepOneFragmet.
                             EntryDao entryDao = EntryDao.getInstance(AddCarActivity.this);
                             entryDao.insertEntryResponse(res, EntryCheckinResponse.FLAG_UPLOAD_SUCCESS);
 
-                            new PrintDataTask().execute(res);
+                            //new PrintDataTask().execute(res);
 
                             startActivity(new Intent(AddCarActivity.this, Main2Activity.class));
                             finish();
@@ -190,22 +106,6 @@ public class AddCarActivity extends ActionBarActivity implements StepOneFragmet.
       */
     }
 
-    private void updateBottomBar() {
-        position = mPager.getCurrentItem();
-        totalPages = checkinAdapter.getCount()-1;
-
-        if (position == totalPages) {
-            mNextButton.setText(R.string.finish);
-            mNextButton.setBackgroundResource(R.drawable.finish_background);
-            mNextButton.setTextAppearance(this, R.style.TextAppearanceFinish);
-        }else {
-            mNextButton.setText(R.string.next);
-            mNextButton.setBackgroundResource(R.drawable.selectable_item_background);
-            mNextButton.setTextColor(Color.BLACK);
-        }
-
-        mPrevButton.setVisibility(position <= 0 ? View.INVISIBLE : View.VISIBLE);
-    }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -219,38 +119,38 @@ public class AddCarActivity extends ActionBarActivity implements StepOneFragmet.
 
     @Override
     public void setCheckin(String dropPoint, String platNo, String carType, String merk, String email, String warna) {
-        ReviewFragment reviewFragment = ReviewFragment.reviewFragment;
-        reviewFragment.setCheckin(dropPoint, platNo, carType, merk, email, warna);
+        fragmentReview.setCheckin(dropPoint, platNo, carType, merk, email, warna);
     }
 
     @Override
     public void onDefectSelected(String defect, DefectMaster defectMaster) {
-        ReviewFragment reviewFragment = ReviewFragment.reviewFragment;
-        reviewFragment.selectDefect(defect, defectMaster);
+        fragmentReview.selectDefect(defect, defectMaster);
     }
 
     @Override
     public void onDefectUnselected(String defect, DefectMaster defectMaster) {
-        ReviewFragment reviewFragment = ReviewFragment.reviewFragment;
-        reviewFragment.unSelectDefect(defect, defectMaster);
+        fragmentReview.unSelectDefect(defect, defectMaster);
     }
 
     @Override
     public void onStuffSelected(String stuff, AdditionalItems items) {
-        ReviewFragment reviewFragment = ReviewFragment.reviewFragment;
-        reviewFragment.onSelectSuff(stuff, items);
+        fragmentReview.onSelectSuff(stuff, items);
     }
 
     @Override
     public void onStuffUnselected(String stuff, AdditionalItems items) {
-        ReviewFragment reviewFragment = ReviewFragment.reviewFragment;
-        reviewFragment.onUnselectStuff(stuff, items);
+        fragmentReview.onUnselectStuff(stuff, items);
     }
 
 
     @Override
-    public void onDefectDrawing(boolean isPagingEnabled) {
-        mPager.setPagingEnabled(isPagingEnabled);
+    public void onDefectDrawing(List<DefectMaster> defectMasters) {
+        fragmentReview.setDefectMasterList(defectMasters);
+    }
+
+    @Override
+    public void setImageDefect(Bitmap bitmap) {
+        fragmentReview.setImageDefect(bitmap);
     }
 
     private void showConfirmDialog(final ReviewFragment reviewFragment) {
@@ -262,7 +162,8 @@ public class AddCarActivity extends ActionBarActivity implements StepOneFragmet.
                     @Override
                     public void onClick(SweetAlertDialog sweetAlertDialog) {
 
-                        submitCheckin(reviewFragment.getSignatureBmp(), reviewFragment.getCheckin(), reviewFragment.getEntryCheckinContainer());
+                        fragmentRegFirst.setCheckIn();
+                        submitCheckin(fragmentReview.getSignatureBmp(), fragmentReview.getCheckin(), fragmentReview.getEntryCheckinContainer());
 
                         sweetAlertDialog.setTitleText("success!")
                                 .setContentText("Registration success")
@@ -282,13 +183,19 @@ public class AddCarActivity extends ActionBarActivity implements StepOneFragmet.
                 .show();
     }
 
-    private class PrintDataTask extends AsyncTask<EntryCheckinResponse, Void, String> {
-
-        @Override
-        protected String doInBackground(EntryCheckinResponse... reses) {
-            PrintCheckin printCheckin = new PrintCheckin(AddCarActivity.this,reses[0]);
-            printCheckin.print();
-            return null;
+    @Override
+    public void onClick(View view) {
+        if (view == btnSubmit) {
+            showConfirmDialog(fragmentReview);
+        }else {
+            startActivity(new Intent(this, Main2Activity.class));
+            finish();
         }
+    }
+
+
+    @Override
+    public void onValetTypeSelected(ValetTypeJson.Data data) {
+        fragmentReview.setValetType(data);
     }
 }

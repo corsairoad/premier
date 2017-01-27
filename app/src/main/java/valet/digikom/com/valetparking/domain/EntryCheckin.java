@@ -66,6 +66,8 @@ public class EntryCheckin {
         private String paraf;
         @SerializedName("vthdDefectsBlob")
         private String defect;
+        @SerializedName("vthdVfsdId")
+        private String valetType;
 
 
         public Attrib() {
@@ -127,6 +129,12 @@ public class EntryCheckin {
             this.defect = defect;
         }
 
+        public String getValetType() {
+            return valetType;
+        }
+        public void setValetType(String valetType) {
+            this.valetType = valetType;
+        }
     }
 
     public static class RelationShip {
@@ -283,10 +291,11 @@ public class EntryCheckin {
         public Builder() {
         }
 
-        public Builder setAttribute(DropPointMaster dropPointMaster, String platNo, CarMaster carMaster, ColorMaster colorMaster, String email, Bitmap bmpDefects, Bitmap bmpSignature) {
+        public Builder setAttribute(DropPointMaster dropPointMaster, String platNo, CarMaster carMaster, ColorMaster colorMaster, String email, Bitmap bmpDefects, Bitmap bmpSignature, int valetTypeId) {
             attrib = new Attrib();
             attrib.setDropMasterId(String.valueOf(dropPointMaster.getAttrib().getDropId()));
             attrib.setPlatNo(platNo);
+            attrib.setValetType(String.valueOf(valetTypeId));
             attrib.setCarType(String.valueOf(carMaster.getAttrib().getId_attrib()));
 
             if (colorMaster != null) {

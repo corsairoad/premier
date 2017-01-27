@@ -3,7 +3,6 @@ package valet.digikom.com.valetparking.fragments;
 
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -13,14 +12,11 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.github.gcacace.signaturepad.views.SignaturePad;
 import com.google.gson.Gson;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -36,25 +32,19 @@ import valet.digikom.com.valetparking.domain.DefectMaster;
 import valet.digikom.com.valetparking.domain.DropPointMaster;
 import valet.digikom.com.valetparking.domain.EntryCheckin;
 import valet.digikom.com.valetparking.domain.EntryCheckinContainer;
+import valet.digikom.com.valetparking.domain.ValetTypeJson;
 import valet.digikom.com.valetparking.util.PrefManager;
 import valet.digikom.com.valetparking.util.ValetDbHelper;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link ReviewFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+
+
 public class ReviewFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-    private static final String ARG_CHECKIN = "chekin";
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+
     private Checkin checkin = new Checkin();
-    private Button btnResetSign;
     private SignaturePad signPad;
     private TextView textDropPoint;
     private TextView textPlatNo;
@@ -65,38 +55,19 @@ public class ReviewFragment extends Fragment {
     private TextView textStuffs;
     private ImageView imgDefect;
     public static ReviewFragment reviewFragment;
-    private Button btnTestJson;
     private List<DefectMaster> defectMasterList;
     private List<AdditionalItems> itemsList;
     private CarMaster carMaster;
     private ColorMaster colorMaster;
     private DropPointMaster dropPoint;
     private Bitmap bitmapDefect;
-    private EntryCheckinContainer entryCheckinContainer;
+    private ValetTypeJson.Data  valetType;
 
 
     public ReviewFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment ReviewFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static ReviewFragment newInstance(String param1, String param2, Checkin checkin) {
-        ReviewFragment fragment = new ReviewFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        args.putParcelable(ARG_CHECKIN, checkin);
-        fragment.setArguments(args);
-        return fragment;
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -107,8 +78,8 @@ public class ReviewFragment extends Fragment {
         itemsList = new ArrayList<>();
 
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            //String mParam1 = getArguments().getString(ARG_PARAM1);
+            //String mParam2 = getArguments().getString(ARG_PARAM2);
         }
 
         getDefualtDropPoint();
@@ -129,7 +100,7 @@ public class ReviewFragment extends Fragment {
         textStuffs = (TextView) view.findViewById(R.id.text_stuff);
         imgDefect = (ImageView) view.findViewById(R.id.img_defecs_review);
         init();
-        btnResetSign = (Button) view.findViewById(R.id.btn_reset_sign);
+        Button btnResetSign = (Button) view.findViewById(R.id.btn_reset_sign);
         signPad = (SignaturePad) view.findViewById(R.id.signature_pad);
 
         btnResetSign.setOnClickListener(new View.OnClickListener() {
@@ -139,7 +110,7 @@ public class ReviewFragment extends Fragment {
             }
         });
 
-        btnTestJson = (Button) view.findViewById(R.id.test_json);
+        Button btnTestJson = (Button) view.findViewById(R.id.test_json);
         btnTestJson.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -195,6 +166,14 @@ public class ReviewFragment extends Fragment {
         initStuffs();
     }
 
+    public ValetTypeJson.Data getValetType() {
+        return valetType;
+    }
+
+    public void setValetType(ValetTypeJson.Data valetType) {
+        this.valetType = valetType;
+    }
+
     private void initStuffs() {
         textStuffs.setText(checkin.stuffsToString());
     }
@@ -209,10 +188,6 @@ public class ReviewFragment extends Fragment {
 
     public Checkin getCheckin() {
         return checkin;
-    }
-
-    public CarMaster getCarMaster() {
-        return carMaster;
     }
 
     public void setCarMaster(CarMaster carMaster) {
@@ -231,9 +206,6 @@ public class ReviewFragment extends Fragment {
         this.defectMasterList.addAll(set);
     }
 
-    public ColorMaster getColorMaster() {
-        return colorMaster;
-    }
 
     public void setColorMaster(ColorMaster colorMaster) {
         this.colorMaster = colorMaster;
@@ -241,14 +213,6 @@ public class ReviewFragment extends Fragment {
 
     public List<AdditionalItems> getItemsList() {
         return itemsList;
-    }
-
-    public void setItemsList(List<AdditionalItems> itemsList) {
-        this.itemsList = itemsList;
-    }
-
-    public DropPointMaster getDropPoint() {
-        return dropPoint;
     }
 
     public void setDropPoint(DropPointMaster dropPoint) {
@@ -270,16 +234,16 @@ public class ReviewFragment extends Fragment {
 
     private EntryCheckinContainer buildCheckinEntry() {
         EntryCheckin.Builder builder = new EntryCheckin.Builder();
-        builder.setAttribute(dropPoint,textPlatNo.getText().toString(), carMaster, colorMaster,textEmail.getText().toString(),bitmapDefect, signPad.getSignatureBitmap());
+        builder.setAttribute(dropPoint,textPlatNo.getText().toString(), carMaster, colorMaster,textEmail.getText().toString(),bitmapDefect, signPad.getSignatureBitmap(), valetType.getAttrib().getId());
         builder.setRelationShip(getDefectMasterList(), getItemsList());
         EntryCheckin entryCheckin = builder.build();
-        entryCheckinContainer = new EntryCheckinContainer();
+        EntryCheckinContainer entryCheckinContainer = new EntryCheckinContainer();
         entryCheckinContainer.setEntryCheckin(entryCheckin);
 
-        //Gson gson = new Gson();
-        //String jsonEntryCheckin = gson.toJson(entryCheckinContainer);
-        //exportToFile(jsonEntryCheckin);
-        //Log.d("JSON CHECKIN", jsonEntryCheckin);
+        Gson gson = new Gson();
+        String jsonEntryCheckin = gson.toJson(entryCheckinContainer);
+        exportToFile(jsonEntryCheckin);
+        Log.d("JSON CHECKIN", jsonEntryCheckin);
         return entryCheckinContainer;
     }
 

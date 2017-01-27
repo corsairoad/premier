@@ -6,92 +6,74 @@
     android:orientation="vertical"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
-
-            <android.support.v7.widget.Toolbar
-                android:id="@+id/action_bar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="?attr/colorPrimary"
-                app:titleTextColor="@android:color/white"
-                android:minHeight="?attr/actionBarSize" />
-
-            <me.relex.circleindicator.CircleIndicator
-                android:id="@+id/indicator"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                app:ci_animator="@animator/indicator_animator"
-                app:ci_animator_reverse="@animator/indicator_animator_reverse"
-                app:ci_drawable="@drawable/black_radius_square"
-                app:ci_height="6dp"
-                app:ci_margin="6dp"
-                app:ci_width="10dp"/>
-
-            <valet.digikom.com.valetparking.util.CustomViewPager
-                android:id="@+id/pager"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:visibility="visible">
-            </valet.digikom.com.valetparking.util.CustomViewPager>
-
-            <include
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:visibility="gone"
-                layout="@layout/fragment_step_one"/>
-
-
-            <!--
+            android:layout_height="0dp"
+            android:layout_weight="2"
+            android:orientation="horizontal">
 
             <fragment
-                android:id="@+id/fragment3"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
+                android:id="@+id/step_one_fragment"
+                android:layout_width="0dp"
                 android:layout_weight="1"
-                android:name="valet.digikom.com.valetparking.fragments.ReviewFragment"/>
-            -->
+                android:layout_height="match_parent"
+                android:name="valet.digikom.com.valetparking.fragments.StepOneFragmet"/>
 
-            <View
-                android:id="@+id/divider"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="?android:attr/listDivider" />
+            <fragment
+                android:id="@+id/step_two_fragment"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:name="valet.digikom.com.valetparking.fragments.StepTwoFragment"/>
 
-            <LinearLayout
-                style="@style/ButtonBar"
-                android:layout_width="match_parent"
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+
+            <fragment
+                android:id="@+id/defect_fragment"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:name="valet.digikom.com.valetparking.fragments.DefectFragment"/>
+
+            <fragment
+                android:id="@+id/review_fragment"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            style="@style/ButtonBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btn_registration"
+                style="@style/ButtonBarButton"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:layout_weight="1"
+                android:background="@drawable/buttonshape"
+                android:text="@string/prev"/>
 
-                <Button
-                    android:id="@+id/prev_button"
-                    style="@style/ButtonBarButton"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:background="@drawable/selectable_item_background"
-                    android:text="@string/prev"/>
+        </LinearLayout>
 
-                <View
-                    android:layout_width="1dp"
-                    android:layout_height="match_parent"
-                    android:background="?android:attr/listDivider"/>
-
-                <Button
-                    android:id="@+id/next_button"
-                    style="@style/ButtonBarButton"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:background="@drawable/selectable_item_background"
-                    android:text="@string/next" />
-            </LinearLayout>
     </LinearLayout>
+
 
 
 </android.support.design.widget.CoordinatorLayout>

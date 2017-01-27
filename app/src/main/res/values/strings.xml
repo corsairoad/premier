@@ -166,5 +166,7 @@
     <string name="handlingmsg_err_offline">Printer is offline.\n</string>
     <string name="setup_printer">Setup Printer</string>
     <string name="discovery">Scan Printer</string>
+    <string name="cancel">Cancel</string>
+    <string name="submitprint"><![CDATA[Submit & Print]]></string>
 
 </resources>
