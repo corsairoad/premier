@@ -62,7 +62,7 @@ public class ReviewFragment extends Fragment {
     private DropPointMaster dropPoint;
     private Bitmap bitmapDefect;
     private ValetTypeJson.Data  valetType;
-
+    private Bitmap signBitmap;
 
     public ReviewFragment() {
         // Required empty public constructor
@@ -183,7 +183,11 @@ public class ReviewFragment extends Fragment {
     }
 
     public Bitmap getSignatureBmp() {
-        return signPad.getSignatureBitmap();
+        return this.signBitmap;
+    }
+
+    public void setSignBitmap(Bitmap signBitmap) {
+        this.signBitmap = signBitmap;
     }
 
     public Checkin getCheckin() {
@@ -224,6 +228,10 @@ public class ReviewFragment extends Fragment {
         imgDefect.setImageBitmap(bitmap);
     }
 
+    public Bitmap getBitmapDefect() {
+        return bitmapDefect;
+    }
+
     public void clearImageDefect() {
         imgDefect.setImageBitmap(null);
     }
@@ -234,16 +242,19 @@ public class ReviewFragment extends Fragment {
 
     private EntryCheckinContainer buildCheckinEntry() {
         EntryCheckin.Builder builder = new EntryCheckin.Builder();
-        builder.setAttribute(dropPoint,textPlatNo.getText().toString(), carMaster, colorMaster,textEmail.getText().toString(),bitmapDefect, signPad.getSignatureBitmap(), valetType.getAttrib().getId());
+        builder.setAttribute(dropPoint,textPlatNo.getText().toString(), carMaster, colorMaster,textEmail.getText().toString(),bitmapDefect, signBitmap, valetType.getAttrib().getId());
         builder.setRelationShip(getDefectMasterList(), getItemsList());
         EntryCheckin entryCheckin = builder.build();
         EntryCheckinContainer entryCheckinContainer = new EntryCheckinContainer();
         entryCheckinContainer.setEntryCheckin(entryCheckin);
 
+        /*
         Gson gson = new Gson();
         String jsonEntryCheckin = gson.toJson(entryCheckinContainer);
         exportToFile(jsonEntryCheckin);
         Log.d("JSON CHECKIN", jsonEntryCheckin);
+        */
+
         return entryCheckinContainer;
     }
 

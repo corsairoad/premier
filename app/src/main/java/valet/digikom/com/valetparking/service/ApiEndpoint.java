@@ -15,6 +15,7 @@ import valet.digikom.com.valetparking.domain.AdditionalItemsResponse;
 import valet.digikom.com.valetparking.domain.CarMasterResponse;
 import valet.digikom.com.valetparking.domain.ColorMasterResponse;
 import valet.digikom.com.valetparking.domain.DefectResponse;
+import valet.digikom.com.valetparking.domain.Disclaimer;
 import valet.digikom.com.valetparking.domain.DropPointMasterResponse;
 import valet.digikom.com.valetparking.domain.EntryCheckinContainer;
 import valet.digikom.com.valetparking.domain.EntryCheckinResponse;
@@ -67,4 +68,7 @@ public interface ApiEndpoint {
 
     @GET("valetfee_site_detail")
     Call<ValetTypeJson> getValetType();
+
+    @GET("disclaimer_master")
+    Call<Disclaimer> getDisclaimer();
 }

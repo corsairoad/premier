@@ -161,7 +161,7 @@ public class DefectFragment extends Fragment implements View.OnTouchListener, Vi
             int displayWidth = display.getWidth();
             BitmapFactory.Options bmpFactoryOptions = new BitmapFactory.Options();
             bmpFactoryOptions.inJustDecodeBounds = true;
-            BitmapFactory.decodeResource(getResources(), R.drawable.car_new, bmpFactoryOptions);
+            BitmapFactory.decodeResource(getResources(), R.drawable.car_defect_land, bmpFactoryOptions);
             int width = bmpFactoryOptions.outWidth;
 
             if (width > displayWidth) {
@@ -170,7 +170,7 @@ public class DefectFragment extends Fragment implements View.OnTouchListener, Vi
             }
 
             bmpFactoryOptions.inJustDecodeBounds = false;
-            bmp = BitmapFactory.decodeResource(getResources(), R.drawable.car_new, bmpFactoryOptions);
+            bmp = BitmapFactory.decodeResource(getResources(), R.drawable.car_defect_land, bmpFactoryOptions);
             alteredBitmap = Bitmap.createBitmap(bmp.getWidth(), bmp.getHeight(), Bitmap.Config.RGB_565);
             canvas = new Canvas(alteredBitmap);
             paint = new Paint();
@@ -180,6 +180,8 @@ public class DefectFragment extends Fragment implements View.OnTouchListener, Vi
             canvas.drawBitmap(bmp, matrix, paint);
             choosenImageView.setImageBitmap(alteredBitmap);
             choosenImageView.setOnTouchListener(this);
+
+            onDefectDrawingListener.setImageDefect(alteredBitmap);
 
             viewCoords = new int[2];
             choosenImageView.getLocationOnScreen(viewCoords);

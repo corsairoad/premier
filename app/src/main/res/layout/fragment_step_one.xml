@@ -58,7 +58,7 @@
 
                 <android.support.design.widget.TextInputLayout
                     android:layout_width="0dp"
-                    android:layout_weight="10"
+                    android:layout_weight="5"
                     android:layout_height="wrap_content">
 
                     <EditText
@@ -73,7 +73,7 @@
                 <ImageButton
                     android:id="@+id/btn_drop"
                     android:layout_width="0dp"
-                    android:layout_weight="1"
+                    android:layout_weight="2"
                     android:layout_height="match_parent"
                     android:background="@null"
                     android:src="@drawable/ic_arrow_drop_down_black_24dp"/>
@@ -94,7 +94,7 @@
 
                 <android.support.design.widget.TextInputLayout
                     android:layout_width="0dp"
-                    android:layout_weight="10"
+                    android:layout_weight="5"
                     android:layout_height="match_parent">
 
                     <EditText
@@ -107,7 +107,7 @@
 
                 <ImageButton
                     android:layout_width="0dp"
-                    android:layout_weight="1"
+                    android:layout_weight="2"
                     android:layout_height="match_parent"
                     android:visibility="invisible"
                     android:background="@null"
@@ -134,7 +134,7 @@
 
                     <android.support.design.widget.TextInputLayout
                         android:layout_width="0dp"
-                        android:layout_weight="10"
+                        android:layout_weight="5"
                         android:layout_height="match_parent">
 
                         <EditText
@@ -149,7 +149,7 @@
                     <ImageButton
                         android:id="@+id/btn_dropdown_cartype"
                         android:layout_width="0dp"
-                        android:layout_weight="1"
+                        android:layout_weight="2"
                         android:layout_height="match_parent"
                         android:background="@null"
                         android:src="@drawable/ic_arrow_drop_down_black_24dp"/>
@@ -195,46 +195,11 @@
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:src="@drawable/ic_email_black_24dp" />
-
-                <android.support.design.widget.TextInputLayout
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="10">
-
-                    <EditText
-                        android:id="@+id/input_email"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:inputType="textEmailAddress"
-                        android:hint="@string/email"/>
-
-                </android.support.design.widget.TextInputLayout>
-
-                <ImageButton
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="match_parent"
-                    android:visibility="invisible"
-                    android:background="@null"
-                    android:src="@drawable/ic_arrow_drop_down_black_24dp"/>
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginBottom="16dp">
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
                     android:src="@drawable/ic_format_color_fill_black_24dp" />
 
                 <android.support.design.widget.TextInputLayout
                     android:layout_width="0dp"
-                    android:layout_weight="10"
+                    android:layout_weight="5"
                     android:layout_height="match_parent">
 
                     <EditText
@@ -249,8 +214,44 @@
                 <ImageButton
                     android:id="@+id/btn_dropdown_color"
                     android:layout_width="0dp"
-                    android:layout_weight="1"
+                    android:layout_weight="2"
                     android:layout_height="match_parent"
+                    android:background="@null"
+                    android:src="@drawable/ic_arrow_drop_down_black_24dp"/>
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="16dp">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/ic_email_black_24dp" />
+
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="5">
+
+                    <EditText
+                        android:id="@+id/input_email"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textEmailAddress"
+                        android:hint="@string/email"/>
+
+                </android.support.design.widget.TextInputLayout>
+
+                <ImageButton
+                    android:layout_width="0dp"
+                    android:layout_weight="2"
+                    android:layout_height="match_parent"
+                    android:visibility="invisible"
                     android:background="@null"
                     android:src="@drawable/ic_arrow_drop_down_black_24dp"/>
 

@@ -168,5 +168,6 @@
     <string name="discovery">Scan Printer</string>
     <string name="cancel">Cancel</string>
     <string name="submitprint"><![CDATA[Submit & Print]]></string>
+    <string name="done">Done</string>
 
 </resources>
