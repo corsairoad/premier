@@ -2,6 +2,7 @@ package valet.digikom.com.valetparking;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -25,9 +26,11 @@ import valet.digikom.com.valetparking.domain.Checkin;
 import valet.digikom.com.valetparking.domain.DefectMaster;
 import valet.digikom.com.valetparking.domain.EntryCheckinContainer;
 import valet.digikom.com.valetparking.domain.EntryCheckinResponse;
+import valet.digikom.com.valetparking.domain.PrintCheckin;
 import valet.digikom.com.valetparking.domain.ValetTypeJson;
 import valet.digikom.com.valetparking.fragments.DefectFragment;
 import valet.digikom.com.valetparking.fragments.ReviewFragment;
+import valet.digikom.com.valetparking.fragments.SignDialogFragment;
 import valet.digikom.com.valetparking.fragments.StepOneFragmet;
 import valet.digikom.com.valetparking.fragments.StepThreeFragment;
 import valet.digikom.com.valetparking.fragments.StepTwoFragment;
@@ -36,15 +39,15 @@ import valet.digikom.com.valetparking.service.ApiEndpoint;
 import valet.digikom.com.valetparking.service.ProcessRequest;
 
 public class AddCarActivity extends FragmentActivity implements StepOneFragmet.OnRegsitrationValid, StepTwoFragment.OnDefectSelectedListener,
-                StepThreeFragment.OnStuffSelectedListener, DefectFragment.OnDefectDrawingListener, View.OnClickListener, StepOneFragmet.OnValetTypeSelectedListener {
+                StepThreeFragment.OnStuffSelectedListener, DefectFragment.OnDefectDrawingListener, View.OnClickListener, StepOneFragmet.OnValetTypeSelectedListener, SignDialogFragment.OnDialogSignListener {
 
+    public static final String KEY_DIALOG_SIGN = "sign";
     Button btnSubmit;
     Button btnCancel;
     StepOneFragmet fragmentRegFirst;
     DefectFragment fragmentDefect;
     StepThreeFragment fragmentStuff;
     ReviewFragment fragmentReview;
-
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,10 +79,12 @@ public class AddCarActivity extends FragmentActivity implements StepOneFragmet.O
                             EntryDao entryDao = EntryDao.getInstance(AddCarActivity.this);
                             entryDao.insertEntryResponse(res, EntryCheckinResponse.FLAG_UPLOAD_SUCCESS);
 
-                            //new PrintDataTask().execute(res);
+                            //new PrintCheckinTask().execute(res);
 
                             startActivity(new Intent(AddCarActivity.this, Main2Activity.class));
                             finish();
+
+                            printCheckin(res);
                             //Log.d("Post checkin success: ", res.getData().getType());
                         }else {
                             Log.d("Post entry", "post entry checkin failed.");
@@ -153,6 +158,7 @@ public class AddCarActivity extends FragmentActivity implements StepOneFragmet.O
         fragmentReview.setImageDefect(bitmap);
     }
 
+
     private void showConfirmDialog(final ReviewFragment reviewFragment) {
         new SweetAlertDialog(this, SweetAlertDialog.NORMAL_TYPE)
                 .setTitleText("Registration")
@@ -161,10 +167,9 @@ public class AddCarActivity extends FragmentActivity implements StepOneFragmet.O
                 .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
                     @Override
                     public void onClick(SweetAlertDialog sweetAlertDialog) {
-
                         fragmentRegFirst.setCheckIn();
                         submitCheckin(fragmentReview.getSignatureBmp(), fragmentReview.getCheckin(), fragmentReview.getEntryCheckinContainer());
-
+                        //submitCheckin(signBmp, fragmentReview.getCheckin(), fragmentReview.getEntryCheckinContainer());
                         sweetAlertDialog.setTitleText("success!")
                                 .setContentText("Registration success")
                                 .setConfirmText("OK")
@@ -186,16 +191,38 @@ public class AddCarActivity extends FragmentActivity implements StepOneFragmet.O
     @Override
     public void onClick(View view) {
         if (view == btnSubmit) {
-            showConfirmDialog(fragmentReview);
+            if (fragmentRegFirst.isFormValid()){
+                showSignDialog();
+            }
         }else {
             startActivity(new Intent(this, Main2Activity.class));
             finish();
         }
     }
 
-
     @Override
     public void onValetTypeSelected(ValetTypeJson.Data data) {
         fragmentReview.setValetType(data);
+    }
+
+    private void showSignDialog() {
+        SignDialogFragment sdf = new SignDialogFragment();
+        sdf.show(getSupportFragmentManager(), KEY_DIALOG_SIGN);
+    }
+
+    @Override
+    public void setBitMapSign(Bitmap bitMapSign) {
+        fragmentReview.setSignBitmap(bitMapSign);
+        showConfirmDialog(fragmentReview);
+    }
+
+    private void printCheckin(final EntryCheckinResponse response) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                PrintCheckin printCheckin = new PrintCheckin(AddCarActivity.this, response,fragmentReview.getBitmapDefect(), fragmentReview.getSignatureBmp(), fragmentReview.getItemsList());
+                printCheckin.print();
+            }
+        });
     }
 }

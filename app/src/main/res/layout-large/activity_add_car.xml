@@ -15,50 +15,51 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:orientation="horizontal">
+            android:orientation="vertical">
 
             <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
                 android:layout_weight="1"
-                android:orientation="vertical">
+                android:orientation="horizontal">
 
                 <fragment
                     android:id="@+id/step_one_fragment"
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_weight="1"
-                    android:layout_height="0dp"
+                    android:layout_height="match_parent"
                     android:name="valet.digikom.com.valetparking.fragments.StepOneFragmet"/>
 
                 <fragment
-                    android:id="@+id/defect_fragment"
-                    android:layout_width="match_parent"
+                    android:id="@+id/stuff_fragment"
+                    android:layout_width="0dp"
                     android:layout_weight="1"
-                    android:layout_height="0dp"
-                    android:name="valet.digikom.com.valetparking.fragments.DefectFragment"/>
+                    android:layout_height="match_parent"
+                    android:name="valet.digikom.com.valetparking.fragments.StepThreeFragment"/>
 
 
             </LinearLayout>
 
             <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
                 android:layout_weight="1"
-                android:orientation="vertical">
+                android:orientation="horizontal">
+
 
                 <fragment
-                    android:id="@+id/stuff_fragment"
-                    android:layout_width="match_parent"
+                    android:id="@+id/defect_fragment"
+                    android:layout_width="0dp"
                     android:layout_weight="1"
-                    android:layout_height="0dp"
-                    android:name="valet.digikom.com.valetparking.fragments.StepThreeFragment"/>
+                    android:layout_height="match_parent"
+                    android:name="valet.digikom.com.valetparking.fragments.DefectFragment"/>
 
                 <fragment
                     android:id="@+id/review_fragment"
-                    android:layout_width="match_parent"
-                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_weight="0"
                     android:name="valet.digikom.com.valetparking.fragments.ReviewFragment"
-                    android:layout_height="0dp"/>
+                    android:layout_height="match_parent"/>
 
             </LinearLayout>
 

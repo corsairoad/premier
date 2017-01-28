@@ -3,6 +3,7 @@ package valet.digikom.com.valetparking.domain;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Build;
 
 import com.epson.epos2.Epos2Exception;
 import com.epson.epos2.printer.Printer;
@@ -11,8 +12,17 @@ import com.epson.epos2.printer.ReceiveListener;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import valet.digikom.com.valetparking.R;
+import valet.digikom.com.valetparking.dao.TokenDao;
+import valet.digikom.com.valetparking.service.ApiClient;
+import valet.digikom.com.valetparking.service.ApiEndpoint;
+import valet.digikom.com.valetparking.service.ProcessRequest;
+import valet.digikom.com.valetparking.util.MakeCurrencyString;
 import valet.digikom.com.valetparking.util.PrefManager;
 
 /**
@@ -25,99 +35,47 @@ public class PrintCheckin implements ReceiveListener {
     private EntryCheckinResponse response;
     private Printer mPrinter;
     PrefManager prefManager;
+    private Bitmap bitmapDefect;
+    private Bitmap bitmapSign;
+    private List<AdditionalItems> itemsList;
 
-    public PrintCheckin(Context context, EntryCheckinResponse response) {
+    public PrintCheckin(Context context, EntryCheckinResponse response, Bitmap  bmpDefect, Bitmap bmpSign, List<AdditionalItems> items) {
         this.context = context;
         this.response = response;
         prefManager = PrefManager.getInstance(context);
+        itemsList = items;
+        this.bitmapSign = bmpSign;
+
+        if (bmpDefect == null) {
+            this.bitmapDefect = BitmapFactory.decodeResource(context.getResources(), R.drawable.car_defect_land);
+        }else {
+            this.bitmapDefect = bmpDefect;
+        }
+
         initializeObject();
     }
 
     public void print() {
-        try {
-            String noTransaksi = response.getData().getAttribute().getIdTransaksi();
-            Bitmap logoData = BitmapFactory.decodeResource(context.getResources(), R.mipmap.logo_1);
-            String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
-            String dropPoint = response.getData().getAttribute().getDropPoint();
-            StringBuilder sb = new StringBuilder();
+        TokenDao.getToken(new ProcessRequest() {
+            @Override
+            public void process(String token) {
+                ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class, token);
+                Call<Disclaimer> call = apiEndpoint.getDisclaimer();
+                call.enqueue(new Callback<Disclaimer>() {
+                    @Override
+                    public void onResponse(Call<Disclaimer> call, Response<Disclaimer> response) {
+                        if (response != null && response.body() != null) {
+                            buildPrintCheckin(response.body().getDataList().get(0));
+                        }
+                    }
 
-            mPrinter.addTextAlign(Printer.ALIGN_CENTER);
+                    @Override
+                    public void onFailure(Call<Disclaimer> call, Throwable t) {
 
-            mPrinter.addImage(logoData, 0, 0,
-                    logoData.getWidth(),
-                    logoData.getHeight(),
-                    Printer.COLOR_1,
-                    Printer.MODE_MONO,
-                    Printer.HALFTONE_DITHER,
-                    Printer.PARAM_DEFAULT,
-                    Printer.COMPRESS_AUTO);
-
-            mPrinter.addFeedLine(2);
-
-            mPrinter.addTextAlign(Printer.ALIGN_CENTER);
-            mPrinter.addTextAlign(Printer.ALIGN_LEFT);
-            mPrinter.addText(date + "           ");
-            mPrinter.addText(dropPoint);
-
-            mPrinter.addFeedLine(2);
-
-            mPrinter.addTextAlign(Printer.ALIGN_CENTER);
-            mPrinter.addTextSize(2, 2);
-            mPrinter.addText(noTransaksi);
-
-            mPrinter.addFeedLine(2);
-
-            mPrinter.addCut(Printer.CUT_FEED);
-
-            //---------------------------------------
-            mPrinter.addTextSize(1,1);
-            mPrinter.addTextAlign(Printer.ALIGN_CENTER);
-            mPrinter.addImage(logoData, 0, 0,
-                    logoData.getWidth(),
-                    logoData.getHeight(),
-                    Printer.COLOR_1,
-                    Printer.MODE_MONO,
-                    Printer.HALFTONE_DITHER,
-                    Printer.PARAM_DEFAULT,
-                    Printer.COMPRESS_AUTO);
-
-            mPrinter.addFeedLine(2);
-
-            mPrinter.addTextAlign(Printer.ALIGN_CENTER);
-            mPrinter.addTextAlign(Printer.ALIGN_LEFT);
-            mPrinter.addText(date + "           ");
-            mPrinter.addText(dropPoint);
-
-            mPrinter.addFeedLine(2);
-
-            mPrinter.addTextAlign(Printer.ALIGN_CENTER);
-            mPrinter.addTextSize(2, 2);
-            mPrinter.addText(noTransaksi);
-
-            mPrinter.addFeedLine(3);
-
-            mPrinter.addTextAlign(Printer.ALIGN_LEFT);
-
-            sb.append(" No. Plat      :    " + response.getData().getAttribute().getPlatNo() + "\n");
-            sb.append(" Tipe Mobil    :    " + response.getData().getAttribute().getCar() + "\n");
-            sb.append(" Warna         :    " + response.getData().getAttribute().getColor() + "\n");
-            sb.append(" Sektor Parkir :    " + response.getData().getAttribute().getSektorParkir() + "\n");
-            sb.append(" Blok Parkir   :    " + response.getData().getAttribute().getBlokParkir() + "\n");
-            sb.append(" Area Parkir   :    " + response.getData().getAttribute().getAreaParkir() + "\n");
-
-            mPrinter.addTextSize(1,1);
-            mPrinter.addText(sb.toString());
-
-            mPrinter.addFeedLine(2);
-
-            mPrinter.addCut(Printer.CUT_FEED);
-
-            //----------------------------
-            connectPrinter();
-        } catch (Epos2Exception e) {
-            e.printStackTrace();
-        }
-
+                    }
+                });
+            }
+        });
     }
     private boolean initializeObject() {
         try {
@@ -209,7 +167,7 @@ public class PrintCheckin implements ReceiveListener {
             mPrinter.beginTransaction();
             isBeginTransaction = true;
             mPrinter.sendData(Printer.PARAM_DEFAULT);
-            //disconnectPrinter();
+            disconnectPrinter();
         } catch (Exception e) {
             ShowMsg.showException(e, "beginTransaction", context);
         }
@@ -259,5 +217,225 @@ public class PrintCheckin implements ReceiveListener {
         }
 
         finalizeObject();
+    }
+
+    private void buildPrintCheckin(Disclaimer.Data data) {
+        try {
+            String noTransaksi = response.getData().getAttribute().getIdTransaksi();
+            String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+            String dropPoint = response.getData().getAttribute().getDropPoint();
+            String site = response.getData().getAttribute().getSiteName();
+            Bitmap logoData = BitmapFactory.decodeResource(context.getResources(), R.mipmap.logo_1);
+            StringBuilder sb = new StringBuilder();
+
+            mPrinter.addTextAlign(Printer.ALIGN_CENTER);
+            mPrinter.addImage(logoData, 0, 0,
+                    logoData.getWidth(),
+                    logoData.getHeight(),
+                    Printer.COLOR_1,
+                    Printer.MODE_MONO,
+                    Printer.HALFTONE_DITHER,
+                    Printer.PARAM_DEFAULT,
+                    Printer.COMPRESS_AUTO);
+
+            mPrinter.addFeedLine(1);
+
+            mPrinter.addTextAlign(Printer.ALIGN_CENTER);
+            mPrinter.addText(site);
+
+            mPrinter.addFeedLine(2);
+
+            mPrinter.addTextAlign(Printer.ALIGN_CENTER);
+            mPrinter.addTextSize(2, 2);
+            mPrinter.addText(noTransaksi);
+
+            mPrinter.addFeedLine(2);
+
+            mPrinter.addTextAlign(Printer.ALIGN_LEFT);
+            mPrinter.addTextSize(1, 1);
+            sb.append(" Checkin       :  " + date + "\n");
+            sb.append(" No. Plat      :  " + response.getData().getAttribute().getPlatNo() + "\n");
+            sb.append(" Tipe Mobil    :  " + response.getData().getAttribute().getCar() + "\n");
+            if (response.getData().getAttribute().getColor() != null) {
+                sb.append(" Warna         :  " + response.getData().getAttribute().getColor() + "\n");
+            }
+            sb.append(" Drop Point    :  " + dropPoint + "\n");
+            sb.append(" Harga         :  " + MakeCurrencyString.fromInt(response.getData().getAttribute().getFee()));
+
+            mPrinter.addText(sb.toString());
+            sb.delete(0, sb.length());
+            mPrinter.addFeedLine(1);
+            mPrinter.addText("------------------------------------------\n");
+            //mPrinter.addHLine(0, 100, Printer.LINE_THIN);
+
+            mPrinter.addFeedLine(1);
+            mPrinter.addTextAlign(Printer.ALIGN_CENTER);
+            mPrinter.addTextSize(1,1);
+            mPrinter.addText(data.getAttrib().getDscDesc());
+
+            mPrinter.addFeedLine(2);
+            mPrinter.addCut(Printer.CUT_FEED);
+
+            /*
+            ------------------- Receipt for keyguard
+             */
+            mPrinter.addTextAlign(Printer.ALIGN_CENTER);
+            mPrinter.addImage(logoData, 0, 0,
+                    logoData.getWidth(),
+                    logoData.getHeight(),
+                    Printer.COLOR_1,
+                    Printer.MODE_MONO,
+                    Printer.HALFTONE_DITHER,
+                    Printer.PARAM_DEFAULT,
+                    Printer.COMPRESS_AUTO);
+
+            mPrinter.addFeedLine(1);
+
+            mPrinter.addTextAlign(Printer.ALIGN_CENTER);
+            mPrinter.addText(site);
+
+            mPrinter.addFeedLine(2);
+
+            mPrinter.addTextAlign(Printer.ALIGN_CENTER);
+            mPrinter.addTextSize(2, 2);
+            mPrinter.addText(noTransaksi);
+
+            mPrinter.addFeedLine(2);
+
+            mPrinter.addTextAlign(Printer.ALIGN_LEFT);
+            mPrinter.addTextSize(1, 1);
+            sb.append(" Checkin       :  " + date + "\n");
+            sb.append(" No. Plat      :  " + response.getData().getAttribute().getPlatNo() + "\n");
+            sb.append(" Tipe Mobil    :  " + response.getData().getAttribute().getCar() + "\n");
+            if (response.getData().getAttribute().getColor() != null) {
+                sb.append(" Warna         :  " + response.getData().getAttribute().getColor() + "\n");
+            }
+            sb.append(" Drop Point    :  " + dropPoint + "\n");
+            sb.append(" Harga         :  " + MakeCurrencyString.fromInt(response.getData().getAttribute().getFee()));
+
+            mPrinter.addText(sb.toString());
+            sb.delete(0, sb.length());
+
+            // image defect
+            if (bitmapDefect != null) {
+                mPrinter.addFeedLine(2);
+                mPrinter.addTextAlign(Printer.ALIGN_CENTER);
+                mPrinter.addText("CHECK MOBIL");
+                mPrinter.addFeedLine(1);
+                mPrinter.addImage(bitmapDefect, 0, 0,
+                        bitmapDefect.getWidth(),
+                        bitmapDefect.getHeight(),
+                        Printer.COLOR_1,
+                        Printer.MODE_MONO,
+                        Printer.HALFTONE_DITHER,
+                        Printer.PARAM_DEFAULT,
+                        Printer.COMPRESS_DEFLATE);
+            }
+
+
+            mPrinter.addFeedLine(1);
+
+            if (itemsList != null && !itemsList.isEmpty()) {
+                mPrinter.addTextAlign(Printer.ALIGN_LEFT);
+                sb.append("Barang Berharga: ");
+                mPrinter.addFeedLine(1);
+                int loop = 1;
+                for (AdditionalItems i : itemsList) {
+                    sb.append(i.getAttributes().getAdditionalItemMaster().getName());
+                    if (loop < itemsList.size()){
+                        sb.append(", ");
+                    }
+                    loop++;
+                }
+                mPrinter.addText(sb.toString());
+                sb.delete(0, sb.length());
+                mPrinter.addFeedLine(1);
+            }
+
+
+            // tanda tangan
+            /*
+            mPrinter.addTextAlign(Printer.ALIGN_CENTER);
+            mPrinter.addText("Ttd");
+            mPrinter.addFeedLine(1);
+            mPrinter.addImage(bitmapSign, 0, 0,
+                    bitmapSign.getWidth(),
+                    bitmapDefect.getHeight(),
+                    Printer.COLOR_1,
+                    Printer.MODE_MONO,
+                    Printer.HALFTONE_DITHER,
+                    Printer.PARAM_DEFAULT,
+                    Printer.COMPRESS_AUTO);
+
+            mPrinter.addFeedLine(1);
+            mPrinter.addCut(Printer.CUT_FEED);
+            */
+
+            mPrinter.addCut(Printer.CUT_FEED);
+
+            /*
+            ---------- receipt to put on dashboard
+             */
+            mPrinter.addTextAlign(Printer.ALIGN_CENTER);
+            mPrinter.addImage(logoData, 0, 0,
+                    logoData.getWidth(),
+                    logoData.getHeight(),
+                    Printer.COLOR_1,
+                    Printer.MODE_MONO,
+                    Printer.HALFTONE_DITHER,
+                    Printer.PARAM_DEFAULT,
+                    Printer.COMPRESS_AUTO);
+
+            mPrinter.addFeedLine(1);
+
+            mPrinter.addTextAlign(Printer.ALIGN_CENTER);
+            mPrinter.addText(site);
+
+            mPrinter.addFeedLine(2);
+
+            mPrinter.addTextAlign(Printer.ALIGN_CENTER);
+            mPrinter.addTextSize(2, 2);
+            mPrinter.addText(noTransaksi);
+
+            mPrinter.addFeedLine(2);
+
+            mPrinter.addTextAlign(Printer.ALIGN_LEFT);
+            mPrinter.addTextSize(1, 1);
+            sb.append(" Checkin       :  " + date + "\n");
+            sb.append(" No. Plat      :  " + response.getData().getAttribute().getPlatNo() + "\n");
+            sb.append(" Tipe Mobil    :  " + response.getData().getAttribute().getCar() + "\n");
+            if (response.getData().getAttribute().getColor() != null) {
+                sb.append(" Warna         :  " + response.getData().getAttribute().getColor() + "\n");
+            }
+            sb.append(" Drop Point    :  " + dropPoint + "\n");
+            sb.append(" Harga         :  " + MakeCurrencyString.fromInt(response.getData().getAttribute().getFee()));
+
+            mPrinter.addText(sb.toString());
+            sb.delete(0, sb.length());
+            mPrinter.addFeedLine(2);
+
+            mPrinter.addTextAlign(Printer.ALIGN_CENTER);
+            mPrinter.addTextSize(2,1);
+            mPrinter.addText("DASHBOARD");
+
+            mPrinter.addFeedLine(2);
+            mPrinter.addCut(Printer.CUT_FEED);
+
+            connectPrinter();
+        } catch (Epos2Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private Bitmap scaleBitmap(Bitmap bmp) {
+        int targetWidth = 640; // your arbitrary fixed limit
+        int targetHeight = (int) (bmp.getHeight() * targetWidth / (double) bmp.getWidth());
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            bmp.setWidth(targetWidth);
+            bmp.setHeight(targetHeight);
+        }
+
+        return bmp;
     }
 }
