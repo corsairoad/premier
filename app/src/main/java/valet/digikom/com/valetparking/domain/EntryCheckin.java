@@ -294,7 +294,13 @@ public class EntryCheckin {
         public Builder setAttribute(DropPointMaster dropPointMaster, String platNo, CarMaster carMaster, ColorMaster colorMaster, String email, Bitmap bmpDefects, Bitmap bmpSignature, int valetTypeId) {
             attrib = new Attrib();
             attrib.setDropMasterId(String.valueOf(dropPointMaster.getAttrib().getDropId()));
+            String p = platNo;
+
+            if (Character.isDigit(p.trim().charAt(0))) {
+                platNo = "B " + platNo;
+            }
             attrib.setPlatNo(platNo);
+
             attrib.setValetType(String.valueOf(valetTypeId));
             attrib.setCarType(String.valueOf(carMaster.getAttrib().getId_attrib()));
 

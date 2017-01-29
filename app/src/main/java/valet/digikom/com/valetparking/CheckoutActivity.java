@@ -238,7 +238,7 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
         FinishCheckoutDao finishCheckoutDao = FinishCheckoutDao.getInstance(this);
         finishCheckoutDao.setFinishCheckOut(builder.build());
         finishCheckoutDao.setId(idValetHeader);
-        TokenDao.getToken(finishCheckoutDao);
+        TokenDao.getToken(finishCheckoutDao, this);
 
         new PrintCheckoutTask().execute();
 

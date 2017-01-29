@@ -30,6 +30,10 @@ public class ApiClient {
                     .addConverterFactory(GsonConverterFactory.create());
 
 
+    public static  Retrofit getClient() {
+       return builder.build();
+    }
+
     public static <S> S createService(Class<S> serviceClass) {
         return createService(serviceClass, null);
     }

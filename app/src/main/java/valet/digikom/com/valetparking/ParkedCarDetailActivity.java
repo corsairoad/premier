@@ -231,7 +231,7 @@ public class ParkedCarDetailActivity extends AppCompatActivity implements View.O
         callDao.setAddCarCallBody(addCarCallBody);
         callDao.setCalledCarById(id, EntryCheckinResponse.FLAG_CALL);
 
-        TokenDao.getToken(callDao);
+        TokenDao.getToken(callDao, this);
 
         startActivity(new Intent(ParkedCarDetailActivity.this, Main2Activity.class));
         finish();

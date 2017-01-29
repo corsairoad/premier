@@ -35,7 +35,7 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="action_settings">Settings</string>
-    <string name="login_empty">Silahkan lengkapi username dan password.</string>
+    <string name="login_empty">User name or password incorrect.</string>
     <string name="list_car_empty">No Transaction at this time.</string>
     <string name="action_search">Search</string>
     <string name="prev">Kembali</string>
@@ -169,5 +169,6 @@
     <string name="cancel">Cancel</string>
     <string name="submitprint"><![CDATA[Submit & Print]]></string>
     <string name="done">Done</string>
+    <string name="logout">Logout</string>
 
 </resources>
