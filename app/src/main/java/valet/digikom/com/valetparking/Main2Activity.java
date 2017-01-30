@@ -2,6 +2,7 @@ package valet.digikom.com.valetparking;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
+import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -18,6 +19,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -25,6 +27,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.Calendar;
 
@@ -44,7 +47,8 @@ import valet.digikom.com.valetparking.util.PrefManager;
 import valet.digikom.com.valetparking.util.ValetDbHelper;
 
 public class Main2Activity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener{
+        implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener, ParkedCarFragment.CountParkedCarListener,
+        CalledCarFragment.CountCalledCarListener{
 
     ViewPager viewPager;
     ParkedCarPagerAdapter pagerAdapter;
@@ -53,6 +57,8 @@ public class Main2Activity extends AppCompatActivity
     NavigationView navView;
     View headerView;
     Button btnLogout;
+    TextView txtCountParkedCar;
+    TextView txtCountCalledCar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +68,9 @@ public class Main2Activity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        setDefaultKeyMode(DEFAULT_KEYS_SEARCH_LOCAL);
+        handleIntent(getIntent());
 
         tabLayout = (TabLayout) findViewById(R.id.tabs);
         viewPager = (ViewPager) findViewById(R.id.viewpager);
@@ -90,7 +99,15 @@ public class Main2Activity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        downloadData();
         //startCheckoutEntryAlarm(this);
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        handleIntent(intent);
     }
 
     private void setUserName() {
@@ -99,9 +116,9 @@ public class Main2Activity extends AppCompatActivity
     }
 
     private void setupPagers() {
-        pagerAdapter = new ParkedCarPagerAdapter(getSupportFragmentManager());
-        pagerAdapter.addFragments(new ParkedCarFragment(), "Parked Car");
-        pagerAdapter.addFragments(new CalledCarFragment(), "Called Car");
+        pagerAdapter = new ParkedCarPagerAdapter(this,getSupportFragmentManager());
+        pagerAdapter.addFragments(new ParkedCarFragment(), "Parked Cars");
+        pagerAdapter.addFragments(new CalledCarFragment(), "Called Cars");
         viewPager.setAdapter(pagerAdapter);
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
@@ -124,6 +141,11 @@ public class Main2Activity extends AppCompatActivity
             }
         });
         tabLayout.setupWithViewPager(viewPager);
+
+        for (int a=0; a< tabLayout.getTabCount(); a++) {
+            View v = pagerAdapter.getTabView(a);
+            tabLayout.getTabAt(a).setCustomView(v);
+        }
     }
 
     @Override
@@ -141,6 +163,14 @@ public class Main2Activity extends AppCompatActivity
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main2, menu);
 
+        // Get the SearchView and set the searchable configuration
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
+        // Assumes current activity is the searchable activity
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        searchView.setIconifiedByDefault(true); // Do not iconify the widget; expand it by default
+        searchView.setMaxWidth(Integer.MAX_VALUE);
+
         return true;
     }
 
@@ -153,12 +183,12 @@ public class Main2Activity extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_search) {
+            onSearchRequested();
             return true;
         }
 
         // checking ready checkout car
         if (id == R.id.action_refresh) {
-
             return true;
         }
 
@@ -209,7 +239,6 @@ public class Main2Activity extends AppCompatActivity
     public void onClick(View view) {
         if (view == btnLogout) {
             showLogoutDialog();
-            return;
         }
     }
 
@@ -241,4 +270,34 @@ public class Main2Activity extends AppCompatActivity
         finish();
     }
 
+    @Override
+    public void setCountParkedCar(int count) {
+        View v = tabLayout.getTabAt(0).getCustomView();
+        txtCountParkedCar = (TextView) v.findViewById(R.id.text_count);
+        txtCountParkedCar.setText(String.valueOf(count));
+    }
+
+    @Override
+    public void setCountCalledCar(int count) {
+        View v = tabLayout.getTabAt(1).getCustomView();
+        txtCountCalledCar = (TextView) v.findViewById(R.id.text_count);
+        txtCountCalledCar.setText(String.valueOf(count));
+    }
+
+    private void handleIntent(Intent intent) {
+        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+            String query = intent.getStringExtra(SearchManager.QUERY);
+            Toast.makeText(this, query, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void downloadData() {
+        ValetDbHelper dbHelper = ValetDbHelper.getInstance(this);
+        TokenDao.getToken(DefectDao.getInstance(dbHelper), this);
+        TokenDao.getToken(ItemsDao.getInstance(dbHelper), this);
+        TokenDao.getToken(CarDao.getInstance(dbHelper), this);
+        TokenDao.getToken(ColorDao.getInstance(dbHelper), this);
+        TokenDao.getToken(DropDao.getInstance(dbHelper), this);
+        TokenDao.getToken(FineFeeDao.getInstance(this), this);
+    }
 }

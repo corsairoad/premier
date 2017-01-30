@@ -30,6 +30,7 @@ public class CalledCarFragment extends Fragment implements ListCalledCarAdapter.
     private List<EntryCheckinResponse> responseList = new ArrayList<>();
     private ListCalledCarAdapter calledCarAdapter;
     private TextView textEmpty;
+    private CountCalledCarListener listener;
 
     public CalledCarFragment() {
     }
@@ -60,6 +61,7 @@ public class CalledCarFragment extends Fragment implements ListCalledCarAdapter.
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+        listener = (CountCalledCarListener) context;
     }
 
     @Override
@@ -108,6 +110,13 @@ public class CalledCarFragment extends Fragment implements ListCalledCarAdapter.
             responseList.addAll(responseListx);
             calledCarAdapter.notifyDataSetChanged();
             textEmpty.setVisibility(View.GONE);
+            listener.setCountCalledCar(responseListx.size());
+        }else {
+            listener.setCountCalledCar(0);
         }
+    }
+
+    public interface CountCalledCarListener {
+        void setCountCalledCar (int count);
     }
 }

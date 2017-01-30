@@ -29,6 +29,7 @@ import valet.digikom.com.valetparking.domain.AddCarCall;
 import valet.digikom.com.valetparking.domain.AddCarCallBody;
 import valet.digikom.com.valetparking.domain.DropPointMaster;
 import valet.digikom.com.valetparking.domain.EntryCheckinResponse;
+import valet.digikom.com.valetparking.util.MakeCurrencyString;
 import valet.digikom.com.valetparking.util.ValetDbHelper;
 
 public class ParkedCarDetailActivity extends AppCompatActivity implements View.OnClickListener, TimePickerDialog.OnTimeSetListener {
@@ -97,15 +98,19 @@ public class ParkedCarDetailActivity extends AppCompatActivity implements View.O
     private void init() {
         if (entry != null) {
             EntryCheckinResponse.Attribute attr = entry.getData().getAttribute();
-            String platNo = attr.getPlatNo() + " - " + attr.getCar() + " (" + attr.getColor() + ")";
             String lokasiParkir = attr.getAreaParkir() + " " + attr.getBlokParkir() + " " + attr.getSektorParkir();
+            String platNo = attr.getPlatNo() + " - " + attr.getCar();
+
+            if (attr.getColor() != null) {
+                platNo =  platNo + " (" + attr.getColor() + ")";
+            }
 
             txtPlatNo.setText(platNo);
             txtLokasiParkir.setText(lokasiParkir);
             txtNoTrans.setText(attr.getIdTransaksi());
             txtDropPoint.setText(attr.getDropPoint());
             txtCheckin.setText(attr.getCheckinTime());
-            txtFee.setText(String.valueOf(attr.getFee()));
+            txtFee.setText(MakeCurrencyString.fromInt(attr.getFee()));
         }
     }
 

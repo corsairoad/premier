@@ -3,6 +3,8 @@ package valet.digikom.com.valetparking.domain;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.graphics.RectF;
 import android.os.Build;
 import android.text.TextUtils;
 import android.widget.Toast;
@@ -50,12 +52,12 @@ public class PrintCheckin implements ReceiveListener {
         this.response = response;
         prefManager = PrefManager.getInstance(context);
         itemsList = items;
-        this.bitmapSign = bmpSign;
+        this.bitmapSign = scaleBitmap(bmpSign);
 
         if (bmpDefect == null) {
-            this.bitmapDefect = BitmapFactory.decodeResource(context.getResources(), R.drawable.car_defect_land);
+            this.bitmapDefect = scaleBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.car_defect_land));
         }else {
-            this.bitmapDefect = bmpDefect;
+            this.bitmapDefect = scaleBitmap(bmpDefect);
         }
 
         initializeObject();
@@ -328,6 +330,7 @@ public class PrintCheckin implements ReceiveListener {
             Bitmap logoData = BitmapFactory.decodeResource(context.getResources(), R.mipmap.logo_1);
             StringBuilder sb = new StringBuilder();
 
+            /*
             mPrinter.addTextAlign(Printer.ALIGN_CENTER);
             mPrinter.addImage(logoData, 0, 0,
                     logoData.getWidth(),
@@ -375,6 +378,7 @@ public class PrintCheckin implements ReceiveListener {
 
             mPrinter.addFeedLine(2);
             mPrinter.addCut(Printer.CUT_FEED);
+            */
 
             /*
             ------------------- Receipt for keyguard
@@ -452,15 +456,13 @@ public class PrintCheckin implements ReceiveListener {
                 mPrinter.addFeedLine(1);
             }
 
-
             // tanda tangan
-            /*
             mPrinter.addTextAlign(Printer.ALIGN_CENTER);
             mPrinter.addText("Ttd");
             mPrinter.addFeedLine(1);
             mPrinter.addImage(bitmapSign, 0, 0,
                     bitmapSign.getWidth(),
-                    bitmapDefect.getHeight(),
+                    bitmapSign.getHeight(),
                     Printer.COLOR_1,
                     Printer.MODE_MONO,
                     Printer.HALFTONE_DITHER,
@@ -468,14 +470,14 @@ public class PrintCheckin implements ReceiveListener {
                     Printer.COMPRESS_AUTO);
 
             mPrinter.addFeedLine(1);
-            mPrinter.addCut(Printer.CUT_FEED);
-            */
+            //mPrinter.addCut(Printer.CUT_FEED);
 
             mPrinter.addCut(Printer.CUT_FEED);
 
             /*
             ---------- receipt to put on dashboard
              */
+            /*
             mPrinter.addTextAlign(Printer.ALIGN_CENTER);
             mPrinter.addImage(logoData, 0, 0,
                     logoData.getWidth(),
@@ -517,6 +519,7 @@ public class PrintCheckin implements ReceiveListener {
             mPrinter.addTextAlign(Printer.ALIGN_CENTER);
             mPrinter.addTextSize(2,1);
             mPrinter.addText("DASHBOARD");
+            */
 
             mPrinter.addFeedLine(2);
             mPrinter.addCut(Printer.CUT_FEED);
@@ -527,15 +530,10 @@ public class PrintCheckin implements ReceiveListener {
         return true;
     }
 
-    private Bitmap scaleBitmap(Bitmap bmp) {
-        int targetWidth = 640; // your arbitrary fixed limit
-        int targetHeight = (int) (bmp.getHeight() * targetWidth / (double) bmp.getWidth());
+    private Bitmap scaleBitmap(Bitmap b) {
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            bmp.setWidth(targetWidth);
-            bmp.setHeight(targetHeight);
-        }
-
-        return bmp;
+        Matrix m = new Matrix();
+        m.setRectToRect(new RectF(0, 0, b.getWidth(), b.getHeight()), new RectF(0, 0, 400, 400), Matrix.ScaleToFit.CENTER);
+        return Bitmap.createBitmap(b, 0, 0, b.getWidth(), b.getHeight(), m, true);
     }
 }

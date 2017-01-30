@@ -65,6 +65,11 @@ public class AuthResDao {
             @Override
             public void onResponse(Call<AuthResponse> call, Response<AuthResponse> response) {
                 if (response != null && response.body() != null) {
+                    AuthResponse.Data.Role role = response.body().getData().getRole();
+                    if (role.getRoleId() != 20) {
+                        onAuthListener.loginFailed();
+                        return;
+                    }
                     saveAuthRes(response.body());
                     savePwx(password);
                     isOke[0] = true;
