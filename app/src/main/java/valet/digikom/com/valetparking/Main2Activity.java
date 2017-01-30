@@ -19,12 +19,16 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
 
 import java.util.Calendar;
 
+import cn.pedant.SweetAlert.SweetAlertDialog;
 import valet.digikom.com.valetparking.adapter.ParkedCarPagerAdapter;
 import valet.digikom.com.valetparking.dao.CarDao;
 import valet.digikom.com.valetparking.dao.CheckoutDao;
@@ -36,14 +40,19 @@ import valet.digikom.com.valetparking.dao.ItemsDao;
 import valet.digikom.com.valetparking.dao.TokenDao;
 import valet.digikom.com.valetparking.fragments.CalledCarFragment;
 import valet.digikom.com.valetparking.fragments.ParkedCarFragment;
+import valet.digikom.com.valetparking.util.PrefManager;
 import valet.digikom.com.valetparking.util.ValetDbHelper;
 
 public class Main2Activity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener{
+        implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener{
 
     ViewPager viewPager;
     ParkedCarPagerAdapter pagerAdapter;
     TabLayout tabLayout;
+    TextView txtUserName;
+    NavigationView navView;
+    View headerView;
+    Button btnLogout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +65,12 @@ public class Main2Activity extends AppCompatActivity
 
         tabLayout = (TabLayout) findViewById(R.id.tabs);
         viewPager = (ViewPager) findViewById(R.id.viewpager);
+        btnLogout = (Button) findViewById(R.id.btn_logout);
+        btnLogout.setOnClickListener(this);
+        navView = (NavigationView) findViewById(R.id.nav_view);
+        headerView = navView.inflateHeaderView(R.layout.nav_header_main2);
+        txtUserName = (TextView) headerView.findViewById(R.id.text_user_name);
+        setUserName();
         // set up pager parked car and called cars
         setupPagers();
 
@@ -75,16 +90,12 @@ public class Main2Activity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-
-        ValetDbHelper dbHelper = ValetDbHelper.getInstance(this);
-        TokenDao.getToken(DefectDao.getInstance(dbHelper));
-        TokenDao.getToken(ItemsDao.getInstance(dbHelper));
-        TokenDao.getToken(CarDao.getInstance(dbHelper));
-        TokenDao.getToken(ColorDao.getInstance(dbHelper));
-        TokenDao.getToken(DropDao.getInstance(dbHelper));
-        TokenDao.getToken(FineFeeDao.getInstance(this));
-
         //startCheckoutEntryAlarm(this);
+    }
+
+    private void setUserName() {
+        String userName = PrefManager.getInstance(this).getUserName();
+        txtUserName.setText(userName);
     }
 
     private void setupPagers() {
@@ -104,7 +115,7 @@ public class Main2Activity extends AppCompatActivity
                 Fragment fragmentCalledCar = pagerAdapter.getItem(1);
 
                 CheckoutDao checkoutDao = CheckoutDao.getInstance(Main2Activity.this, fragmentCalledCar, fragMentParkedCar);
-                TokenDao.getToken(checkoutDao);
+                TokenDao.getToken(checkoutDao, Main2Activity.this);
             }
 
             @Override
@@ -193,4 +204,41 @@ public class Main2Activity extends AppCompatActivity
         Calendar cal = Calendar.getInstance();
         alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, cal.getTimeInMillis(),1000,alarmIntent);
     }
+
+    @Override
+    public void onClick(View view) {
+        if (view == btnLogout) {
+            showLogoutDialog();
+            return;
+        }
+    }
+
+    private void showLogoutDialog() {
+        new SweetAlertDialog(this, SweetAlertDialog.NORMAL_TYPE)
+                .setTitleText("Confirmation")
+                .setContentText("Do you want to logout?")
+                .setConfirmText("Yes")
+                .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                    @Override
+                    public void onClick(SweetAlertDialog sweetAlertDialog) {
+                        PrefManager.getInstance(Main2Activity.this).logoutUser();
+                        goToSplash();
+                    }
+                })
+                .setCancelText("Cancel")
+                .setCancelClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                    @Override
+                    public void onClick(SweetAlertDialog sweetAlertDialog) {
+                        sweetAlertDialog.cancel();
+                    }
+                })
+                .showCancelButton(true)
+                .show();
+    }
+
+    private void goToSplash() {
+        startActivity(new Intent(this,SplashActivity.class));
+        finish();
+    }
+
 }

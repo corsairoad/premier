@@ -4,7 +4,10 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
+import android.text.TextUtils;
+import android.widget.Toast;
 
+import com.epson.epos2.Epos2CallbackCode;
 import com.epson.epos2.Epos2Exception;
 import com.epson.epos2.printer.Printer;
 import com.epson.epos2.printer.PrinterStatusInfo;
@@ -17,6 +20,7 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import valet.digikom.com.valetparking.AddCarActivity;
 import valet.digikom.com.valetparking.R;
 import valet.digikom.com.valetparking.dao.TokenDao;
 import valet.digikom.com.valetparking.service.ApiClient;
@@ -38,9 +42,11 @@ public class PrintCheckin implements ReceiveListener {
     private Bitmap bitmapDefect;
     private Bitmap bitmapSign;
     private List<AdditionalItems> itemsList;
+    private AddCarActivity addCarActivity;
 
     public PrintCheckin(Context context, EntryCheckinResponse response, Bitmap  bmpDefect, Bitmap bmpSign, List<AdditionalItems> items) {
         this.context = context;
+        addCarActivity = (AddCarActivity) context;
         this.response = response;
         prefManager = PrefManager.getInstance(context);
         itemsList = items;
@@ -65,7 +71,11 @@ public class PrintCheckin implements ReceiveListener {
                     @Override
                     public void onResponse(Call<Disclaimer> call, Response<Disclaimer> response) {
                         if (response != null && response.body() != null) {
-                            buildPrintCheckin(response.body().getDataList().get(0));
+                            if (runPrintCheckinData(response.body().getDataList().get(0))){
+                                Toast.makeText(context, "Print success", Toast.LENGTH_SHORT).show();
+                            }else {
+                                Toast.makeText(context, "Print failed", Toast.LENGTH_SHORT).show();
+                            }
                         }
                     }
 
@@ -75,8 +85,78 @@ public class PrintCheckin implements ReceiveListener {
                     }
                 });
             }
-        });
+        }, context);
     }
+
+    private boolean runPrintCheckinData(Disclaimer.Data data) {
+        if (!initializeObject()) {
+            return false;
+        }
+
+        if (!buildPrintCheckin(data)) {
+            return false;
+        }
+
+        if (!prindData()) {
+            finalizeObject();
+            return false;
+        }
+        return true;
+
+    }
+
+    private boolean prindData() {
+        if (mPrinter == null) {
+            return false;
+        }
+
+        if (!connectPrinter()) {
+            return false;
+        }
+
+        PrinterStatusInfo status = mPrinter.getStatus();
+        if (isPrintable(status)) {
+            try {
+                mPrinter.sendData(Printer.PARAM_DEFAULT);
+            } catch (Epos2Exception e) {
+                try {
+                    mPrinter.disconnect();
+                }
+                catch (Exception ex) {
+                    // Do nothing
+                }
+                return false;
+            }
+        } else {
+            try {
+                mPrinter.disconnect();
+            }
+            catch (Exception ex) {
+                // Do nothing
+            }
+            return false;
+        }
+        return true;
+    }
+
+    private boolean isPrintable(PrinterStatusInfo status) {
+        if (status == null) {
+            return false;
+        }
+
+        if (status.getConnection() == Printer.FALSE) {
+            return false;
+        }
+        else if (status.getOnline() == Printer.FALSE) {
+            return false;
+        }
+        else {
+            ;//print available
+        }
+
+        return true;
+    }
+
     private boolean initializeObject() {
         try {
             mPrinter = new Printer(Printer.TM_T88,Printer.LANG_EN,context);
@@ -93,7 +173,22 @@ public class PrintCheckin implements ReceiveListener {
 
     @Override
     public void onPtrReceive(final Printer printerObj, final int code, final PrinterStatusInfo status, final String printJobId) {
-
+            addCarActivity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (code == Epos2CallbackCode.CODE_SUCCESS) {
+                        Toast.makeText(context, "Print success", Toast.LENGTH_SHORT).show();
+                    }else {
+                        Toast.makeText(context, "Print failed", Toast.LENGTH_SHORT).show();
+                    }
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            disconnectPrinter();
+                        }
+                    }).start();
+                }
+            });
     }
 
     private String makeErrorMessage(PrinterStatusInfo status) {
@@ -166,8 +261,6 @@ public class PrintCheckin implements ReceiveListener {
         try {
             mPrinter.beginTransaction();
             isBeginTransaction = true;
-            mPrinter.sendData(Printer.PARAM_DEFAULT);
-            disconnectPrinter();
         } catch (Exception e) {
             ShowMsg.showException(e, "beginTransaction", context);
         }
@@ -219,12 +312,19 @@ public class PrintCheckin implements ReceiveListener {
         finalizeObject();
     }
 
-    private void buildPrintCheckin(Disclaimer.Data data) {
+    private boolean buildPrintCheckin(Disclaimer.Data data) {
+
+        if (mPrinter == null) {
+            return false;
+        }
+
         try {
             String noTransaksi = response.getData().getAttribute().getIdTransaksi();
             String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
             String dropPoint = response.getData().getAttribute().getDropPoint();
             String site = response.getData().getAttribute().getSiteName();
+            String platNo = response.getData().getAttribute().getPlatNo();
+
             Bitmap logoData = BitmapFactory.decodeResource(context.getResources(), R.mipmap.logo_1);
             StringBuilder sb = new StringBuilder();
 
@@ -254,7 +354,7 @@ public class PrintCheckin implements ReceiveListener {
             mPrinter.addTextAlign(Printer.ALIGN_LEFT);
             mPrinter.addTextSize(1, 1);
             sb.append(" Checkin       :  " + date + "\n");
-            sb.append(" No. Plat      :  " + response.getData().getAttribute().getPlatNo() + "\n");
+            sb.append(" No. Plat      :  " + platNo + "\n");
             sb.append(" Tipe Mobil    :  " + response.getData().getAttribute().getCar() + "\n");
             if (response.getData().getAttribute().getColor() != null) {
                 sb.append(" Warna         :  " + response.getData().getAttribute().getColor() + "\n");
@@ -305,7 +405,7 @@ public class PrintCheckin implements ReceiveListener {
             mPrinter.addTextAlign(Printer.ALIGN_LEFT);
             mPrinter.addTextSize(1, 1);
             sb.append(" Checkin       :  " + date + "\n");
-            sb.append(" No. Plat      :  " + response.getData().getAttribute().getPlatNo() + "\n");
+            sb.append(" No. Plat      :  " + platNo + "\n");
             sb.append(" Tipe Mobil    :  " + response.getData().getAttribute().getCar() + "\n");
             if (response.getData().getAttribute().getColor() != null) {
                 sb.append(" Warna         :  " + response.getData().getAttribute().getColor() + "\n");
@@ -402,7 +502,7 @@ public class PrintCheckin implements ReceiveListener {
             mPrinter.addTextAlign(Printer.ALIGN_LEFT);
             mPrinter.addTextSize(1, 1);
             sb.append(" Checkin       :  " + date + "\n");
-            sb.append(" No. Plat      :  " + response.getData().getAttribute().getPlatNo() + "\n");
+            sb.append(" No. Plat      :  " + platNo + "\n");
             sb.append(" Tipe Mobil    :  " + response.getData().getAttribute().getCar() + "\n");
             if (response.getData().getAttribute().getColor() != null) {
                 sb.append(" Warna         :  " + response.getData().getAttribute().getColor() + "\n");
@@ -420,11 +520,11 @@ public class PrintCheckin implements ReceiveListener {
 
             mPrinter.addFeedLine(2);
             mPrinter.addCut(Printer.CUT_FEED);
-
-            connectPrinter();
         } catch (Epos2Exception e) {
             e.printStackTrace();
+            return false;
         }
+        return true;
     }
 
     private Bitmap scaleBitmap(Bitmap bmp) {

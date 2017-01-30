@@ -97,7 +97,7 @@ public class AddCarActivity extends FragmentActivity implements StepOneFragmet.O
                     }
                 });
             }
-        });
+        }, this);
 
         /*
       new Thread(new Runnable() {

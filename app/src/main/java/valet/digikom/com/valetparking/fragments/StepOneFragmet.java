@@ -420,7 +420,7 @@ public class StepOneFragmet extends Fragment {
                     }
                 });
             }
-        });
+        }, getContext());
     }
 
     public interface OnValetTypeSelectedListener{

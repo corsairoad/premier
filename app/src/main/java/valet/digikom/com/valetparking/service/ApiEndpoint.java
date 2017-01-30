@@ -12,6 +12,7 @@ import retrofit2.http.Query;
 import valet.digikom.com.valetparking.domain.AddCarCallBody;
 import valet.digikom.com.valetparking.domain.AddCarCallResponse;
 import valet.digikom.com.valetparking.domain.AdditionalItemsResponse;
+import valet.digikom.com.valetparking.domain.AuthResponse;
 import valet.digikom.com.valetparking.domain.CarMasterResponse;
 import valet.digikom.com.valetparking.domain.ColorMasterResponse;
 import valet.digikom.com.valetparking.domain.DefectResponse;
@@ -38,6 +39,10 @@ public interface ApiEndpoint {
     @FormUrlEncoded
     @POST("authenticate")
     Call<TokenResponse> getToken(@Field("email") String email, @Field("password") String password);
+
+    @FormUrlEncoded
+    @POST("authenticate")
+    Call<AuthResponse> login(@Field("email") String email, @Field("password") String password);
 
     @GET("additional_item_site_detail")
     Call<AdditionalItemsResponse> getItems();
