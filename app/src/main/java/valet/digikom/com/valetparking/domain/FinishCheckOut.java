@@ -64,6 +64,8 @@ public class FinishCheckOut {
         public static class RelationShip {
             @SerializedName("valet_finefee_detail_transaction")
             private FineFeeDetail fineFeeDetail;
+            @SerializedName("valet_discount_detail_transaction")
+            private DiscountFeeDetail discountFeeDetail;
 
             public RelationShip() {
             }
@@ -75,11 +77,20 @@ public class FinishCheckOut {
             public void setFineFeeDetail(FineFeeDetail fineFeeDetail) {
                 this.fineFeeDetail = fineFeeDetail;
             }
+
+            public DiscountFeeDetail getDiscountFeeDetail() {
+                return discountFeeDetail;
+            }
+
+            public void setDiscountFeeDetail(DiscountFeeDetail discountFeeDetail) {
+                this.discountFeeDetail = discountFeeDetail;
+            }
         }
 
         public static class FineFeeDetail {
             @SerializedName("data")
             List<DataRelationship> data;
+
 
             public FineFeeDetail() {
             }
@@ -89,6 +100,19 @@ public class FinishCheckOut {
             }
 
             public void setData(List<DataRelationship> data) {
+                this.data = data;
+            }
+        }
+
+        public static class DiscountFeeDetail {
+            @SerializedName("data")
+            List<DataRelationshipDiscount> data;
+
+            public List<DataRelationshipDiscount> getData() {
+                return data;
+            }
+
+            public void setData(List<DataRelationshipDiscount> data) {
                 this.data = data;
             }
         }
@@ -130,14 +154,57 @@ public class FinishCheckOut {
                 }
             }
         }
+
+        public static class DataRelationshipDiscount {
+            @SerializedName("type")
+            private final String type = "valet_discount_detail_transaction";
+            @SerializedName("attributes")
+            private Attr attrributes;
+
+            public String getType() {
+                return type;
+            }
+
+            public Attr getAttrributes() {
+                return attrributes;
+            }
+
+            public void setAttrributes(Attr attrributes) {
+                this.attrributes = attrributes;
+            }
+
+            public static class Attr {
+                @SerializedName("vdddDcdtToken")
+                private String idDiscount;
+
+                public String getIdDiscount() {
+                    return idDiscount;
+                }
+
+                public void setIdDiscount(String idDiscount) {
+                    this.idDiscount = idDiscount;
+                }
+            }
+        }
     }
 
     public static class Builder {
         private FineFee.Fine lostTicketFee;
         private FineFee.Fine overnightFee;
+        MembershipResponse.Data membership;
+        String voucher;
+
         private Data data;
 
         public Builder() {
+        }
+
+        public String getVoucher() {
+            return voucher;
+        }
+
+        public void setVoucher(String voucher) {
+            this.voucher = voucher;
         }
 
         public FineFee.Fine getLostTicketFee() {
@@ -156,6 +223,14 @@ public class FinishCheckOut {
             this.overnightFee = overnightFee;
         }
 
+        public MembershipResponse.Data getMembership() {
+            return membership;
+        }
+
+        public void setMembership(MembershipResponse.Data membership) {
+            this.membership = membership;
+        }
+
         public Data getData() {
             return data;
         }
@@ -170,6 +245,8 @@ public class FinishCheckOut {
             data.setAttribute(attribute);
 
             Data.RelationShip relationShip = new Data.RelationShip();
+
+            // setup fine fee json object
             Data.FineFeeDetail fineFeeDetail = new Data.FineFeeDetail();
             List<Data.DataRelationship> relationshipDataList = new ArrayList<>();
 
@@ -196,9 +273,43 @@ public class FinishCheckOut {
             if (!relationshipDataList.isEmpty()) {
                 fineFeeDetail.setData(relationshipDataList);
                 relationShip.setFineFeeDetail(fineFeeDetail);
-                data.setRelationShip(relationShip);
             }
+
+            // setup discount fee json object
+            Data.DiscountFeeDetail discountFeeDetail = new Data.DiscountFeeDetail();
+            List<Data.DataRelationshipDiscount> relationshipDiscountList = new ArrayList<>();
+
+            if (membership != null) {
+                Data.DataRelationshipDiscount dataRelationshipDiscount = new Data.DataRelationshipDiscount();
+                Data.DataRelationshipDiscount.Attr attr = new Data.DataRelationshipDiscount.Attr();
+
+                attr.setIdDiscount(membership.getAttr().getToken());
+                dataRelationshipDiscount.setAttrributes(attr);
+
+                relationshipDiscountList.add(dataRelationshipDiscount);
+            }
+
+            if (voucher != null) {
+                Data.DataRelationshipDiscount dataRelationshipDiscount = new Data.DataRelationshipDiscount();
+                Data.DataRelationshipDiscount.Attr attr = new Data.DataRelationshipDiscount.Attr();
+
+                attr.setIdDiscount(voucher);
+                dataRelationshipDiscount.setAttrributes(attr);
+
+                relationshipDiscountList.add(dataRelationshipDiscount);
+            }
+
+
+            if (!relationshipDiscountList.isEmpty()) {
+                discountFeeDetail.setData(relationshipDiscountList);
+                relationShip.setDiscountFeeDetail(discountFeeDetail);
+            }
+
+            data.setRelationShip(relationShip);
+
             return new FinishCheckOut(this);
         }
+
+
     }
 }

@@ -58,6 +58,7 @@ public class CheckoutDao implements ProcessRequest {
         if (fragment != null) {
             listener = (OnCarReadyListener) fragment;
         }
+
         if (fragmentParkedCar != null) {
             listenerOnParkedCark = (OnCarReadyListener) fragmentParkedCar;
         }
@@ -152,8 +153,13 @@ public class CheckoutDao implements ProcessRequest {
 
     private void notifyApp(List<EntryCheckinResponse> responseList) {
 
-        listener.onCheckoutReady();
-        listenerOnParkedCark.onCheckoutReady();
+        if (listener != null){
+            listener.onCheckoutReady();
+        }
+
+        if (listenerOnParkedCark != null) {
+            listenerOnParkedCark.onCheckoutReady();
+        }
 
         for (EntryCheckinResponse e : responseList) {
             notify(e);

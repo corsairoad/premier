@@ -11,6 +11,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -88,12 +89,13 @@ public class AddCarActivity extends FragmentActivity implements StepOneFragmet.O
                             //Log.d("Post checkin success: ", res.getData().getType());
                         }else {
                             Log.d("Post entry", "post entry checkin failed.");
+                            Toast.makeText(AddCarActivity.this,"Post Entry Checkin failed", Toast.LENGTH_SHORT).show();
                         }
                     }
 
                     @Override
                     public void onFailure(Call<EntryCheckinResponse> call, Throwable t) {
-                        //Log.d("Post checkin error: ", t.getMessage());
+                        Toast.makeText(AddCarActivity.this,"Post Entry Checkin failed", Toast.LENGTH_SHORT).show();
                     }
                 });
             }

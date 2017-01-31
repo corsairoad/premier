@@ -7,6 +7,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
@@ -41,6 +42,7 @@ import valet.digikom.com.valetparking.dao.DropDao;
 import valet.digikom.com.valetparking.dao.FineFeeDao;
 import valet.digikom.com.valetparking.dao.ItemsDao;
 import valet.digikom.com.valetparking.dao.TokenDao;
+import valet.digikom.com.valetparking.domain.EntryCheckinResponse;
 import valet.digikom.com.valetparking.fragments.CalledCarFragment;
 import valet.digikom.com.valetparking.fragments.ParkedCarFragment;
 import valet.digikom.com.valetparking.util.PrefManager;
@@ -101,7 +103,7 @@ public class Main2Activity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         downloadData();
-        //startCheckoutEntryAlarm(this);
+        startCheckoutEntryAlarm(this);
     }
 
     @Override
@@ -128,11 +130,13 @@ public class Main2Activity extends AppCompatActivity
 
             @Override
             public void onPageSelected(int position) {
+                /*
                 Fragment fragMentParkedCar = pagerAdapter.getItem(0);
                 Fragment fragmentCalledCar = pagerAdapter.getItem(1);
 
                 CheckoutDao checkoutDao = CheckoutDao.getInstance(Main2Activity.this, fragmentCalledCar, fragMentParkedCar);
                 TokenDao.getToken(checkoutDao, Main2Activity.this);
+                */
             }
 
             @Override
@@ -230,9 +234,9 @@ public class Main2Activity extends AppCompatActivity
 
         //this.sendBroadcast(intent);
 
-        PendingIntent alarmIntent = PendingIntent.getService(context,0,intent,0);
-        Calendar cal = Calendar.getInstance();
-        alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, cal.getTimeInMillis(),1000,alarmIntent);
+        PendingIntent alarmIntent = PendingIntent.getBroadcast(context,0,intent,0);
+        alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 10000, alarmIntent);
+        //alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, System.currentTimeMillis(),8000,alarmIntent);
     }
 
     @Override
@@ -285,9 +289,10 @@ public class Main2Activity extends AppCompatActivity
     }
 
     private void handleIntent(Intent intent) {
-        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-            String query = intent.getStringExtra(SearchManager.QUERY);
-            Toast.makeText(this, query, Toast.LENGTH_SHORT).show();
+        if(Intent.ACTION_VIEW.equals(intent.getAction())) {
+            Uri uri = intent.getData();
+            String queryId = uri.getLastPathSegment();
+            startParkDetailActivity(queryId);
         }
     }
 
@@ -299,5 +304,11 @@ public class Main2Activity extends AppCompatActivity
         TokenDao.getToken(ColorDao.getInstance(dbHelper), this);
         TokenDao.getToken(DropDao.getInstance(dbHelper), this);
         TokenDao.getToken(FineFeeDao.getInstance(this), this);
+    }
+
+    private void startParkDetailActivity(String idResponse) {
+        Intent intent = new Intent(this, ParkedCarDetailActivity.class);
+        intent.putExtra(EntryCheckinResponse.ID_ENTRY_CHECKIN, Integer.valueOf(idResponse));
+        startActivity(intent);
     }
 }

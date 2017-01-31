@@ -171,6 +171,12 @@
     <string name="submitprint"><![CDATA[Submit & Print]]></string>
     <string name="done">Done</string>
     <string name="logout">Logout</string>
-    <string name="find_car">Find Car</string>
+    <string name="find_car">Search Plate No</string>
+    <string name="direct_checkout">Direct Checkout</string>
+    <string name="membership">Mebership</string>
+    <string name="voucher">Voucher</string>
+    <string name="membership_id">Membership id</string>
+    <string name="input_voucher">Voucher code</string>
+    <string name="valet_type">VALET TYPE</string>
 
 </resources>

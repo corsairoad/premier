@@ -113,8 +113,14 @@ public class EntryCheckinResponse {
         private String namaRunner;
         @SerializedName("vthd_valetfee")
         private int fee;
+        @SerializedName("vthd_vfsd_name")
+        private String valetType;
 
         public Attribute() {
+        }
+
+        public String getValetType() {
+            return valetType;
         }
 
         public int getId() {

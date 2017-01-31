@@ -31,6 +31,7 @@ public class ParkedCarFragment extends Fragment implements ListCheckinAdapter.On
     TextView textEmpty;
     TextView textTotalCheckin;
     CountParkedCarListener listener;
+    public static ParkedCarFragment parkedCarFragment;
 
     public ParkedCarFragment() {
     }
@@ -38,6 +39,11 @@ public class ParkedCarFragment extends Fragment implements ListCheckinAdapter.On
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        parkedCarFragment = this;
+    }
+
+    public static ParkedCarFragment getInstance() {
+        return parkedCarFragment;
     }
 
     @Override

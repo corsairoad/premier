@@ -31,6 +31,7 @@ public class CalledCarFragment extends Fragment implements ListCalledCarAdapter.
     private ListCalledCarAdapter calledCarAdapter;
     private TextView textEmpty;
     private CountCalledCarListener listener;
+    public static CalledCarFragment calledCarFragment;
 
     public CalledCarFragment() {
     }
@@ -38,6 +39,11 @@ public class CalledCarFragment extends Fragment implements ListCalledCarAdapter.
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        calledCarFragment = this;
+    }
+
+    public static CalledCarFragment getInstance() {
+        return calledCarFragment;
     }
 
     @Override

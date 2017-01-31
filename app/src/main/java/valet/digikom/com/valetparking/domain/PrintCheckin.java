@@ -330,7 +330,6 @@ public class PrintCheckin implements ReceiveListener {
             Bitmap logoData = BitmapFactory.decodeResource(context.getResources(), R.mipmap.logo_1);
             StringBuilder sb = new StringBuilder();
 
-            /*
             mPrinter.addTextAlign(Printer.ALIGN_CENTER);
             mPrinter.addImage(logoData, 0, 0,
                     logoData.getWidth(),
@@ -378,7 +377,7 @@ public class PrintCheckin implements ReceiveListener {
 
             mPrinter.addFeedLine(2);
             mPrinter.addCut(Printer.CUT_FEED);
-            */
+
 
             /*
             ------------------- Receipt for keyguard
@@ -477,7 +476,7 @@ public class PrintCheckin implements ReceiveListener {
             /*
             ---------- receipt to put on dashboard
              */
-            /*
+
             mPrinter.addTextAlign(Printer.ALIGN_CENTER);
             mPrinter.addImage(logoData, 0, 0,
                     logoData.getWidth(),
@@ -518,8 +517,7 @@ public class PrintCheckin implements ReceiveListener {
 
             mPrinter.addTextAlign(Printer.ALIGN_CENTER);
             mPrinter.addTextSize(2,1);
-            mPrinter.addText("DASHBOARD");
-            */
+            mPrinter.addText("DASHBOARD RECEIPT");
 
             mPrinter.addFeedLine(2);
             mPrinter.addCut(Printer.CUT_FEED);

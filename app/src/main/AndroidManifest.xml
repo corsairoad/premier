@@ -68,8 +68,10 @@
                 android:value="valet.digikom.com.valetparking.Main2Activity" />
         </activity>
 
-        <receiver android:name=".EntryCheckoutReceiver" />
-        <receiver android:name=".CheckoutReceiver" />
+        <receiver android:name=".EntryCheckoutReceiver"
+            android:enabled="true"/>
+        <receiver android:name=".CheckoutReceiver"
+            android:enabled="true"/>
 
         <activity
             android:name=".CheckoutActivity"

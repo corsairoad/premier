@@ -242,20 +242,27 @@ public class ReviewFragment extends Fragment {
 
     private EntryCheckinContainer buildCheckinEntry() {
         EntryCheckin.Builder builder = new EntryCheckin.Builder();
-        builder.setAttribute(dropPoint,textPlatNo.getText().toString(), carMaster, colorMaster,textEmail.getText().toString(),bitmapDefect, signBitmap, valetType.getAttrib().getId());
+        int idValetType = 1;
+        if (valetType!=null) {
+            idValetType = valetType.getAttrib().getId();
+        }
+        builder.setAttribute(dropPoint,textPlatNo.getText().toString(), carMaster, colorMaster,textEmail.getText().toString(),bitmapDefect, signBitmap, idValetType);
         builder.setRelationShip(getDefectMasterList(), getItemsList());
         EntryCheckin entryCheckin = builder.build();
         EntryCheckinContainer entryCheckinContainer = new EntryCheckinContainer();
         entryCheckinContainer.setEntryCheckin(entryCheckin);
 
-        /*
+        //debugJsonCheckin(entryCheckinContainer);
+
+        return entryCheckinContainer;
+    }
+
+    private void debugJsonCheckin(EntryCheckinContainer entryCheckinContainer) {
         Gson gson = new Gson();
         String jsonEntryCheckin = gson.toJson(entryCheckinContainer);
         exportToFile(jsonEntryCheckin);
         Log.d("JSON CHECKIN", jsonEntryCheckin);
-        */
 
-        return entryCheckinContainer;
     }
 
     private void getDefualtDropPoint() {

@@ -42,16 +42,12 @@ public class ParkedCarProvider extends ContentProvider {
         projectionMap.put(EntryCheckinResponse.Table.COL_RESPONSE_ID, EntryCheckinResponse.Table.COL_RESPONSE_ID + " AS " + SearchManager.SUGGEST_COLUMN_INTENT_DATA_ID);
 
         builder.setProjectionMap(projectionMap);
-        builder.appendWhere(SearchManager.SUGGEST_COLUMN_TEXT_1 + " LIKE '%" + sqry + "%'");
-        //builder.appendWhere(EntryCheckinResponse.Table.COL_ID + " = 1");
+        builder.appendWhere(EntryCheckinResponse.Table.COL_IS_CHECKOUT + "= 0 AND " +SearchManager.SUGGEST_COLUMN_TEXT_1 + " LIKE '%" + sqry + "%'");
         builder.setTables(EntryCheckinResponse.Table.TABLE_NAME);
 
         SQLiteDatabase db = dbHelper.getWritableDatabase();
-
         Cursor c = builder.query(db,projection,selection,selectionArgs,null,null,sortOrder);
-        if (c.moveToFirst()) {
-            String a = c.getString(0);
-        }
+
         return c;
     }
 
