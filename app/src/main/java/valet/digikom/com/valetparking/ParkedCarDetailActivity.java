@@ -29,6 +29,8 @@ import valet.digikom.com.valetparking.domain.AddCarCall;
 import valet.digikom.com.valetparking.domain.AddCarCallBody;
 import valet.digikom.com.valetparking.domain.DropPointMaster;
 import valet.digikom.com.valetparking.domain.EntryCheckinResponse;
+import valet.digikom.com.valetparking.domain.EntryCheckoutCont;
+import valet.digikom.com.valetparking.util.MakeCurrencyString;
 import valet.digikom.com.valetparking.util.ValetDbHelper;
 
 public class ParkedCarDetailActivity extends AppCompatActivity implements View.OnClickListener, TimePickerDialog.OnTimeSetListener {
@@ -43,12 +45,15 @@ public class ParkedCarDetailActivity extends AppCompatActivity implements View.O
     TextView txtCheckin;
     TextView txtFee;
     TextView txtEta;
+    TextView txtValetType;
     Button btnSetEta;
     EditText inputDropTo;
     DropPointMaster dropPointMaster;
     ImageButton btnDropPoint;
     ValetDbHelper dbHelper;
     private String arrivedTime;
+    private Button btnDirectCheckout;
+    private int id;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,13 +68,16 @@ public class ParkedCarDetailActivity extends AppCompatActivity implements View.O
         txtNoTrans = (TextView) findViewById(R.id.text_no_transaksi);
         txtDropPoint = (TextView) findViewById(R.id.text_drop_point);
         txtCheckin = (TextView) findViewById(R.id.text_chekin_time);
+        txtValetType = (TextView) findViewById(R.id.text_valet_type);
         txtFee = (TextView) findViewById(R.id.text_fee);
         txtEta = (TextView) findViewById(R.id.text_arrived_time);
         inputDropTo = (EditText) findViewById(R.id.input_drop_point);
         btnDropPoint = (ImageButton) findViewById(R.id.btn_drop);
         btnSetEta = (Button) findViewById(R.id.btn_set_time);
-        btnSetEta.setOnClickListener(this);
+        btnDirectCheckout = (Button) findViewById(R.id.btn_direct_checkout);
 
+        btnSetEta.setOnClickListener(this);
+        btnDirectCheckout.setOnClickListener(this);
         btnDropPoint.setOnClickListener(this);
         dbHelper = new ValetDbHelper(this);
         new FetchDropPointTask().execute();
@@ -89,7 +97,7 @@ public class ParkedCarDetailActivity extends AppCompatActivity implements View.O
         });
 
         if (getIntent() != null) {
-            int id = getIntent().getIntExtra(EntryCheckinResponse.ID_ENTRY_CHECKIN, 0);
+            id = getIntent().getIntExtra(EntryCheckinResponse.ID_ENTRY_CHECKIN, 0);
             new LoadEntryTask().execute(id);
         }
     }
@@ -97,15 +105,19 @@ public class ParkedCarDetailActivity extends AppCompatActivity implements View.O
     private void init() {
         if (entry != null) {
             EntryCheckinResponse.Attribute attr = entry.getData().getAttribute();
-            String platNo = attr.getPlatNo() + " - " + attr.getCar() + " (" + attr.getColor() + ")";
             String lokasiParkir = attr.getAreaParkir() + " " + attr.getBlokParkir() + " " + attr.getSektorParkir();
+            String platNo = attr.getPlatNo() + " - " + attr.getCar();
 
+            if (attr.getColor() != null) {
+                platNo =  platNo + " (" + attr.getColor() + ")";
+            }
+            txtValetType.setText(attr.getValetType());
             txtPlatNo.setText(platNo);
             txtLokasiParkir.setText(lokasiParkir);
             txtNoTrans.setText(attr.getIdTransaksi());
             txtDropPoint.setText(attr.getDropPoint());
             txtCheckin.setText(attr.getCheckinTime());
-            txtFee.setText(String.valueOf(attr.getFee()));
+            txtFee.setText(MakeCurrencyString.fromInt(attr.getFee()));
         }
     }
 
@@ -118,6 +130,10 @@ public class ParkedCarDetailActivity extends AppCompatActivity implements View.O
             int second = calendar.get(Calendar.SECOND);
             TimePickerDialog tpd = TimePickerDialog.newInstance(this, hourOfDay, minute, second, true);
             tpd.show(getFragmentManager(),"timepicker");
+        } else if (view == btnDirectCheckout) {
+            Intent intent = new Intent(this,CheckoutActivity.class);
+            intent.putExtra(EntryCheckoutCont.KEY_ENTRY_CHECKOUT, id);
+            startActivity(intent);
         }
     }
 

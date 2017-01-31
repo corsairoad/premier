@@ -44,7 +44,7 @@
     <com.github.gcacace.signaturepad.views.SignaturePad
         android:id="@+id/signature_pad"
         android:layout_width="match_parent"
-        android:background="@color/bg_color_signature"
+        android:background="@android:color/white"
         android:layout_height="300dp"
         app:penColor="@android:color/black" />
 

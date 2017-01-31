@@ -34,6 +34,8 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
+        downloadData();
+
         if (PrefManager.getInstance(this).getAuthResponse() != null) {
             goToMain();
             return;
@@ -55,7 +57,6 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
         TokenDao.getToken(ColorDao.getInstance(dbHelper), this);
         TokenDao.getToken(DropDao.getInstance(dbHelper), this);
         TokenDao.getToken(FineFeeDao.getInstance(this), this);
-
     }
 
     @Override
@@ -74,8 +75,6 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
         new Thread(new Runnable() {
             @Override
             public void run() {
-                downloadData();
-
                 AuthResDao authResDao = AuthResDao.getInstance(SplashActivity.this);
                 authResDao.login(email, password, SplashActivity.this);
             }

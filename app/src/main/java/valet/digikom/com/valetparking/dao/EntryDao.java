@@ -52,12 +52,15 @@ public class EntryDao {
     public void insertEntryResponse(EntryCheckinResponse response, int flagUpload) {
         Gson gson = new Gson();
         String jsonResponse = gson.toJson(response);
-
+        String platNo = response.getData().getAttribute().getPlatNo();
+        String noTrans = response.getData().getAttribute().getIdTransaksi();
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
         ContentValues cv = new ContentValues();
         cv.put(EntryCheckinResponse.Table.COL_RESPONSE_ID, response.getData().getAttribute().getId());
         cv.put(EntryCheckinResponse.Table.COL_JSON_RESPONSE, jsonResponse);
+        cv.put(EntryCheckinResponse.Table.COL_PLAT_NO, platNo);
+        cv.put(EntryCheckinResponse.Table.COL_NO_TRANS, noTrans);
         cv.put(EntryCheckinResponse.Table.COL_IS_UPLOADED, flagUpload);
 
         db.insert(EntryCheckinResponse.Table.TABLE_NAME,null,cv);
@@ -84,6 +87,19 @@ public class EntryDao {
         db.close();
 
         return responseList;
+    }
+
+    public Cursor getAllParkedCars() {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        return db.query(EntryCheckinResponse.Table.TABLE_NAME,null, EntryCheckinResponse.Table.COL_IS_CHECKOUT + "=? AND " + EntryCheckinResponse.Table.COL_IS_READY_CHECKOUT + "=0",new String[]{"0"},null,null,EntryCheckinResponse.Table.COL_RESPONSE_ID + " DESC");
+    }
+
+    public Cursor getParkedCarsByPlatNo(String platNo) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        String[] args = new String[] {platNo};
+        return db.query(EntryCheckinResponse.Table.TABLE_NAME,null, EntryCheckinResponse.Table.COL_PLAT_NO + " LIKE '?' AND "
+                 + EntryCheckinResponse.Table.COL_IS_CHECKOUT + "=0 AND "
+                + EntryCheckinResponse.Table.COL_IS_READY_CHECKOUT + "=0", args,null,null,EntryCheckinResponse.Table.COL_RESPONSE_ID + " DESC");
     }
 
     public EntryCheckinResponse getEntryByIdResponse(int id) {

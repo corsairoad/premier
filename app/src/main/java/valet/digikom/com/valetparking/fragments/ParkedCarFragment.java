@@ -30,6 +30,8 @@ public class ParkedCarFragment extends Fragment implements ListCheckinAdapter.On
     List<EntryCheckinResponse> responseList = new ArrayList<>();
     TextView textEmpty;
     TextView textTotalCheckin;
+    CountParkedCarListener listener;
+    public static ParkedCarFragment parkedCarFragment;
 
     public ParkedCarFragment() {
     }
@@ -37,6 +39,11 @@ public class ParkedCarFragment extends Fragment implements ListCheckinAdapter.On
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        parkedCarFragment = this;
+    }
+
+    public static ParkedCarFragment getInstance() {
+        return parkedCarFragment;
     }
 
     @Override
@@ -63,6 +70,7 @@ public class ParkedCarFragment extends Fragment implements ListCheckinAdapter.On
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+        listener = (CountParkedCarListener) context;
     }
 
     @Override
@@ -109,10 +117,16 @@ public class ParkedCarFragment extends Fragment implements ListCheckinAdapter.On
                 adapter.notifyDataSetChanged();
                 textEmpty.setVisibility(View.GONE);
                 textTotalCheckin.setText(getResources().getString(R.string.total_checkin) + " " + entryCheckinResponses.size());
+                listener.setCountParkedCar(entryCheckinResponses.size());
             }else {
                 textTotalCheckin.setVisibility(View.INVISIBLE);
                 textEmpty.setVisibility(View.VISIBLE);
+                listener.setCountParkedCar(0);
             }
         }
+    }
+
+    public interface CountParkedCarListener {
+        void setCountParkedCar (int count);
     }
 }

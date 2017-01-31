@@ -113,8 +113,14 @@ public class EntryCheckinResponse {
         private String namaRunner;
         @SerializedName("vthd_valetfee")
         private int fee;
+        @SerializedName("vthd_vfsd_name")
+        private String valetType;
 
         public Attribute() {
+        }
+
+        public String getValetType() {
+            return valetType;
         }
 
         public int getId() {
@@ -280,9 +286,13 @@ public class EntryCheckinResponse {
         public static final String COL_IS_CHECKOUT = "is_checkout";
         public static final String COL_IS_CALLED = "is_called";
         public static final String COL_IS_READY_CHECKOUT = "is_ready";
+        public static final String COL_PLAT_NO = "plat_no";
+        public static final String COL_NO_TRANS = "no_transaction";
 
         public static final String CREATE = "CREATE TABLE " + TABLE_NAME + "( " + COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 COL_RESPONSE_ID + " INTEGER, " +
+                COL_PLAT_NO + " TEXT, " +
+                COL_NO_TRANS + " TEXT, " +
                 COL_JSON_RESPONSE + " TEXT, " +
                 COL_IS_UPLOADED + " INTEGER, " +
                 COL_IS_CHECKOUT + " INTEGER DEFAULT 0, " +

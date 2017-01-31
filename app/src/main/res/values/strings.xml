@@ -88,7 +88,7 @@
         <item> Handphone </item>
 
     </string-array>
-    <string name="title_activity_parked_car_detail">Parked Car</string>
+    <string name="title_activity_parked_car_detail">Call Car</string>
     <string name="trans_code">TRANSACTION NO.</string>
     <string name="runner">RUNNER</string>
     <string name="fee">FEE</string>
@@ -148,7 +148,8 @@
     <string name="lang_korean">KOREAN</string>
     <string name="lang_thai">THAI</string>
     <string name="lang_southasia">SOUTH ASIA</string>
-\    <string name="handlingmsg_warn_receipt_near_end">Roll paper is nearly end.\n</string>
+    \
+    <string name="handlingmsg_warn_receipt_near_end">Roll paper is nearly end.\n</string>
     <string name="handlingmsg_warn_battery_near_end">Battery level of printer is low.\n</string>
     <string name="handlingmsg_err_no_response">Please check the connection of the printer and the mobile terminal.\nConnection get lost.\n</string>
     <string name="handlingmsg_err_cover_open">Please close roll paper cover.\n</string>
@@ -170,5 +171,12 @@
     <string name="submitprint"><![CDATA[Submit & Print]]></string>
     <string name="done">Done</string>
     <string name="logout">Logout</string>
+    <string name="find_car">Search Plate No</string>
+    <string name="direct_checkout">Direct Checkout</string>
+    <string name="membership">Mebership</string>
+    <string name="voucher">Voucher</string>
+    <string name="membership_id">Membership id</string>
+    <string name="input_voucher">Voucher code</string>
+    <string name="valet_type">VALET TYPE</string>
 
 </resources>

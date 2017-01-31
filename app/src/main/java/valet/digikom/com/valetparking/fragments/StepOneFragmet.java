@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
 import android.text.InputFilter;
 import android.text.Spanned;
@@ -50,7 +51,7 @@ import valet.digikom.com.valetparking.util.PrefManager;
 import valet.digikom.com.valetparking.util.ValetDbHelper;
 
 
-public class StepOneFragmet extends Fragment {
+public class StepOneFragmet extends Fragment implements View.OnClickListener {
 
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
@@ -66,16 +67,20 @@ public class StepOneFragmet extends Fragment {
     private EditText inputMerk;
     private EditText inputEmail;
     private EditText inputColor;
-    InputFilter[] filters;
+    private InputFilter[] filters;
     private OnRegsitrationValid onRegsitrationValid;
     private ValetDbHelper dbHelper;
     private List<DropPointMaster> dpMasters = new ArrayList<>();
     private DropPointAdapter adapter;
     private boolean isDefaultDropSet;
-    PrefManager prefManager;
-    List<ValetTypeJson.Data> valetTypeJsonList = new ArrayList<>();
-    Spinner spValetType;
-    ListValetTypeAdapter valetTypeAdapter;
+    private PrefManager prefManager;
+    private List<ValetTypeJson.Data> valetTypeJsonList = new ArrayList<>();
+    private Spinner spValetType;
+    private ListValetTypeAdapter valetTypeAdapter;
+
+    private TextInputLayout tilDropPoint;
+    private TextInputLayout tilCarType;
+    private TextInputLayout tilColorType;
 
     OnValetTypeSelectedListener valetTypeSelectedListener;
 
@@ -106,6 +111,14 @@ public class StepOneFragmet extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_step_one, container, false);
 
+        tilDropPoint = (TextInputLayout) view.findViewById(R.id.til_drop_point);
+        tilCarType = (TextInputLayout) view.findViewById(R.id.til_car_type);
+        tilColorType = (TextInputLayout) view.findViewById(R.id.til_color_type);
+
+        tilDropPoint.setOnClickListener(this);
+        tilCarType.setOnClickListener(this);
+        tilColorType.setOnClickListener(this);
+
         inputDropPoint = (EditText) view.findViewById(R.id.input_drop_point);
         inputDropPoint.setFilters(filters);
         inputPlatNo = (EditText) view.findViewById(R.id.input_plat_no);
@@ -134,14 +147,49 @@ public class StepOneFragmet extends Fragment {
         btnColorType = (ImageButton) view.findViewById(R.id.btn_dropdown_color);
         btnDropPoint = (ImageButton) view.findViewById(R.id.btn_drop);
 
+        // drop point
         btnDropPoint.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 new FetchDropPointTask().execute();
             }
         });
+        inputDropPoint.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new FetchDropPointTask().execute();
+            }
+        });
 
-        initData();
+        // car type
+        btnCarType.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new FetchCarsTask().execute();
+            }
+        });
+        inputCartype.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new FetchCarsTask().execute();
+            }
+        });
+
+        // color type
+        btnColorType.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new FetchColorsTask().execute();
+            }
+        });
+        inputColor.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new FetchColorsTask().execute();
+            }
+        });
+
+        getDefualtDropPoint();
         downloadValetType();
         return view;
     }
@@ -191,6 +239,17 @@ public class StepOneFragmet extends Fragment {
         onRegsitrationValid.setCheckin(dropPoint,platNo,carType,merk,email,color);
     }
 
+    @Override
+    public void onClick(View view) {
+        if (view == tilDropPoint) {
+            new FetchDropPointTask().execute();
+        }else if(view == tilCarType) {
+            new FetchCarsTask().execute();
+        }else if (view == tilColorType) {
+            new FetchColorsTask().execute();
+        }
+    }
+
 
     public interface OnRegsitrationValid{
         void setCheckin(String dropPoint, String platNo, String carType, String merk, String email, String warna);
@@ -207,27 +266,22 @@ public class StepOneFragmet extends Fragment {
         protected void onPostExecute(List<CarMaster> s) {
             if (!s.isEmpty()) {
                 final CarTypeAdapter adapter = new CarTypeAdapter(getContext(), s);
-                btnCarType.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        DialogPlus dialogPlus  = DialogPlus.newDialog(getContext())
-                                .setContentHolder(new GridHolder(3))
-                                .setAdapter(adapter)
-                                .setOnItemClickListener(new OnItemClickListener() {
-                                    @Override
-                                    public void onItemClick(DialogPlus dialog, Object item, View view, int position) {
-                                        CarMaster carMaster = (CarMaster) item;
-                                        inputCartype.setText(carMaster.getAttrib().getCarName());
-                                        ReviewFragment.reviewFragment.setCarMaster(carMaster);
-                                        dialog.dismiss();
-                                    }
-                                })
-                                .setGravity(Gravity.CENTER)
-                                .setExpanded(false)
-                                .create();
-                        dialogPlus.show();
-                    }
-                });
+                DialogPlus dialogPlus  = DialogPlus.newDialog(getContext())
+                        .setContentHolder(new GridHolder(3))
+                        .setAdapter(adapter)
+                        .setOnItemClickListener(new OnItemClickListener() {
+                            @Override
+                            public void onItemClick(DialogPlus dialog, Object item, View view, int position) {
+                                CarMaster carMaster = (CarMaster) item;
+                                inputCartype.setText(carMaster.getAttrib().getCarName());
+                                ReviewFragment.reviewFragment.setCarMaster(carMaster);
+                                dialog.dismiss();
+                            }
+                        })
+                        .setGravity(Gravity.CENTER)
+                        .setExpanded(false)
+                        .create();
+                dialogPlus.show();
             }
         }
     }
@@ -243,27 +297,22 @@ public class StepOneFragmet extends Fragment {
         protected void onPostExecute(final List<ColorMaster> colorMasters) {
             if (!colorMasters.isEmpty()) {
                 final ColorTypeAdapter adapter = new ColorTypeAdapter(colorMasters, getContext());
-                btnColorType.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        DialogPlus dialogPlus  = DialogPlus.newDialog(getContext())
-                                .setContentHolder(new GridHolder(3))
-                                .setAdapter(adapter)
-                                .setOnItemClickListener(new OnItemClickListener() {
-                                    @Override
-                                    public void onItemClick(DialogPlus dialog, Object item, View view, int position) {
-                                        ColorMaster cm = (ColorMaster) item;
-                                        inputColor.setText(cm.getAttrib().getColorName());
-                                        ReviewFragment.reviewFragment.setColorMaster(cm);
-                                        dialog.dismiss();
-                                    }
-                                })
-                                .setGravity(Gravity.CENTER)
-                                .setExpanded(false)
-                                .create();
-                        dialogPlus.show();
-                    }
-                });
+                DialogPlus dialogPlus  = DialogPlus.newDialog(getContext())
+                        .setContentHolder(new GridHolder(3))
+                        .setAdapter(adapter)
+                        .setOnItemClickListener(new OnItemClickListener() {
+                            @Override
+                            public void onItemClick(DialogPlus dialog, Object item, View view, int position) {
+                                ColorMaster cm = (ColorMaster) item;
+                                inputColor.setText(cm.getAttrib().getColorName());
+                                ReviewFragment.reviewFragment.setColorMaster(cm);
+                                dialog.dismiss();
+                            }
+                        })
+                        .setGravity(Gravity.CENTER)
+                        .setExpanded(false)
+                        .create();
+                dialogPlus.show();
             }
         }
     }
@@ -313,7 +362,6 @@ public class StepOneFragmet extends Fragment {
 
     private View initFooter() {
         View v = LayoutInflater.from(getContext()).inflate(R.layout.footer_drop_point, null);
-
         final CheckBox cb = (CheckBox) v.findViewById(R.id.cb_default_droppoint);
         cb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -321,15 +369,10 @@ public class StepOneFragmet extends Fragment {
                 isDefaultDropSet = b;
             }
         });
-
         return v;
     }
 
-    private void initData() {
-        new FetchCarsTask().execute();
-        new FetchColorsTask().execute();
-        getDefualtDropPoint();
-    }
+
 
     private void getDefualtDropPoint() {
         new Thread(new Runnable() {
@@ -354,7 +397,7 @@ public class StepOneFragmet extends Fragment {
     }
 
     private InputFilter getInputFilterPlate() {
-        InputFilter filter = new InputFilter() {
+        return new InputFilter() {
             @Override
             public CharSequence filter(CharSequence character, int start, int end, Spanned spanned, int dStart, int dEnd) {
 
@@ -392,7 +435,7 @@ public class StepOneFragmet extends Fragment {
                 return null;
             }
         };
-        return filter;
+
     }
 
     private void downloadValetType() {

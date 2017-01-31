@@ -5,14 +5,28 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import cn.pedant.SweetAlert.SweetAlertDialog;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import valet.digikom.com.valetparking.adapter.SpinnerMembershipAdapter;
 import valet.digikom.com.valetparking.dao.CheckoutDao;
 import valet.digikom.com.valetparking.dao.EntryDao;
 import valet.digikom.com.valetparking.dao.FineFeeDao;
@@ -22,10 +36,14 @@ import valet.digikom.com.valetparking.domain.EntryCheckinResponse;
 import valet.digikom.com.valetparking.domain.EntryCheckoutCont;
 import valet.digikom.com.valetparking.domain.FineFee;
 import valet.digikom.com.valetparking.domain.FinishCheckOut;
+import valet.digikom.com.valetparking.domain.MembershipResponse;
 import valet.digikom.com.valetparking.domain.PrintCheckout;
+import valet.digikom.com.valetparking.service.ApiClient;
+import valet.digikom.com.valetparking.service.ApiEndpoint;
+import valet.digikom.com.valetparking.service.ProcessRequest;
 import valet.digikom.com.valetparking.util.MakeCurrencyString;
 
-public class CheckoutActivity extends AppCompatActivity implements CompoundButton.OnCheckedChangeListener, View.OnClickListener {
+public class CheckoutActivity extends AppCompatActivity implements CompoundButton.OnCheckedChangeListener, View.OnClickListener, AdapterView.OnItemSelectedListener {
 
     TextView txtPlatNo;
     TextView txtLokasiParkir;
@@ -35,12 +53,17 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
     TextView txtFee;
     TextView txtRunner;
     TextView txtTotalPay;
+    TextView txtValetType;
     CheckBox cbFineFe;
     CheckBox cbOvernight;
+    CheckBox cbVoucher;
+    CheckBox cbMembership;
+    Spinner spMembership;
+    EditText inputVoucher;
+    EditText inputMembershipId;
     TextView txtFineFee;
     TextView txtOvernight;
     Button btnCheckout;
-
     FineFeeDao fineFeeDao;
     FineFee.Fine mLostTicketFine;
     FineFee.Fine mOvernightFine;
@@ -48,9 +71,14 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
     int lostTicketFine = 0;
     int overNightFine = 0;
     int total = 0;
+    int feeMembership = 0;
     int idValetHeader;
 
-    private EntryCheckinResponse entryCheckinResponse;
+    SpinnerMembershipAdapter membershipAdapter;
+    List<MembershipResponse.Data> listMemberShip = new ArrayList<>();
+    MembershipResponse.Data dataMembership;
+
+    EntryCheckinResponse entryCheckinResponse;
 
 
     @Override
@@ -62,25 +90,6 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        txtPlatNo = (TextView) findViewById(R.id.text_plat_no);
-        txtLokasiParkir = (TextView) findViewById(R.id.text_lokasi_parkir);
-        txtNoTransaksi = (TextView) findViewById(R.id.text_no_transaksi);
-        txtDropPoint = (TextView) findViewById(R.id.text_drop_point);
-        txtCheckinTime = (TextView) findViewById(R.id.text_chekin_time);
-        txtFee = (TextView) findViewById(R.id.text_fee);
-        txtRunner = (TextView) findViewById(R.id.text_runner);
-        txtTotalPay = (TextView) findViewById(R.id.text_total_pay);
-        txtOvernight = (TextView) findViewById(R.id.text_overnight);
-        txtFineFee = (TextView) findViewById(R.id.text_lost_ticket);
-        cbFineFe = (CheckBox) findViewById(R.id.cb_fine_fee);
-        cbOvernight = (CheckBox) findViewById(R.id.cb_stay_overnight);
-        btnCheckout = (Button) findViewById(R.id.btn_checkout);
-        btnCheckout.setOnClickListener(this);
-        cbFineFe.setOnCheckedChangeListener(this);
-        cbOvernight.setOnCheckedChangeListener(this);
-
-        fineFeeDao = FineFeeDao.getInstance(this);
-
         if (getIntent() != null) {
             idValetHeader = getIntent().getIntExtra(EntryCheckoutCont.KEY_ENTRY_CHECKOUT,0);
             if (idValetHeader > 0) {
@@ -90,6 +99,66 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
             }
         }
 
+        txtPlatNo = (TextView) findViewById(R.id.text_plat_no);
+        txtLokasiParkir = (TextView) findViewById(R.id.text_lokasi_parkir);
+        txtNoTransaksi = (TextView) findViewById(R.id.text_no_transaksi);
+        txtDropPoint = (TextView) findViewById(R.id.text_drop_point);
+        txtCheckinTime = (TextView) findViewById(R.id.text_chekin_time);
+        txtFee = (TextView) findViewById(R.id.text_fee);
+        txtValetType = (TextView) findViewById(R.id.text_valet_type);
+        txtRunner = (TextView) findViewById(R.id.text_runner);
+        txtTotalPay = (TextView) findViewById(R.id.text_total_pay);
+        txtOvernight = (TextView) findViewById(R.id.text_overnight);
+        txtFineFee = (TextView) findViewById(R.id.text_lost_ticket);
+        cbFineFe = (CheckBox) findViewById(R.id.cb_fine_fee);
+        cbOvernight = (CheckBox) findViewById(R.id.cb_stay_overnight);
+        btnCheckout = (Button) findViewById(R.id.btn_checkout);
+        cbVoucher = (CheckBox) findViewById(R.id.cb_voucher);
+        inputVoucher = (EditText) findViewById(R.id.input_voucher);
+        inputMembershipId = (EditText) findViewById(R.id.input_membership_id);
+        cbMembership = (CheckBox) findViewById(R.id.cb_membership);
+        spMembership = (Spinner) findViewById(R.id.spinner_memebership);
+        spMembership.setOnItemSelectedListener(this);
+
+        btnCheckout.setOnClickListener(this);
+        cbFineFe.setOnCheckedChangeListener(this);
+        cbOvernight.setOnCheckedChangeListener(this);
+        cbVoucher.setOnCheckedChangeListener(this);
+        cbMembership.setOnCheckedChangeListener(this);
+
+        fineFeeDao = FineFeeDao.getInstance(this);
+
+        membershipAdapter = new SpinnerMembershipAdapter(this, R.layout.laoyut_spinner_membership,R.id.text_membership, listMemberShip);
+        membershipAdapter.setDropDownViewResource(R.layout.text_item_membership);
+        spMembership.setAdapter(membershipAdapter);
+        setupMembersip();
+    }
+
+    private void setupMembersip() {
+        TokenDao.getToken(new ProcessRequest() {
+            @Override
+            public void process(String token) {
+               ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class, token);
+                Call<MembershipResponse> call = apiEndpoint.getMemberships();
+                call.enqueue(new Callback<MembershipResponse>() {
+                    @Override
+                    public void onResponse(Call<MembershipResponse> call, Response<MembershipResponse> response) {
+                        if (response != null && response.body() != null) {
+                            MembershipResponse membershipResponse = response.body();
+                            List<MembershipResponse.Data> dataList = membershipResponse.getDataList();
+                            listMemberShip.clear();
+                            listMemberShip.addAll(dataList);
+                            membershipAdapter.notifyDataSetChanged();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<MembershipResponse> call, Throwable t) {
+
+                    }
+                });
+            }
+        }, this);
     }
 
     @Override
@@ -112,7 +181,26 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
                 }
                txtOvernight.setText(MakeCurrencyString.fromInt(overNightFine));
             }
+        } else if (compoundButton == cbVoucher) {
+            if (!b) {
+                inputVoucher.setVisibility(View.INVISIBLE);
+            }else {
+                inputVoucher.setVisibility(View.VISIBLE);
+            }
+        } else if (compoundButton == cbMembership) {
+            if (!b) {
+                spMembership.setVisibility(View.INVISIBLE);
+                inputMembershipId.setVisibility(View.GONE);
+                dataMembership = null;
+                feeMembership = 0;
+            }else {
+                dataMembership = membershipAdapter.getItem(0);
+                feeMembership = Integer.valueOf(dataMembership.getAttr().getPrice());
+                spMembership.setVisibility(View.VISIBLE);
+                inputMembershipId.setVisibility(View.VISIBLE);
+            }
         }
+
         calculateTotal();
 
     }
@@ -121,6 +209,20 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
     @Override
     public void onClick(View view) {
         showConfirmDialog();
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+        if (cbMembership.isChecked()) {
+            dataMembership = membershipAdapter.getItem(i);
+            feeMembership = Integer.valueOf(dataMembership.getAttr().getPrice());
+            calculateTotal();
+        }
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> adapterView) {
+
     }
 
     private class FetchCheckoutTask extends AsyncTask<Integer, Void, EntryCheckoutCont.EntryChekout> {
@@ -167,7 +269,14 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
             this.entryCheckinResponse = response;
             EntryCheckinResponse.Attribute attrib = response.getData().getAttribute();
             fee = attrib.getFee();
+            String platNo = attrib.getPlatNo();
+            String lokasiParkir = attrib.getAreaParkir() + " " + attrib.getBlokParkir() + " " + attrib.getSektorParkir();
+
+            txtValetType.setText(attrib.getValetType());
+            txtPlatNo.setText(platNo);
+            txtLokasiParkir.setText(lokasiParkir);
             txtDropPoint.setText(attrib.getDropPoint());
+            txtNoTransaksi.setText(attrib.getIdTransaksi());
             txtFee.setText(MakeCurrencyString.fromInt(fee));
             txtCheckinTime.setText(attrib.getCheckinTime());
             txtOvernight.setText(MakeCurrencyString.fromInt(overNightFine));
@@ -186,15 +295,15 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
             String platNo = attrib.getPlatNo();
             String lokasiParkir = attrib.getAreaParkir() + " " + attrib.getBlokParkir() + " " + attrib.getSektorParkir();
 
-            txtPlatNo.setText(platNo);
-            txtLokasiParkir.setText(lokasiParkir);
-            txtNoTransaksi.setText(attrib.getIdTransaction());
+            //txtPlatNo.setText(platNo);
+            //txtLokasiParkir.setText(lokasiParkir);
+            //txtNoTransaksi.setText(attrib.getIdTransaction());
             txtRunner.setText(attrib.getRunnerCheckout());
         }
     }
 
     private void calculateTotal() {
-        total = fee + lostTicketFine + overNightFine;
+        total = fee + lostTicketFine + overNightFine + feeMembership;
         txtTotalPay.setText(MakeCurrencyString.fromInt(total));
     }
 
@@ -235,42 +344,46 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
             builder.setLostTicketFee(mLostTicketFine);
         }
 
+        if (cbMembership.isChecked()) {
+            builder.setMembership(dataMembership);
+        }
+
+        if (cbVoucher.isChecked()) {
+            String noVoucher = inputVoucher.getText().toString();
+            if (TextUtils.isEmpty(noVoucher)) {
+                inputVoucher.setError("input voucher cant'be empty");
+                return;
+            }
+            builder.setVoucher(inputVoucher.getText().toString());
+        }
+
         FinishCheckoutDao finishCheckoutDao = FinishCheckoutDao.getInstance(this);
         finishCheckoutDao.setFinishCheckOut(builder.build());
         finishCheckoutDao.setId(idValetHeader);
+        finishCheckoutDao.setEntryCheckinResponse(entryCheckinResponse);
+        finishCheckoutDao.setTotalBayar(txtTotalPay.getText().toString());
+        finishCheckoutDao.setLostTicketFine(lostTicketFine);
+        finishCheckoutDao.setOverNightFine(overNightFine);
+        finishCheckoutDao.setNomorVoucher(inputVoucher.getText().toString());
+        if (dataMembership != null) {
+            dataMembership.getAttr().setToken(inputMembershipId.getText().toString());
+        }
+        finishCheckoutDao.setDataMembership(dataMembership);
+        finishCheckoutDao.setIdMembership(inputMembershipId.getText().toString());
+
         TokenDao.getToken(finishCheckoutDao, this);
 
-        new PrintCheckoutTask().execute();
-
-        goToMain();
         //Gson gson = new Gson();
         //String finishCheckOut = gson.toJson(builder.build());
         //Log.d("json checkout", finishCheckOut);
+
+        //goToMain();
     }
 
     private void goToMain() {
         Intent intent = new Intent(this, Main2Activity.class);
+        intent.putExtra("refresh", 1);
         startActivity(intent);
         finish();
-    }
-
-    private class PrintCheckoutTask extends  AsyncTask<Void, Void, String> {
-
-        @Override
-        protected String doInBackground(Void... voids) {
-            String noTrans = entryCheckinResponse.getData().getAttribute().getIdTransaksi();
-            String noPol = entryCheckinResponse.getData().getAttribute().getPlatNo();
-            String jenis = entryCheckinResponse.getData().getAttribute().getCar();
-            String totalBayar = MakeCurrencyString.fromInt(total);
-            String feex = MakeCurrencyString.fromInt(fee);
-            String lostTicket = MakeCurrencyString.fromInt(lostTicketFine);
-            String overnight = MakeCurrencyString.fromInt(overNightFine);
-            String warna = entryCheckinResponse.getData().getAttribute().getColor();
-
-            PrintCheckout printCheckout = new PrintCheckout(CheckoutActivity.this,noTrans,noPol,jenis,totalBayar,warna, feex, lostTicket, overnight);
-            printCheckout.print();
-
-            return null;
-        }
     }
 }

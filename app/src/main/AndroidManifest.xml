@@ -19,21 +19,33 @@
         <activity
             android:name=".SplashActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
         </activity>
         <activity
             android:name=".SettingsActivity"
             android:label="@string/setting" />
+
+
+        <!-- MAIN ACTIVITY, SEARCHABLE ACTIVITY AND SEARCHING ACTIVITY-->
         <activity
             android:name=".Main2Activity"
             android:label="@string/title_activity_main2"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar"
+            android:launchMode="singleTop">
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
+            <meta-data android:name="android.app.searchable"
+                android:resource="@xml/searchable"/>
+            <!-- enable the search dialog to send searches to SearchableActivity -->
+            <meta-data android:name="android.app.default_searchable"
+                android:value=".SearchableActivity" />
+
         </activity>
         <activity
             android:name=".AddCarActivity"
@@ -56,8 +68,10 @@
                 android:value="valet.digikom.com.valetparking.Main2Activity" />
         </activity>
 
-        <receiver android:name=".EntryCheckoutReceiver" />
-        <receiver android:name=".CheckoutReceiver" />
+        <receiver android:name=".EntryCheckoutReceiver"
+            android:enabled="true"/>
+        <receiver android:name=".CheckoutReceiver"
+            android:enabled="true"/>
 
         <activity
             android:name=".CheckoutActivity"
@@ -68,19 +82,26 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="valet.digikom.com.valetparking.Main2Activity" />
         </activity>
-        <activity android:name=".PrinterActivity"
+        <activity
+            android:name=".PrinterActivity"
             android:label="@string/setup_printer"
             android:parentActivityName=".Main2Activity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="valet.digikom.com.valetparking.Main2Activity" />
         </activity>
-
         <activity
             android:name=".DiscoveryActivity"
             android:label="@string/discovery"
-            android:screenOrientation="portrait" >
+            android:screenOrientation="portrait"></activity>
+
+        <activity android:name=".SearchableActivity">
         </activity>
+        
+        <provider
+            android:authorities="com.valet.premiere"
+            android:name=".util.ParkedCarProvider"
+            android:exported="false"/>
     </application>
 
 </manifest>
