@@ -26,6 +26,7 @@ import com.orhanobut.dialogplus.DialogPlus;
 import com.orhanobut.dialogplus.GridHolder;
 import com.orhanobut.dialogplus.OnItemClickListener;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import retrofit2.Call;
@@ -40,6 +41,7 @@ import valet.digikom.com.valetparking.dao.CarDao;
 import valet.digikom.com.valetparking.dao.ColorDao;
 import valet.digikom.com.valetparking.dao.DropDao;
 import valet.digikom.com.valetparking.dao.TokenDao;
+import valet.digikom.com.valetparking.dao.ValetTypeDao;
 import valet.digikom.com.valetparking.domain.CarMaster;
 import valet.digikom.com.valetparking.domain.ColorMaster;
 import valet.digikom.com.valetparking.domain.DropPointMaster;
@@ -130,6 +132,7 @@ public class StepOneFragmet extends Fragment implements View.OnClickListener {
         inputEmail = (EditText) view.findViewById(R.id.input_email);
         inputColor = (EditText) view.findViewById(R.id.input_color);
         inputColor.setFilters(filters);
+
         spValetType = (Spinner) view.findViewById(R.id.spinner_valet_type_x);
         spValetType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -142,6 +145,8 @@ public class StepOneFragmet extends Fragment implements View.OnClickListener {
 
             }
         });
+        valetTypeAdapter = new ListValetTypeAdapter(getContext(),valetTypeJsonList);
+        spValetType.setAdapter(valetTypeAdapter);
 
         btnCarType = (ImageButton) view.findViewById(R.id.btn_dropdown_cartype);
         btnColorType = (ImageButton) view.findViewById(R.id.btn_dropdown_color);
@@ -190,7 +195,8 @@ public class StepOneFragmet extends Fragment implements View.OnClickListener {
         });
 
         getDefualtDropPoint();
-        downloadValetType();
+        //downloadValetType();
+        new FetchValetTypeTask().execute();
         return view;
     }
 
@@ -372,8 +378,6 @@ public class StepOneFragmet extends Fragment implements View.OnClickListener {
         return v;
     }
 
-
-
     private void getDefualtDropPoint() {
         new Thread(new Runnable() {
             @Override
@@ -464,6 +468,28 @@ public class StepOneFragmet extends Fragment implements View.OnClickListener {
                 });
             }
         }, getContext());
+    }
+
+    private class FetchValetTypeTask extends AsyncTask<Void,Void,List<ValetTypeJson.Data>> {
+
+        @Override
+        protected List<ValetTypeJson.Data> doInBackground(Void... params) {
+            ValetTypeDao vDao = ValetTypeDao.getInstance(getContext());
+            return vDao.getListData();
+        }
+
+        @Override
+        protected void onPostExecute(List<ValetTypeJson.Data> datas) {
+            super.onPostExecute(datas);
+            if (datas != null && !datas.isEmpty()) {
+                valetTypeSelectedListener.onValetTypeSelected(datas.get(0));
+
+                valetTypeJsonList.clear();
+                valetTypeJsonList.addAll(datas);
+                valetTypeAdapter.notifyDataSetChanged();
+
+            }
+        }
     }
 
     public interface OnValetTypeSelectedListener{

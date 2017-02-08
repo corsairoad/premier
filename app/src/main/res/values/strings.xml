@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">ValetParking</string>
+    <string name="app_name">Admin Valet</string>
 
     <string name="title_activity_splash">SplashActivity</string>
     <string name="dummy_button">Dummy Button</string>

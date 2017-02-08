@@ -108,4 +108,16 @@ public class ValetTypeJson {
         }
     }
 
+    public static class Table {
+        public static final String TABLE_NAME = "valet_type";
+
+        public static final String COL_ID = "_id";
+        public static final String COL_JSON_DATA = "json_data";
+        public static final String COL_ID_DATA = "id_data";
+
+        public static final String CREATE = "CREATE TABLE " + TABLE_NAME + "( " + COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                COL_JSON_DATA + " TEXT, " +
+                COL_ID_DATA + " TEXT);";
+    }
+
 }

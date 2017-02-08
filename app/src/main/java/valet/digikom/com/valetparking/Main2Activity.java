@@ -42,6 +42,7 @@ import valet.digikom.com.valetparking.dao.DropDao;
 import valet.digikom.com.valetparking.dao.FineFeeDao;
 import valet.digikom.com.valetparking.dao.ItemsDao;
 import valet.digikom.com.valetparking.dao.TokenDao;
+import valet.digikom.com.valetparking.dao.ValetTypeDao;
 import valet.digikom.com.valetparking.domain.EntryCheckinResponse;
 import valet.digikom.com.valetparking.fragments.CalledCarFragment;
 import valet.digikom.com.valetparking.fragments.ParkedCarFragment;
@@ -304,6 +305,7 @@ public class Main2Activity extends AppCompatActivity
         TokenDao.getToken(ColorDao.getInstance(dbHelper), this);
         TokenDao.getToken(DropDao.getInstance(dbHelper), this);
         TokenDao.getToken(FineFeeDao.getInstance(this), this);
+        TokenDao.getToken(ValetTypeDao.getInstance(this),this);
     }
 
     private void startParkDetailActivity(String idResponse) {

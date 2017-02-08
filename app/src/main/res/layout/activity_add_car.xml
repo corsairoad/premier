@@ -1,65 +1,84 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/coordinatorLayout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:layout_height="match_parent">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="2"
-            android:orientation="horizontal">
-
-            <fragment
-                android:id="@+id/step_one_fragment"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="match_parent"
-                android:name="valet.digikom.com.valetparking.fragments.StepOneFragmet"/>
-
-            <fragment
-                android:id="@+id/step_two_fragment"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="match_parent"
-                android:name="valet.digikom.com.valetparking.fragments.StepTwoFragment"/>
-
-        </LinearLayout>
-
-        <LinearLayout
+            android:id="@+id/cont"
+            android:layout_alignParentTop="true"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:orientation="horizontal">
+            android:orientation="vertical">
 
-            <fragment
-                android:id="@+id/defect_fragment"
-                android:layout_width="0dp"
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
                 android:layout_weight="1"
-                android:layout_height="match_parent"
-                android:name="valet.digikom.com.valetparking.fragments.DefectFragment"/>
+                android:orientation="horizontal">
 
-            <fragment
-                android:id="@+id/review_fragment"
-                android:layout_width="0dp"
+                <fragment
+                    android:id="@+id/step_one_fragment"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="match_parent"
+                    android:name="valet.digikom.com.valetparking.fragments.StepOneFragmet"/>
+
+                <fragment
+                    android:id="@+id/stuff_fragment"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="match_parent"
+                    android:name="valet.digikom.com.valetparking.fragments.StepThreeFragment"/>
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
                 android:layout_weight="1"
-                android:layout_height="match_parent"/>
+                android:orientation="horizontal">
+
+
+                <fragment
+                    android:id="@+id/defect_fragment"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="match_parent"
+                    android:name="valet.digikom.com.valetparking.fragments.DefectFragment"/>
+
+                <fragment
+                    android:id="@+id/review_fragment"
+                    android:layout_width="0dp"
+                    android:layout_weight="0"
+                    android:name="valet.digikom.com.valetparking.fragments.ReviewFragment"
+                    android:layout_height="match_parent"/>
+
+            </LinearLayout>
 
         </LinearLayout>
 
         <LinearLayout
-            style="@style/ButtonBar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:layout_alignParentBottom="true">
+
+            <Button
+                android:id="@+id/btn_cancel_reg"
+                style="@style/ButtonBarButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/buttonshape"
+                android:text="@string/cancel"/>
 
             <Button
                 android:id="@+id/btn_registration"
@@ -68,12 +87,13 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="@drawable/buttonshape"
-                android:text="@string/prev"/>
+                android:text="@string/submitprint"/>
 
         </LinearLayout>
+
 
     </LinearLayout>
 
 
 
-</android.support.design.widget.CoordinatorLayout>
+</RelativeLayout>

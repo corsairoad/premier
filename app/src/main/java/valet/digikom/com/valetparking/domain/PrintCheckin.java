@@ -326,7 +326,7 @@ public class PrintCheckin implements ReceiveListener {
             String dropPoint = response.getData().getAttribute().getDropPoint();
             String site = response.getData().getAttribute().getSiteName();
             String platNo = response.getData().getAttribute().getPlatNo();
-
+            String valetType = response.getData().getAttribute().getValetType();
             Bitmap logoData = BitmapFactory.decodeResource(context.getResources(), R.mipmap.logo_1);
             StringBuilder sb = new StringBuilder();
 
@@ -355,6 +355,7 @@ public class PrintCheckin implements ReceiveListener {
 
             mPrinter.addTextAlign(Printer.ALIGN_LEFT);
             mPrinter.addTextSize(1, 1);
+            sb.append(" Valet         :  " + valetType + "\n");
             sb.append(" Checkin       :  " + date + "\n");
             sb.append(" No. Plat      :  " + platNo + "\n");
             sb.append(" Tipe Mobil    :  " + response.getData().getAttribute().getCar() + "\n");
@@ -407,6 +408,7 @@ public class PrintCheckin implements ReceiveListener {
 
             mPrinter.addTextAlign(Printer.ALIGN_LEFT);
             mPrinter.addTextSize(1, 1);
+            sb.append(" Valet         :  " + valetType + "\n");
             sb.append(" Checkin       :  " + date + "\n");
             sb.append(" No. Plat      :  " + platNo + "\n");
             sb.append(" Tipe Mobil    :  " + response.getData().getAttribute().getCar() + "\n");
@@ -502,6 +504,7 @@ public class PrintCheckin implements ReceiveListener {
 
             mPrinter.addTextAlign(Printer.ALIGN_LEFT);
             mPrinter.addTextSize(1, 1);
+            sb.append(" Valet         :  " + valetType + "\n");
             sb.append(" Checkin       :  " + date + "\n");
             sb.append(" No. Plat      :  " + platNo + "\n");
             sb.append(" Tipe Mobil    :  " + response.getData().getAttribute().getCar() + "\n");
@@ -529,7 +532,6 @@ public class PrintCheckin implements ReceiveListener {
     }
 
     private Bitmap scaleBitmap(Bitmap b) {
-
         Matrix m = new Matrix();
         m.setRectToRect(new RectF(0, 0, b.getWidth(), b.getHeight()), new RectF(0, 0, 400, 400), Matrix.ScaleToFit.CENTER);
         return Bitmap.createBitmap(b, 0, 0, b.getWidth(), b.getHeight(), m, true);

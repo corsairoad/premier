@@ -109,13 +109,15 @@ public class PrintCheckout implements ReceiveListener {
                     Printer.COMPRESS_AUTO);
             mPrinter.addFeedLine(1);
 
-            mPrinter.addTextSize(2,2);
+            mPrinter.addTextSize(1,1);
             mPrinter.addText(site);
-            mPrinter.addFeedLine(1);
-
+            mPrinter.addFeedLine(2);
+            mPrinter.addTextSize(2,2);
+            mPrinter.addText("EXIT CHECK");
+            mPrinter.addFeedLine(2);
             mPrinter.addTextAlign(Printer.ALIGN_LEFT);
             mPrinter.addTextSize(1,1);
-
+            sb.append(" Valet         :  " + valetType + "\n");
             sb.append(" No. Transaksi :  " + noTrans + "\n");
             sb.append(" No. Plat      :  " + noPol + "\n");
             sb.append(" Jenis Mobil   :  " + jenis + "\n");
@@ -303,7 +305,6 @@ public class PrintCheckout implements ReceiveListener {
         catch (final Exception e) {
 
         }
-
         finalizeObject();
     }
 
