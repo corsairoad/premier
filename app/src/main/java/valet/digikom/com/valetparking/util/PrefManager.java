@@ -2,6 +2,7 @@ package valet.digikom.com.valetparking.util;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 
 import com.google.gson.Gson;
 
@@ -25,7 +26,7 @@ public class PrefManager {
 
     private PrefManager(Context context) {
         this.context = context.getApplicationContext();
-        sharedPreferences = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         editor = sharedPreferences.edit();
         gson = new Gson();
     }
@@ -38,12 +39,12 @@ public class PrefManager {
     }
 
     public void setDefaultDropPoint(int idMasterDropPoint) {
-        editor.putInt(KEY_DEFAULT_DROPPOINT, idMasterDropPoint);
+        editor.putString(KEY_DEFAULT_DROPPOINT, String.valueOf(idMasterDropPoint));
         editor.commit();
     }
 
-    public int getIdDefaultDropPoint() {
-        int id = sharedPreferences.getInt(KEY_DEFAULT_DROPPOINT, -1);
+    public String getIdDefaultDropPoint() {
+        String id = sharedPreferences.getString(KEY_DEFAULT_DROPPOINT, null);
         return id;
     }
 

@@ -66,7 +66,7 @@ public class AddCarActivity extends FragmentActivity implements StepOneFragmet.O
         fragmentReview = (ReviewFragment) fragmentManager.findFragmentById(R.id.review_fragment);
     }
 
-    private void submitCheckin(final Bitmap bmp, final Checkin checkin, final EntryCheckinContainer checkinContainer) {
+    private void submitCheckin(final Bitmap bmp, final Checkin checkin, final EntryCheckinContainer checkinContainer, final SweetAlertDialog sweetAlertDialog) {
         TokenDao.getToken(new ProcessRequest() {
             @Override
             public void process(String token) {
@@ -87,15 +87,30 @@ public class AddCarActivity extends FragmentActivity implements StepOneFragmet.O
 
                             printCheckin(res);
                             //Log.d("Post checkin success: ", res.getData().getType());
+                            sweetAlertDialog.setTitleText("success!")
+                                    .setContentText("Registration success")
+                                    .setConfirmText("OK")
+                                    .setConfirmClickListener(null)
+                                    .changeAlertType(SweetAlertDialog.SUCCESS_TYPE);
                         }else {
                             Log.d("Post entry", "post entry checkin failed.");
-                            Toast.makeText(AddCarActivity.this,"Post Entry Checkin failed", Toast.LENGTH_SHORT).show();
+                            //Toast.makeText(AddCarActivity.this,"Post Entry Checkin failed", Toast.LENGTH_SHORT).show();
+                            sweetAlertDialog.setTitleText("Failed!")
+                                    .setContentText("Registration Failed. Please contact your support.")
+                                    .setConfirmText("OK")
+                                    .setConfirmClickListener(null)
+                                    .changeAlertType(SweetAlertDialog.ERROR_TYPE);
                         }
                     }
 
                     @Override
                     public void onFailure(Call<EntryCheckinResponse> call, Throwable t) {
-                        Toast.makeText(AddCarActivity.this,"Post Entry Checkin failed", Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(AddCarActivity.this,"Post Entry Checkin failed", Toast.LENGTH_SHORT).show();
+                        sweetAlertDialog.setTitleText("Failed!")
+                                .setContentText("Registration Failed. Please contact your support.")
+                                .setConfirmText("OK")
+                                .setConfirmClickListener(null)
+                                .changeAlertType(SweetAlertDialog.ERROR_TYPE);
                     }
                 });
             }
@@ -112,7 +127,6 @@ public class AddCarActivity extends FragmentActivity implements StepOneFragmet.O
       }).run();
       */
     }
-
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -160,7 +174,6 @@ public class AddCarActivity extends FragmentActivity implements StepOneFragmet.O
         fragmentReview.setImageDefect(bitmap);
     }
 
-
     private void showConfirmDialog(final ReviewFragment reviewFragment) {
         new SweetAlertDialog(this, SweetAlertDialog.NORMAL_TYPE)
                 .setTitleText("Registration")
@@ -170,13 +183,9 @@ public class AddCarActivity extends FragmentActivity implements StepOneFragmet.O
                     @Override
                     public void onClick(SweetAlertDialog sweetAlertDialog) {
                         fragmentRegFirst.setCheckIn();
-                        submitCheckin(fragmentReview.getSignatureBmp(), fragmentReview.getCheckin(), fragmentReview.getEntryCheckinContainer());
+                        submitCheckin(fragmentReview.getSignatureBmp(), fragmentReview.getCheckin(), fragmentReview.getEntryCheckinContainer(), sweetAlertDialog);
                         //submitCheckin(signBmp, fragmentReview.getCheckin(), fragmentReview.getEntryCheckinContainer());
-                        sweetAlertDialog.setTitleText("success!")
-                                .setContentText("Registration success")
-                                .setConfirmText("OK")
-                                .setConfirmClickListener(null)
-                                .changeAlertType(SweetAlertDialog.SUCCESS_TYPE);
+
                     }
                 })
                 .setCancelText("Cancel")

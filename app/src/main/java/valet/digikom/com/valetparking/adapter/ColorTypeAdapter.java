@@ -50,6 +50,7 @@ public class ColorTypeAdapter extends BaseAdapter {
         }
 
         CircleImageView cm = (CircleImageView) view.findViewById(R.id.circle_image);
+        cm.setVisibility(View.VISIBLE);
         TextView textColor = (TextView) view.findViewById(R.id.text_cartype);
 
         ColorMaster colorMaster = colorMasterList.get(i);

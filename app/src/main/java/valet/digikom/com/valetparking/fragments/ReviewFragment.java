@@ -252,7 +252,7 @@ public class ReviewFragment extends Fragment {
         EntryCheckinContainer entryCheckinContainer = new EntryCheckinContainer();
         entryCheckinContainer.setEntryCheckin(entryCheckin);
 
-        //debugJsonCheckin(entryCheckinContainer);
+        debugJsonCheckin(entryCheckinContainer);
 
         return entryCheckinContainer;
     }
@@ -269,9 +269,9 @@ public class ReviewFragment extends Fragment {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                int dropIdDefault = PrefManager.getInstance(getContext()).getIdDefaultDropPoint();
-                if (dropIdDefault > 0) {
-                    final DropPointMaster dropPointMaster = DropDao.getInstance(new ValetDbHelper(getContext())).getDropPointById(dropIdDefault);
+                String dropIdDefault = PrefManager.getInstance(getContext()).getIdDefaultDropPoint();
+                if (dropIdDefault != null) {
+                    final DropPointMaster dropPointMaster = DropDao.getInstance(new ValetDbHelper(getContext())).getDropPointById(Integer.valueOf(dropIdDefault));
                     if (dropPointMaster == null) {
                         return;
                     }

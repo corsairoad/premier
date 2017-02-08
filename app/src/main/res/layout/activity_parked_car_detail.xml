@@ -21,6 +21,8 @@
 
     </android.support.design.widget.AppBarLayout>
 
+        <include layout="@layout/content_parked_car_detail" />
+
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
         android:layout_width="56dp"
@@ -28,9 +30,5 @@
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
         app:srcCompat="@drawable/ic_call" />
-
-
-        <include layout="@layout/content_parked_car_detail" />
-
 
 </android.support.design.widget.CoordinatorLayout>

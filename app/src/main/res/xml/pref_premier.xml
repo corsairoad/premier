@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <Preference android:title="@string/printer"
+        android:icon="@drawable/ic_print_black_24dp">
+        <intent android:action="valet.digikom.com.valetparking.PrinterActivity"/>
+    </Preference>
+
     <ListPreference
-        android:key="loc_pref"
-        android:title="@string/title_pref_location"
-        app:entries="@array/location"
-        app:entryValues="@array/location_values"
-        app:summary="%s"
-        app:defaultValue="@string/default_location_value"/>
+        android:key="@string/pref_drop_point_key"
+        android:title="@string/lobby"
+        android:summary="%s"
+        android:dialogTitle="@string/title_list_preference"
+        android:icon="@drawable/ic_pin_drop_black_24dp"/>
+
 </PreferenceScreen>

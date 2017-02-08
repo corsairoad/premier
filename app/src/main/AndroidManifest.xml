@@ -25,27 +25,25 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".SettingsActivity"
-            android:label="@string/setting" />
 
-
-        <!-- MAIN ACTIVITY, SEARCHABLE ACTIVITY AND SEARCHING ACTIVITY-->
+        <!-- MAIN ACTIVITY, SEARCHABLE ACTIVITY AND SEARCHING ACTIVITY -->
         <activity
             android:name=".Main2Activity"
             android:label="@string/title_activity_main2"
+            android:launchMode="singleTop"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:launchMode="singleTop">
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
-            <meta-data android:name="android.app.searchable"
-                android:resource="@xml/searchable"/>
-            <!-- enable the search dialog to send searches to SearchableActivity -->
-            <meta-data android:name="android.app.default_searchable"
-                android:value=".SearchableActivity" />
 
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable" />
+            <!-- enable the search dialog to send searches to SearchableActivity -->
+            <meta-data
+                android:name="android.app.default_searchable"
+                android:value=".SearchableActivity" />
         </activity>
         <activity
             android:name=".AddCarActivity"
@@ -68,10 +66,12 @@
                 android:value="valet.digikom.com.valetparking.Main2Activity" />
         </activity>
 
-        <receiver android:name=".EntryCheckoutReceiver"
-            android:enabled="true"/>
-        <receiver android:name=".CheckoutReceiver"
-            android:enabled="true"/>
+        <receiver
+            android:name=".EntryCheckoutReceiver"
+            android:enabled="true" />
+        <receiver
+            android:name=".CheckoutReceiver"
+            android:enabled="true" />
 
         <activity
             android:name=".CheckoutActivity"
@@ -85,23 +85,35 @@
         <activity
             android:name=".PrinterActivity"
             android:label="@string/setup_printer"
+            android:parentActivityName=".PreferenceActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="valet.digikom.com.valetparking.PreferenceActivity" />
+            <intent-filter>
+                <action android:name="valet.digikom.com.valetparking.PrinterActivity"/>
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+
+        </activity>
+        <activity
+            android:name=".DiscoveryActivity"
+            android:label="@string/discovery"
+            android:screenOrientation="portrait" />
+        <activity android:name=".SearchableActivity" />
+
+        <provider
+            android:name=".util.ParkedCarProvider"
+            android:authorities="com.valet.premiere"
+            android:exported="false" />
+
+        <activity
+            android:name=".PreferenceActivity"
+            android:label="@string/title_activity_preference"
             android:parentActivityName=".Main2Activity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="valet.digikom.com.valetparking.Main2Activity" />
         </activity>
-        <activity
-            android:name=".DiscoveryActivity"
-            android:label="@string/discovery"
-            android:screenOrientation="portrait"></activity>
-
-        <activity android:name=".SearchableActivity">
-        </activity>
-        
-        <provider
-            android:authorities="com.valet.premiere"
-            android:name=".util.ParkedCarProvider"
-            android:exported="false"/>
     </application>
 
 </manifest>

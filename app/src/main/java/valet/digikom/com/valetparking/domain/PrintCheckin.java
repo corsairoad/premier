@@ -55,7 +55,7 @@ public class PrintCheckin implements ReceiveListener {
         this.bitmapSign = scaleBitmap(bmpSign);
 
         if (bmpDefect == null) {
-            this.bitmapDefect = scaleBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.car_defect_land));
+            this.bitmapDefect = scaleBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.car_vector_update_72));
         }else {
             this.bitmapDefect = scaleBitmap(bmpDefect);
         }
