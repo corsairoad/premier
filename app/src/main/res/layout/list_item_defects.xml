@@ -17,7 +17,7 @@
     <TextView
         android:id="@+id/text_defect"
         android:layout_width="0dp"
-        android:layout_weight="10"
+        android:layout_weight="2"
         android:textSize="20sp"
         android:textColor="@color/colorPrimaryDark"
         android:layout_height="wrap_content"/>

@@ -4,6 +4,7 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
 import android.os.SystemClock;
 
 import java.io.IOException;
@@ -15,6 +16,15 @@ import okhttp3.Request;
 import okhttp3.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+import valet.digikom.com.valetparking.dao.CarDao;
+import valet.digikom.com.valetparking.dao.ColorDao;
+import valet.digikom.com.valetparking.dao.DefectDao;
+import valet.digikom.com.valetparking.dao.DropDao;
+import valet.digikom.com.valetparking.dao.FineFeeDao;
+import valet.digikom.com.valetparking.dao.ItemsDao;
+import valet.digikom.com.valetparking.dao.TokenDao;
+import valet.digikom.com.valetparking.dao.ValetTypeDao;
+import valet.digikom.com.valetparking.util.ValetDbHelper;
 
 /**
  * Created by dev on 1/7/17.
@@ -61,5 +71,20 @@ public class ApiClient {
         return retrofit.create(serviceClass);
     }
 
+    public static void downloadData(Context context) {
+        ValetDbHelper dbHelper = ValetDbHelper.getInstance(context);
+        TokenDao.getToken(DefectDao.getInstance(dbHelper), context);
+        TokenDao.getToken(ItemsDao.getInstance(dbHelper), context);
+        TokenDao.getToken(CarDao.getInstance(dbHelper), context);
+        TokenDao.getToken(ColorDao.getInstance(dbHelper), context);
+        TokenDao.getToken(DropDao.getInstance(dbHelper), context);
+        TokenDao.getToken(FineFeeDao.getInstance(context), context);
+        TokenDao.getToken(ValetTypeDao.getInstance(context),context);
+    }
+
+    public static boolean isNetworkAvailable(final Context context) {
+        final ConnectivityManager connectivityManager = ((ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE));
+        return connectivityManager.getActiveNetworkInfo() != null && connectivityManager.getActiveNetworkInfo().isConnected();
+    }
 
 }

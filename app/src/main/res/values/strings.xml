@@ -256,5 +256,6 @@
 
     <string name="title_list_preference">Set Lobby</string>
     <string name="pref_drop_point_key">drop_pint</string>
+    <string name="data_sync">Sync Data</string>
 
 </resources>

@@ -103,7 +103,6 @@ public class Main2Activity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        downloadData();
         startCheckoutEntryAlarm(this);
     }
 
@@ -287,17 +286,6 @@ public class Main2Activity extends AppCompatActivity
             String queryId = uri.getLastPathSegment();
             startParkDetailActivity(queryId);
         }
-    }
-
-    private void downloadData() {
-        ValetDbHelper dbHelper = ValetDbHelper.getInstance(this);
-        TokenDao.getToken(DefectDao.getInstance(dbHelper), this);
-        TokenDao.getToken(ItemsDao.getInstance(dbHelper), this);
-        TokenDao.getToken(CarDao.getInstance(dbHelper), this);
-        TokenDao.getToken(ColorDao.getInstance(dbHelper), this);
-        TokenDao.getToken(DropDao.getInstance(dbHelper), this);
-        TokenDao.getToken(FineFeeDao.getInstance(this), this);
-        TokenDao.getToken(ValetTypeDao.getInstance(this),this);
     }
 
     private void startParkDetailActivity(String idResponse) {

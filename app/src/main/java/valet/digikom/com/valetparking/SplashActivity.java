@@ -18,6 +18,7 @@ import valet.digikom.com.valetparking.dao.DropDao;
 import valet.digikom.com.valetparking.dao.FineFeeDao;
 import valet.digikom.com.valetparking.dao.ItemsDao;
 import valet.digikom.com.valetparking.dao.TokenDao;
+import valet.digikom.com.valetparking.service.ApiClient;
 import valet.digikom.com.valetparking.util.PrefManager;
 import valet.digikom.com.valetparking.util.ValetDbHelper;
 
@@ -34,8 +35,6 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
-        downloadData();
-
         if (PrefManager.getInstance(this).getAuthResponse() != null) {
             goToMain();
             return;
@@ -49,15 +48,6 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
         progressBar = (ProgressBar) findViewById(R.id.progressbar);
     }
 
-    private void downloadData() {
-        ValetDbHelper dbHelper = ValetDbHelper.getInstance(this);
-        TokenDao.getToken(DefectDao.getInstance(dbHelper), this);
-        TokenDao.getToken(ItemsDao.getInstance(dbHelper), this);
-        TokenDao.getToken(CarDao.getInstance(dbHelper), this);
-        TokenDao.getToken(ColorDao.getInstance(dbHelper), this);
-        TokenDao.getToken(DropDao.getInstance(dbHelper), this);
-        TokenDao.getToken(FineFeeDao.getInstance(this), this);
-    }
 
     @Override
     public void onClick(View view) {
@@ -91,6 +81,7 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
 
     @Override
     public void loginSuccess() {
+        ApiClient.downloadData(this);
         goToMain();
     }
 

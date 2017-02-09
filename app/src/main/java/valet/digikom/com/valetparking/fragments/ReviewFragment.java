@@ -252,7 +252,7 @@ public class ReviewFragment extends Fragment {
         EntryCheckinContainer entryCheckinContainer = new EntryCheckinContainer();
         entryCheckinContainer.setEntryCheckin(entryCheckin);
 
-        debugJsonCheckin(entryCheckinContainer);
+        //debugJsonCheckin(entryCheckinContainer);
 
         return entryCheckinContainer;
     }

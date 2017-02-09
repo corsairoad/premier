@@ -14,4 +14,9 @@
         android:dialogTitle="@string/title_list_preference"
         android:icon="@drawable/ic_pin_drop_black_24dp"/>
 
+    <Preference android:title="@string/data_sync"
+        android:icon="@drawable/ic_autorenew_black_24dp">
+        <intent android:action="valet.digikom.com.valetparking.PreferenceActivity"/>
+    </Preference>
+
 </PreferenceScreen>

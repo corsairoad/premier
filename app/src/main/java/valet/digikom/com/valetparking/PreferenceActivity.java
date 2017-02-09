@@ -5,6 +5,7 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -13,18 +14,20 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
-import android.support.v7.app.ActionBar;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
+import android.support.v4.app.NavUtils;
+import android.support.v7.app.ActionBar;
 import android.text.TextUtils;
 import android.view.MenuItem;
-import android.support.v4.app.NavUtils;
-
+import android.widget.Toast;
 import java.util.List;
-
+import cc.cloudist.acplibrary.ACProgressConstant;
+import cc.cloudist.acplibrary.ACProgressFlower;
 import valet.digikom.com.valetparking.dao.DropDao;
 import valet.digikom.com.valetparking.domain.DropPointMaster;
+import valet.digikom.com.valetparking.service.ApiClient;
 import valet.digikom.com.valetparking.util.ValetDbHelper;
 
 /**
@@ -94,6 +97,47 @@ public class PreferenceActivity extends AppCompatPreferenceActivity {
         }
     };
 
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        if (intent.getAction() != null && intent.getAction().equals("valet.digikom.com.valetparking.PreferenceActivity")) {
+            if (ApiClient.isNetworkAvailable(this)) {
+                new DownloadDataTask().execute();
+            }else {
+                Toast.makeText(this, "Can't sync data. Please check your internet connection", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    private class DownloadDataTask extends AsyncTask<Void, Void, Void> {
+        ACProgressFlower dialog;
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+             dialog = new ACProgressFlower.Builder(PreferenceActivity.this)
+                    .direction(ACProgressConstant.DIRECT_CLOCKWISE)
+                    .themeColor(Color.WHITE)
+                    .text("Syncing data...")
+                    .textSize(14)
+                    .fadeColor(Color.DKGRAY).build();
+            dialog.show();
+            Toast.makeText(PreferenceActivity.this, "Syncing data...", Toast.LENGTH_SHORT).show();
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            ApiClient.downloadData(PreferenceActivity.this);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            Toast.makeText(PreferenceActivity.this, "Sync data completed", Toast.LENGTH_SHORT).show();
+            dialog.dismiss();
+        }
+    }
+
     /**
      * Helper method to determine if the device has an extra-large screen. For
      * example, 10" tablets are extra-large.
@@ -131,7 +175,7 @@ public class PreferenceActivity extends AppCompatPreferenceActivity {
 
         addPreferencesFromResource(R.xml.pref_premier);
 
-       prefDropPoint = (ListPreference) findPreference(getString(R.string.pref_drop_point_key));
+       prefDropPoint = (ListPreference)findPreference(getString(R.string.pref_drop_point_key));
         new FetchDropPointTask().execute();
     }
 

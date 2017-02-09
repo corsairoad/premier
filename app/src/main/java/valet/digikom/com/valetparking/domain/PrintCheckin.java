@@ -3,6 +3,8 @@ package valet.digikom.com.valetparking.domain;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.RectF;
 import android.os.Build;
@@ -52,12 +54,12 @@ public class PrintCheckin implements ReceiveListener {
         this.response = response;
         prefManager = PrefManager.getInstance(context);
         itemsList = items;
-        this.bitmapSign = scaleBitmap(bmpSign);
-
+        this.bitmapSign = scaleBitmap(bmpSign, 200,200);
+        this.bitmapSign = createBorder(bitmapSign,2);
         if (bmpDefect == null) {
-            this.bitmapDefect = scaleBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.car_vector_update_72));
+            this.bitmapDefect = scaleBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.car_vector_update_72),400,400);
         }else {
-            this.bitmapDefect = scaleBitmap(bmpDefect);
+            this.bitmapDefect = scaleBitmap(bmpDefect, 400, 400);
         }
 
         initializeObject();
@@ -164,7 +166,7 @@ public class PrintCheckin implements ReceiveListener {
             mPrinter = new Printer(Printer.TM_T88,Printer.LANG_EN,context);
         }
         catch (Exception e) {
-            ShowMsg.showException(e, "Printer", context);
+            //ShowMsg.showException(e, "Printer", context);
             return false;
         }
 
@@ -256,7 +258,7 @@ public class PrintCheckin implements ReceiveListener {
             mPrinter.connect(target,Printer.PARAM_DEFAULT);
         }
         catch (Exception e) {
-            ShowMsg.showException(e, "connect", context);
+            //ShowMsg.showException(e, "connect", context);
             return false;
         }
 
@@ -264,7 +266,7 @@ public class PrintCheckin implements ReceiveListener {
             mPrinter.beginTransaction();
             isBeginTransaction = true;
         } catch (Exception e) {
-            ShowMsg.showException(e, "beginTransaction", context);
+            //ShowMsg.showException(e, "beginTransaction", context);
         }
 
         if (isBeginTransaction == false) {
@@ -416,14 +418,14 @@ public class PrintCheckin implements ReceiveListener {
                 sb.append(" Warna         :  " + response.getData().getAttribute().getColor() + "\n");
             }
             sb.append(" Drop Point    :  " + dropPoint + "\n");
-            sb.append(" Harga         :  " + MakeCurrencyString.fromInt(response.getData().getAttribute().getFee()));
+            //sb.append(" Harga         :  " + MakeCurrencyString.fromInt(response.getData().getAttribute().getFee()));
 
             mPrinter.addText(sb.toString());
             sb.delete(0, sb.length());
 
             // image defect
             if (bitmapDefect != null) {
-                mPrinter.addFeedLine(2);
+                mPrinter.addFeedLine(1);
                 mPrinter.addTextAlign(Printer.ALIGN_CENTER);
                 mPrinter.addText("CHECK MOBIL");
                 mPrinter.addFeedLine(1);
@@ -458,7 +460,7 @@ public class PrintCheckin implements ReceiveListener {
             }
 
             // tanda tangan
-            mPrinter.addTextAlign(Printer.ALIGN_CENTER);
+            mPrinter.addTextAlign(Printer.ALIGN_LEFT);
             mPrinter.addText("Ttd");
             mPrinter.addFeedLine(1);
             mPrinter.addImage(bitmapSign, 0, 0,
@@ -512,7 +514,7 @@ public class PrintCheckin implements ReceiveListener {
                 sb.append(" Warna         :  " + response.getData().getAttribute().getColor() + "\n");
             }
             sb.append(" Drop Point    :  " + dropPoint + "\n");
-            sb.append(" Harga         :  " + MakeCurrencyString.fromInt(response.getData().getAttribute().getFee()));
+            //sb.append(" Harga         :  " + MakeCurrencyString.fromInt(response.getData().getAttribute().getFee()));
 
             mPrinter.addText(sb.toString());
             sb.delete(0, sb.length());
@@ -531,9 +533,17 @@ public class PrintCheckin implements ReceiveListener {
         return true;
     }
 
-    private Bitmap scaleBitmap(Bitmap b) {
+    private Bitmap scaleBitmap(Bitmap b, int x, int y) {
         Matrix m = new Matrix();
-        m.setRectToRect(new RectF(0, 0, b.getWidth(), b.getHeight()), new RectF(0, 0, 400, 400), Matrix.ScaleToFit.CENTER);
+        m.setRectToRect(new RectF(0, 0, b.getWidth(), b.getHeight()), new RectF(0, 0, x, y), Matrix.ScaleToFit.CENTER);
         return Bitmap.createBitmap(b, 0, 0, b.getWidth(), b.getHeight(), m, true);
+    }
+
+    private Bitmap createBorder(Bitmap bmp, int borderSize) {
+        Bitmap bmpWithBorder = Bitmap.createBitmap(bmp.getWidth() + borderSize * 2, bmp.getHeight() + borderSize * 2, bmp.getConfig());
+        Canvas canvas = new Canvas(bmpWithBorder);
+        canvas.drawColor(Color.BLACK);
+        canvas.drawBitmap(bmp, borderSize, borderSize, null);
+        return bmpWithBorder;
     }
 }

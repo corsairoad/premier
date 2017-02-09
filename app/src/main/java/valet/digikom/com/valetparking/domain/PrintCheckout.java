@@ -228,7 +228,7 @@ public class PrintCheckout implements ReceiveListener {
             mPrinter = new Printer(Printer.TM_T88,Printer.LANG_EN,context);
         }
         catch (Exception e) {
-            ShowMsg.showException(e, "Printer", context);
+            //ShowMsg.showException(e, "Printer", context);
             return false;
         }
 
@@ -251,7 +251,7 @@ public class PrintCheckout implements ReceiveListener {
             mPrinter.connect(target,Printer.PARAM_DEFAULT);
         }
         catch (Exception e) {
-            ShowMsg.showException(e, "connect", context);
+            //ShowMsg.showException(e, "connect", context);
             return false;
         }
 
@@ -259,7 +259,7 @@ public class PrintCheckout implements ReceiveListener {
             mPrinter.beginTransaction();
             isBeginTransaction = true;
         } catch (Exception e) {
-            ShowMsg.showException(e, "beginTransaction", context);
+            //ShowMsg.showException(e, "beginTransaction", context);
         }
 
         if (isBeginTransaction == false) {

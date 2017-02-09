@@ -9,6 +9,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
+import android.widget.Toast;
 
 import com.epson.epos2.Epos2Exception;
 import com.epson.epos2.discovery.DeviceInfo;
@@ -49,12 +50,13 @@ public class DiscoveryActivity extends Activity implements View.OnClickListener,
         mFilterOption = new FilterOption();
         mFilterOption.setDeviceType(Discovery.TYPE_PRINTER);
         mFilterOption.setEpsonFilter(Discovery.FILTER_NAME);
+
         try {
             Discovery.start(this, mFilterOption, mDiscoveryListener);
+        } catch (Epos2Exception e) {
+            e.printStackTrace();
         }
-        catch (Exception e) {
-            ShowMsg.showException(e, "start", mContext);
-        }
+
     }
 
     @Override
