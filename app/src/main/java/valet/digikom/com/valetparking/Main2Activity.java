@@ -7,6 +7,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -29,6 +30,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
 
 import java.util.Calendar;
 
@@ -71,6 +75,8 @@ public class Main2Activity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        checkPrinter();
 
         setDefaultKeyMode(DEFAULT_KEYS_SEARCH_LOCAL);
         handleIntent(getIntent());
@@ -292,5 +298,24 @@ public class Main2Activity extends AppCompatActivity
         Intent intent = new Intent(this, ParkedCarDetailActivity.class);
         intent.putExtra(EntryCheckinResponse.ID_ENTRY_CHECKIN, Integer.valueOf(idResponse));
         startActivity(intent);
+    }
+
+    private void checkPrinter() {
+        PrefManager prefManager = PrefManager.getInstance(this);
+        String printer = prefManager.getPrinterMacAddress();
+        if (printer == null) {
+            new MaterialDialog.Builder(this)
+                    .title("Connect to Printer?")
+                    .content("You are not connected to printer. Connect now?")
+                    .positiveText("Oke")
+                    .positiveColor(Color.parseColor("#00695c"))
+                    .negativeText("Cancel")
+                    .onPositive(new MaterialDialog.SingleButtonCallback() {
+                        @Override
+                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                            startActivity(new Intent(Main2Activity.this, PrinterActivity.class));
+                        }
+                    }).show();
+        }
     }
 }

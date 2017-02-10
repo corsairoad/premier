@@ -9,6 +9,8 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -42,6 +44,13 @@ public class ListCalledCarAdapter extends RecyclerView.Adapter<ListCalledCarAdap
     @Override
     public void onBindViewHolder(ViewHolder holder, final int position) {
         EntryCheckinResponse response = responsesList.get(position);
+        String logoMobil = response.getData().getAttribute().getLogoMobil();
+        Glide.with(context)
+                .load(logoMobil)
+                .centerCrop()
+                .placeholder(R.drawable.car_icon)
+                .crossFade()
+                .into(holder.imgCar);
 
         if (response.isReadyToCheckout()) {
             holder.textReady.setVisibility(View.VISIBLE);
@@ -95,6 +104,7 @@ public class ListCalledCarAdapter extends RecyclerView.Adapter<ListCalledCarAdap
         TextView textIdCheckin;
         CircleImageView circleImageView;
         TextView textReady;
+        CircleImageView imgCar;
 
         public ViewHolder(View view) {
             super(view);
@@ -104,6 +114,7 @@ public class ListCalledCarAdapter extends RecyclerView.Adapter<ListCalledCarAdap
             layoutContainer = (LinearLayout) view.findViewById(R.id.container_checkin);
             circleImageView = (CircleImageView) view.findViewById(R.id.img_car);
             textReady = (TextView) view.findViewById(R.id.text_ready);
+            imgCar = (CircleImageView) view.findViewById(R.id.img_car);
         }
     }
 

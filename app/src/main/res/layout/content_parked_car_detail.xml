@@ -38,6 +38,7 @@
                     <de.hdodenhof.circleimageview.CircleImageView
                         android:layout_width="75dp"
                         android:src="@drawable/car_icon"
+                        android:id="@+id/img_car"
                         android:layout_height="75dp" />
 
                     <LinearLayout
@@ -104,7 +105,7 @@
                         <TextView
                             android:layout_width="0dp"
                             android:layout_weight="1"
-                            android:textSize="14sp"
+                            android:textSize="18sp"
                             android:textStyle="bold"
                             android:layout_height="wrap_content"
                             android:id="@+id/text_valet_type" />
@@ -132,7 +133,7 @@
                         <TextView
                             android:layout_width="0dp"
                             android:layout_weight="1"
-                            android:textSize="14sp"
+                            android:textSize="18sp"
                             android:textStyle="bold"
                             android:layout_height="wrap_content"
                             android:id="@+id/text_no_transaksi" />
@@ -159,7 +160,7 @@
                         <TextView
                             android:layout_width="0dp"
                             android:layout_weight="1"
-                            android:textSize="14sp"
+                            android:textSize="18sp"
                             android:textStyle="bold"
                             android:layout_height="wrap_content"
                             android:id="@+id/text_drop_point" />
@@ -186,7 +187,7 @@
                         <TextView
                             android:layout_width="0dp"
                             android:layout_weight="1"
-                            android:textSize="14sp"
+                            android:textSize="18sp"
                             android:textStyle="bold"
                             android:layout_height="wrap_content"
                             android:id="@+id/text_chekin_time" />
@@ -213,7 +214,7 @@
                         <TextView
                             android:layout_width="0dp"
                             android:layout_weight="1"
-                            android:textSize="14sp"
+                            android:textSize="18sp"
                             android:textStyle="bold"
                             android:layout_height="wrap_content"
                             android:id="@+id/text_fee" />

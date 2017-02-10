@@ -113,7 +113,7 @@ public class PrintCheckout implements ReceiveListener {
             mPrinter.addText(site);
             mPrinter.addFeedLine(2);
             mPrinter.addTextSize(2,2);
-            mPrinter.addText("EXIT CHECK");
+            mPrinter.addText("RECEIPT");
             mPrinter.addFeedLine(2);
             mPrinter.addTextAlign(Printer.ALIGN_LEFT);
             mPrinter.addTextSize(1,1);

@@ -6,11 +6,9 @@ import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.widget.Toast;
-
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import valet.digikom.com.valetparking.AddCarActivity;
 import valet.digikom.com.valetparking.CheckoutActivity;
 import valet.digikom.com.valetparking.Main2Activity;
 import valet.digikom.com.valetparking.domain.EntryCheckinResponse;
@@ -21,7 +19,6 @@ import valet.digikom.com.valetparking.domain.PrintCheckout;
 import valet.digikom.com.valetparking.service.ApiClient;
 import valet.digikom.com.valetparking.service.ApiEndpoint;
 import valet.digikom.com.valetparking.service.ProcessRequest;
-import valet.digikom.com.valetparking.util.MakeCurrencyString;
 import valet.digikom.com.valetparking.util.ValetDbHelper;
 
 /**
@@ -142,7 +139,6 @@ public class FinishCheckoutDao implements ProcessRequest {
                     checkedOutTime = response.body().getData().getAttrib().getUpdatedAt();
                     setCheckoutCar(id);
                     Toast.makeText(context,"Checkout success", Toast.LENGTH_SHORT).show();
-                    Toast.makeText(context,"printing..", Toast.LENGTH_LONG).show();
                     new PrintCheckoutTask().execute();
 
                     //print();

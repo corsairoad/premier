@@ -8,8 +8,11 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+
 import java.util.List;
 
+import de.hdodenhof.circleimageview.CircleImageView;
 import valet.digikom.com.valetparking.R;
 import valet.digikom.com.valetparking.domain.Checkin;
 import valet.digikom.com.valetparking.domain.EntryCheckinResponse;
@@ -51,6 +54,13 @@ public class ListCheckinAdapter extends RecyclerView.Adapter<ListCheckinAdapter.
     @Override
     public void onBindViewHolder(ViewHolder holder, final int position) {
         EntryCheckinResponse response = responsesList.get(position);
+        String logoMobil = response.getData().getAttribute().getLogoMobil();
+        Glide.with(context)
+                .load(logoMobil)
+                .centerCrop()
+                .placeholder(R.drawable.car_icon)
+                .crossFade()
+                .into(holder.imgCar);
 
         String platNo = response.getData().getAttribute().getIdTransaksi() + " - " + response.getData().getAttribute().getPlatNo();
         String checkinTime = response.getData().getAttribute().getCheckinTime();
@@ -83,6 +93,7 @@ public class ListCheckinAdapter extends RecyclerView.Adapter<ListCheckinAdapter.
         TextView textPlatNo;
         TextView textRunnerName;
         TextView textIdCheckin;
+        CircleImageView imgCar;
 
         public ViewHolder(View view) {
             super(view);
@@ -90,6 +101,7 @@ public class ListCheckinAdapter extends RecyclerView.Adapter<ListCheckinAdapter.
             textRunnerName = (TextView) view.findViewById(R.id.text_runner);
             textIdCheckin = (TextView) view.findViewById(R.id.id_checkin);
             layoutContainer = (LinearLayout) view.findViewById(R.id.container_checkin);
+            imgCar = (CircleImageView) view.findViewById(R.id.img_car);
         }
     }
 

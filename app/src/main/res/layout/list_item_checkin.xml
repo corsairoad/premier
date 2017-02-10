@@ -21,7 +21,6 @@
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/img_car"
             android:layout_width="45dp"
-            android:src="@drawable/car_icon"
             app:civ_border_width="0dp"
             android:layout_height="45dp" />
 

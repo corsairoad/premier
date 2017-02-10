@@ -12,6 +12,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
+
+import com.bumptech.glide.Glide;
 import com.orhanobut.dialogplus.DialogPlus;
 import com.orhanobut.dialogplus.GridHolder;
 import com.orhanobut.dialogplus.OnItemClickListener;
@@ -20,6 +22,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
 import cn.pedant.SweetAlert.SweetAlertDialog;
+import de.hdodenhof.circleimageview.CircleImageView;
 import valet.digikom.com.valetparking.adapter.DropPointAdapter;
 import valet.digikom.com.valetparking.dao.CallDao;
 import valet.digikom.com.valetparking.dao.DropDao;
@@ -49,6 +52,7 @@ public class ParkedCarDetailActivity extends AppCompatActivity implements View.O
     Button btnSetEta;
     EditText inputDropTo;
     DropPointMaster dropPointMaster;
+    CircleImageView imgCar;
     ImageButton btnDropPoint;
     ValetDbHelper dbHelper;
     private String arrivedTime;
@@ -71,6 +75,7 @@ public class ParkedCarDetailActivity extends AppCompatActivity implements View.O
         txtValetType = (TextView) findViewById(R.id.text_valet_type);
         txtFee = (TextView) findViewById(R.id.text_fee);
         txtEta = (TextView) findViewById(R.id.text_arrived_time);
+        imgCar = (CircleImageView) findViewById(R.id.img_car);
         inputDropTo = (EditText) findViewById(R.id.input_drop_point);
         btnDropPoint = (ImageButton) findViewById(R.id.btn_drop);
         btnSetEta = (Button) findViewById(R.id.btn_set_time);
@@ -79,6 +84,7 @@ public class ParkedCarDetailActivity extends AppCompatActivity implements View.O
         btnSetEta.setOnClickListener(this);
         btnDirectCheckout.setOnClickListener(this);
         btnDropPoint.setOnClickListener(this);
+
         dbHelper = new ValetDbHelper(this);
         new FetchDropPointTask().execute();
         entryDao = EntryDao.getInstance(this);
@@ -118,6 +124,14 @@ public class ParkedCarDetailActivity extends AppCompatActivity implements View.O
             txtDropPoint.setText(attr.getDropPoint());
             txtCheckin.setText(attr.getCheckinTime());
             txtFee.setText(MakeCurrencyString.fromInt(attr.getFee()));
+            String logoMobil = attr.getLogoMobil();
+
+            Glide.with(this)
+                    .load(logoMobil)
+                    .centerCrop()
+                    .placeholder(R.drawable.car_icon)
+                    .crossFade()
+                    .into(imgCar);
         }
     }
 

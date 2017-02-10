@@ -115,8 +115,22 @@ public class EntryCheckinResponse {
         private int fee;
         @SerializedName("vthd_vfsd_name")
         private String valetType;
+        @SerializedName("vthd_cbms_logo")
+        private String logoMobil;
 
         public Attribute() {
+        }
+
+        public void setValetType(String valetType) {
+            this.valetType = valetType;
+        }
+
+        public String getLogoMobil() {
+            return logoMobil;
+        }
+
+        public void setLogoMobil(String logoMobil) {
+            this.logoMobil = logoMobil;
         }
 
         public String getValetType() {

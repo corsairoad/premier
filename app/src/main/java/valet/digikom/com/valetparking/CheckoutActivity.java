@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -16,13 +15,11 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.google.gson.Gson;
-
+import com.bumptech.glide.Glide;
 import java.util.ArrayList;
 import java.util.List;
-
 import cn.pedant.SweetAlert.SweetAlertDialog;
+import de.hdodenhof.circleimageview.CircleImageView;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -63,6 +60,7 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
     TextView txtFineFee;
     TextView txtOvernight;
     Button btnCheckout;
+    CircleImageView imgCar;
     FineFeeDao fineFeeDao;
     FineFee.Fine mLostTicketFine;
     FineFee.Fine mOvernightFine;
@@ -117,8 +115,9 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
         inputMembershipId = (EditText) findViewById(R.id.input_membership_id);
         cbMembership = (CheckBox) findViewById(R.id.cb_membership);
         spMembership = (Spinner) findViewById(R.id.spinner_memebership);
-        spMembership.setOnItemSelectedListener(this);
+        imgCar = (CircleImageView) findViewById(R.id.img_car);
 
+        spMembership.setOnItemSelectedListener(this);
         btnCheckout.setOnClickListener(this);
         cbFineFe.setOnCheckedChangeListener(this);
         cbOvernight.setOnCheckedChangeListener(this);
@@ -259,7 +258,7 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
         protected Void doInBackground(Void... voids) {
             mLostTicketFine = fineFeeDao.getLostTickeFine();
             mOvernightFine = fineFeeDao.getOvernightFine();
-             return null;
+            return null;
         }
     }
 
@@ -270,6 +269,14 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
             fee = attrib.getFee();
             String platNo = attrib.getPlatNo();
             String lokasiParkir = attrib.getAreaParkir() + " " + attrib.getBlokParkir() + " " + attrib.getSektorParkir();
+            String logoMobil = response.getData().getAttribute().getLogoMobil();
+
+            Glide.with(this)
+                    .load(logoMobil)
+                    .centerCrop()
+                    .placeholder(R.drawable.car_icon)
+                    .crossFade()
+                    .into(imgCar);
 
             txtValetType.setText(attrib.getValetType());
             txtPlatNo.setText(platNo);
@@ -280,6 +287,7 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
             txtCheckinTime.setText(attrib.getCheckinTime());
             txtOvernight.setText(MakeCurrencyString.fromInt(overNightFine));
             txtFineFee.setText(MakeCurrencyString.fromInt(lostTicketFine));
+
             calculateTotal();
         } else {
             Toast.makeText(this,"Transaction already checked out.", Toast.LENGTH_SHORT).show();
