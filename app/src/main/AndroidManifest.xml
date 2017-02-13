@@ -89,11 +89,12 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="valet.digikom.com.valetparking.PreferenceActivity" />
+
             <intent-filter>
-                <action android:name="valet.digikom.com.valetparking.PrinterActivity"/>
+                <action android:name="valet.digikom.com.valetparking.PrinterActivity" />
+
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
-
         </activity>
         <activity
             android:name=".DiscoveryActivity"
@@ -109,15 +110,25 @@
         <activity
             android:name=".PreferenceActivity"
             android:label="@string/title_activity_preference"
-            android:parentActivityName=".Main2Activity"
-            android:launchMode="singleTop">
+            android:launchMode="singleTop"
+            android:parentActivityName=".Main2Activity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="valet.digikom.com.valetparking.Main2Activity" />
+
             <intent-filter>
-                <action android:name="valet.digikom.com.valetparking.PreferenceActivity"/>
-                <category android:name="android.intent.category.DEFAULT"/>
+                <action android:name="valet.digikom.com.valetparking.PreferenceActivity" />
+
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
+        </activity>
+        <activity android:name=".ClosingActivity"
+            android:label="@string/closing_activity"
+            android:parentActivityName=".Main2Activity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="valet.digikom.com.valetparking.Main2Activity" />
+
         </activity>
     </application>
 

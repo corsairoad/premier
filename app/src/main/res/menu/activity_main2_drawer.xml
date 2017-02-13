@@ -34,6 +34,11 @@
             android:id="@+id/setting"
             android:icon="@drawable/ic_menu_manage"
             android:title="@string/setting" />
+
+        <item
+            android:id="@+id/closing"
+            android:icon="@drawable/ic_cloud_upload_black_24dp"
+            android:title="@string/closing" />
     </group>
 
     <item android:title="Communicate" android:visible="false">

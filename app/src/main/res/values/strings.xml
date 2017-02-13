@@ -257,5 +257,14 @@
     <string name="title_list_preference">Set Lobby</string>
     <string name="pref_drop_point_key">drop_pint</string>
     <string name="data_sync">Sync Data</string>
+    <string name="closing">Closing EOD</string>
+    <string name="closing_activity">Closing EOD</string>
+    <string name="from">From</string>
+    <string name="to">Until</string>
+    <string name="closing_date">Closing Date</string>
+    <string name="valet_total">Valet Total</string>
+    <string name="regular">REGULAR</string>
+    <string name="exclusive">EXCLUSIVE</string>
+    <string name="total">TOTAL</string>
 
 </resources>

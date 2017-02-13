@@ -216,6 +216,9 @@ public class Main2Activity extends AppCompatActivity
         } else if (id == R.id.nav_manage) {
             Intent intent = new Intent(this, PrinterActivity.class);
             startActivity(intent);
+        } else if (id == R.id.closing) {
+            Intent intent = new Intent(this, ClosingActivity.class);
+            startActivity(intent);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
