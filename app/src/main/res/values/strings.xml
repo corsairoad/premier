@@ -260,11 +260,13 @@
     <string name="closing">Closing EOD</string>
     <string name="closing_activity">Closing EOD</string>
     <string name="from">From</string>
-    <string name="to">Until</string>
+    <string name="to">To</string>
     <string name="closing_date">Closing Date</string>
     <string name="valet_total">Valet Total</string>
     <string name="regular">REGULAR</string>
     <string name="exclusive">EXCLUSIVE</string>
     <string name="total">TOTAL</string>
+    <string name="refresh">Refresh</string>
+    <string name="remark">Remark (Optional)</string>
 
 </resources>

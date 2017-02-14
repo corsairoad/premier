@@ -14,7 +14,9 @@ import valet.digikom.com.valetparking.domain.AddCarCallResponse;
 import valet.digikom.com.valetparking.domain.AdditionalItemsResponse;
 import valet.digikom.com.valetparking.domain.AuthResponse;
 import valet.digikom.com.valetparking.domain.CarMasterResponse;
+import valet.digikom.com.valetparking.domain.ClosingBody;
 import valet.digikom.com.valetparking.domain.ClosingData;
+import valet.digikom.com.valetparking.domain.ClosingResponse;
 import valet.digikom.com.valetparking.domain.ColorMasterResponse;
 import valet.digikom.com.valetparking.domain.DefectResponse;
 import valet.digikom.com.valetparking.domain.Disclaimer;
@@ -83,5 +85,8 @@ public interface ApiEndpoint {
     Call<MembershipResponse> getMemberships();
 
     @GET("ad_checkout_finish_fine")
-    Call<ClosingData> getClosingData();
+    Call<ClosingData> getClosingData(@Query("page[size]")int pageSize);
+
+    @POST("report_administrative")
+    Call<ClosingResponse> close(@Body ClosingBody closingBody);
 }
