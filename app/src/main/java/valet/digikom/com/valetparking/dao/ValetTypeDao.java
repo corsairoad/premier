@@ -67,7 +67,6 @@ public class ValetTypeDao implements ProcessRequest {
     private void insertData(List<ValetTypeJson.Data> data) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         db.execSQL("DELETE FROM " + ValetTypeJson.Table.TABLE_NAME);
-
         for (ValetTypeJson.Data d : data) {
             String id = String.valueOf(d.getAttrib().getId());
             String jsonData = gson.toJson(d);
