@@ -7,20 +7,15 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.RectF;
-import android.os.Build;
-import android.text.TextUtils;
 import android.widget.Toast;
-
 import com.epson.epos2.Epos2CallbackCode;
 import com.epson.epos2.Epos2Exception;
 import com.epson.epos2.printer.Printer;
 import com.epson.epos2.printer.PrinterStatusInfo;
 import com.epson.epos2.printer.ReceiveListener;
-
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -195,54 +190,6 @@ public class PrintCheckin implements ReceiveListener {
             });
     }
 
-    private String makeErrorMessage(PrinterStatusInfo status) {
-        String msg = "";
-
-        if (status.getOnline() == Printer.FALSE) {
-            msg += context.getString(R.string.handlingmsg_err_offline);
-        }
-        if (status.getConnection() == Printer.FALSE) {
-            msg += context.getString(R.string.handlingmsg_err_no_response);
-        }
-        if (status.getCoverOpen() == Printer.TRUE) {
-            msg += context.getString(R.string.handlingmsg_err_cover_open);
-        }
-        if (status.getPaper() == Printer.PAPER_EMPTY) {
-            msg += context.getString(R.string.handlingmsg_err_receipt_end);
-        }
-        if (status.getPaperFeed() == Printer.TRUE || status.getPanelSwitch() == Printer.SWITCH_ON) {
-            msg += context.getString(R.string.handlingmsg_err_paper_feed);
-        }
-        if (status.getErrorStatus() == Printer.MECHANICAL_ERR || status.getErrorStatus() == Printer.AUTOCUTTER_ERR) {
-            msg += context.getString(R.string.handlingmsg_err_autocutter);
-            msg += context.getString(R.string.handlingmsg_err_need_recover);
-        }
-        if (status.getErrorStatus() == Printer.UNRECOVER_ERR) {
-            msg += context.getString(R.string.handlingmsg_err_unrecover);
-        }
-        if (status.getErrorStatus() == Printer.AUTORECOVER_ERR) {
-            if (status.getAutoRecoverError() == Printer.HEAD_OVERHEAT) {
-                msg += context.getString(R.string.handlingmsg_err_overheat);
-                msg += context.getString(R.string.handlingmsg_err_head);
-            }
-            if (status.getAutoRecoverError() == Printer.MOTOR_OVERHEAT) {
-                msg += context.getString(R.string.handlingmsg_err_overheat);
-                msg += context.getString(R.string.handlingmsg_err_motor);
-            }
-            if (status.getAutoRecoverError() == Printer.BATTERY_OVERHEAT) {
-                msg += context.getString(R.string.handlingmsg_err_overheat);
-                msg += context.getString(R.string.handlingmsg_err_battery);
-            }
-            if (status.getAutoRecoverError() == Printer.WRONG_PAPER) {
-                msg += context.getString(R.string.handlingmsg_err_wrong_paper);
-            }
-        }
-        if (status.getBatteryLevel() == Printer.BATTERY_LEVEL_0) {
-            msg += context.getString(R.string.handlingmsg_err_battery_real_end);
-        }
-
-        return msg;
-    }
 
     private boolean connectPrinter() {
         boolean isBeginTransaction = false;

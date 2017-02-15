@@ -15,10 +15,9 @@
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/circle_image"
-            android:layout_width="75dp"
-            android:layout_height="75dp"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
             app:civ_border_width="2dp"
-            android:visibility="gone"
             app:civ_border_color="@android:color/black"/>
 
         <TextView

@@ -7,6 +7,8 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -48,7 +50,9 @@ public class CarTypeAdapter extends BaseAdapter {
             view = LayoutInflater.from(context).inflate(R.layout.layout_item_cartype,viewGroup, false);
         }
         CircleImageView circleImageView = (CircleImageView) view.findViewById(R.id.circle_image);
-        circleImageView.setVisibility(View.GONE);
+        Glide.with(context)
+                .load(carMasterList.get(i).getAttrib().getLogo())
+                .into(circleImageView);
         TextView textView = (TextView) view.findViewById(R.id.text_cartype);
         textView.setText(carMasterList.get(i).getAttrib().getCarName());
 

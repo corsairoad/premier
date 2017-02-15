@@ -5,6 +5,7 @@ import retrofit2.http.Body;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
+import retrofit2.http.PATCH;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
@@ -28,6 +29,8 @@ import valet.digikom.com.valetparking.domain.FineFee;
 import valet.digikom.com.valetparking.domain.FinishCheckOut;
 import valet.digikom.com.valetparking.domain.FinishCheckoutResponse;
 import valet.digikom.com.valetparking.domain.MembershipResponse;
+import valet.digikom.com.valetparking.domain.PatchMeBody;
+import valet.digikom.com.valetparking.domain.PatchMeResponse;
 import valet.digikom.com.valetparking.domain.TokenResponse;
 import valet.digikom.com.valetparking.domain.ValetTypeJson;
 
@@ -51,11 +54,11 @@ public interface ApiEndpoint {
     @GET("additional_item_site_detail")
     Call<AdditionalItemsResponse> getItems();
 
-    @GET("car_master")
-    Call<CarMasterResponse> getCars();
+    @GET("car_brand_master")
+    Call<CarMasterResponse> getCars(@Query("page[size]") int pageSize);
 
     @GET("color_master")
-    Call<ColorMasterResponse> getColors();
+    Call<ColorMasterResponse> getColors(@Query("page[size]") int pageSize);
 
     @GET("droppoint_floor_master")
     Call<DropPointMasterResponse> getDropPoints();
@@ -89,4 +92,7 @@ public interface ApiEndpoint {
 
     @POST("report_administrative")
     Call<ClosingResponse> close(@Body ClosingBody closingBody);
+
+    @PATCH("me")
+    Call<PatchMeResponse> patchMe(@Body PatchMeBody patchMeBody);
 }

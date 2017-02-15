@@ -57,7 +57,7 @@ public class DropDao implements ProcessRequest {
         });
     }
 
-    private void insertDropPoints(List<DropPointMaster> dropPointList) {
+    public void insertDropPoints(List<DropPointMaster> dropPointList) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         db.execSQL("DELETE FROM " + DropPointMaster.Table.TABLE_NAME);
         for (DropPointMaster dp : dropPointList) {

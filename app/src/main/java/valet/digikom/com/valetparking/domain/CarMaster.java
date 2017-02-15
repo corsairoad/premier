@@ -43,10 +43,12 @@ public class CarMaster {
     }
 
     public static class Attrib {
-        @SerializedName("crms_id")
+        @SerializedName("cbms_id")
         private int id_attrib;
-        @SerializedName("crms_name")
+        @SerializedName("cbms_name")
         private String carName;
+        @SerializedName("cbms_logo")
+        private String logo;
 
         public Attrib() {
         }
@@ -66,6 +68,14 @@ public class CarMaster {
         public void setCarName(String carName) {
             this.carName = carName;
         }
+
+        public String getLogo() {
+            return logo;
+        }
+
+        public void setLogo(String logo) {
+            this.logo = logo;
+        }
     }
 
     public static class Table {
@@ -74,9 +84,11 @@ public class CarMaster {
         public static final String COL_ID = "_id";
         public static final String COL_CAR_NAME = "car_name";
         public static final String COL_CAR_ID = "id_car";
+        public static final String COL_CAR_LOGO = "logo";
 
         public static final String CREATE = "CREATE TABLE " + TABLE_NAME + "( " + COL_ID + " INTEGER PRIMARY KEY, " +
                 COL_CAR_NAME + " TEXT, " +
-                COL_CAR_ID + " INTEGER)";
+                COL_CAR_ID + " INTEGER," +
+                COL_CAR_LOGO + " TEXT);";
     }
 }

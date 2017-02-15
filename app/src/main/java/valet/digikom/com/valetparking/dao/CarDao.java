@@ -53,6 +53,7 @@ public class CarDao implements ProcessRequest {
                     CarMaster.Attrib attrib = new CarMaster.Attrib();
                     attrib.setId_attrib(cursor.getInt(cursor.getColumnIndex(CarMaster.Table.COL_CAR_ID)));
                     attrib.setCarName(cursor.getString(cursor.getColumnIndex(CarMaster.Table.COL_CAR_NAME)));
+                    attrib.setLogo(cursor.getString(cursor.getColumnIndex(CarMaster.Table.COL_CAR_LOGO)));
                     carMaster.setId(cursor.getInt(cursor.getColumnIndex(CarMaster.Table.COL_ID)));
                     carMaster.setAttrib(attrib);
 
@@ -70,7 +71,7 @@ public class CarDao implements ProcessRequest {
 
     private void downloadCarMaster(String token) {
         ApiEndpoint endpoint = ApiClient.createService(ApiEndpoint.class, token);
-        Call<CarMasterResponse> call = endpoint.getCars();
+        Call<CarMasterResponse> call = endpoint.getCars(200);
         call.enqueue(new Callback<CarMasterResponse>() {
             @Override
             public void onResponse(Call<CarMasterResponse> call, Response<CarMasterResponse> response) {
@@ -96,6 +97,7 @@ public class CarDao implements ProcessRequest {
             cv.put(CarMaster.Table.COL_ID, carMaster.getId());
             cv.put(CarMaster.Table.COL_CAR_NAME, carMaster.getAttrib().getCarName());
             cv.put(CarMaster.Table.COL_CAR_ID, carMaster.getAttrib().getId_attrib());
+            cv.put(CarMaster.Table.COL_CAR_LOGO, carMaster.getAttrib().getLogo());
 
             db.insert(CarMaster.Table.TABLE_NAME, null, cv);
         }

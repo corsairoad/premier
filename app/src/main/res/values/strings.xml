@@ -268,5 +268,7 @@
     <string name="total">TOTAL</string>
     <string name="refresh">Refresh</string>
     <string name="remark">Remark (Optional)</string>
+    <string name="site">Site</string>
+    <string name="save">Save</string>
 
 </resources>

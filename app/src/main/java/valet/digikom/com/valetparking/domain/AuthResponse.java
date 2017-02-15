@@ -2,6 +2,8 @@ package valet.digikom.com.valetparking.domain;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.List;
+
 /**
  * Created by DIGIKOM-EX4 on 1/29/2017.
  */
@@ -32,6 +34,8 @@ public class AuthResponse {
         private User user;
         @SerializedName("role")
         private Role role;
+        @SerializedName("role_options")
+        private List<RoleOption> roleOptions;
 
         public Data() {
         }
@@ -46,6 +50,10 @@ public class AuthResponse {
 
         public Role getRole() {
             return role;
+        }
+
+        public List<RoleOption> getRoleOptions() {
+            return roleOptions;
         }
 
         public static class User {
@@ -101,6 +109,7 @@ public class AuthResponse {
                 return postCode;
             }
         }
+
         public static class Role{
             @SerializedName("rlms_id")
             private int roleId;
@@ -110,6 +119,18 @@ public class AuthResponse {
             private String role_name;
             @SerializedName("rlms_desc")
             private String role_desc;
+            @SerializedName("usrl_id")
+            private int urserRoleId;
+            @SerializedName("usrl_enabled")
+            private String userRoleEnabled;
+            @SerializedName("csms_id")
+            private int siteId;
+            @SerializedName("csms_name")
+            private String siteName;
+            @SerializedName("drms_id")
+            private int idLobby;
+            @SerializedName("drms_name")
+            private String lobbyName;
 
             public Role() {
             }
@@ -128,6 +149,81 @@ public class AuthResponse {
 
             public String getRole_desc() {
                 return role_desc;
+            }
+
+            public int getUrserRoleId() {
+                return urserRoleId;
+            }
+
+            public String getUserRoleEnabled() {
+                return userRoleEnabled;
+            }
+
+            public int getSiteId() {
+                return siteId;
+            }
+
+            public String getSiteName() {
+                return siteName;
+            }
+
+            public int getIdLobby() {
+                return idLobby;
+            }
+
+            public String getLobbyName() {
+                return lobbyName;
+            }
+        }
+
+        public static class RoleOption {
+            @SerializedName("usrl_id")
+            private int userRoleId;
+            @SerializedName("usrl_enabled")
+            private String userRoleEnabled;
+            @SerializedName("csms_id")
+            private int siteId;
+            @SerializedName("csms_name")
+            private String siteName;
+            @SerializedName("rlms_id")
+            private int roleMasterId;
+            @SerializedName("rlms_name")
+            private String roleMasterName;
+            @SerializedName("drms_id")
+            private int idLobby;
+            @SerializedName("drms_name")
+            private String lobbyName;
+
+            public int getUserRoleId() {
+                return userRoleId;
+            }
+
+            public String getUserRoleEnabled() {
+                return userRoleEnabled;
+            }
+
+            public int getSiteId() {
+                return siteId;
+            }
+
+            public String getSiteName() {
+                return siteName;
+            }
+
+            public int getRoleMasterId() {
+                return roleMasterId;
+            }
+
+            public String getRoleMasterName() {
+                return roleMasterName;
+            }
+
+            public int getIdLobby() {
+                return idLobby;
+            }
+
+            public String getLobbyName() {
+                return lobbyName;
             }
         }
     }

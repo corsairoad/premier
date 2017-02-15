@@ -16,12 +16,12 @@ public class PrefManager {
 
     public static final String KEY_DEFAULT_DROPPOINT = "drop_pint";
     public static final String KEY_PRINTER_ADDRESS = "mac_addres";
+    public static final String KEY_ID_SITE = "csmsid";
 
     private Context context;
     private static PrefManager prefManager;
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
-    private  final String PREF_NAME = PrefManager.class.getSimpleName();
     private Gson gson;
 
     private PrefManager(Context context) {
@@ -99,4 +99,15 @@ public class PrefManager {
         editor.remove(AuthResponse.KEY);
         editor.commit();
     }
+
+    public void setIdSite(int id) {
+        editor.putInt(KEY_ID_SITE, id);
+        editor.commit();
+    }
+
+    public int getIdSite() {
+        return  sharedPreferences.getInt(KEY_ID_SITE, 0);
+    }
+
+
 }

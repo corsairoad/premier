@@ -86,7 +86,7 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     private void goToMain() {
-        Intent intent = new Intent(this, Main2Activity.class);
+        Intent intent = new Intent(this, WelcomeActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
         finish();

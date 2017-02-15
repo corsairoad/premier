@@ -72,6 +72,11 @@ public class Main2Activity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main2);
 
+        if (PrefManager.getInstance(this).getAuthResponse() == null) {
+            startActivity(new Intent(this, SplashActivity.class));
+            finish();
+        }
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -271,7 +276,10 @@ public class Main2Activity extends AppCompatActivity
     }
 
     private void goToSplash() {
-        startActivity(new Intent(this,SplashActivity.class));
+        PrefManager.getInstance(this).saveAuthResponse(null);
+        Intent intent = new Intent(this,SplashActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
         finish();
     }
 

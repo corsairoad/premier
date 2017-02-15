@@ -28,6 +28,7 @@ import valet.digikom.com.valetparking.adapter.ListClosingAdapter;
 import valet.digikom.com.valetparking.dao.ClosingDao;
 import valet.digikom.com.valetparking.dao.TokenDao;
 import valet.digikom.com.valetparking.domain.ClosingData;
+import valet.digikom.com.valetparking.domain.PrintClosing;
 import valet.digikom.com.valetparking.service.ApiClient;
 import valet.digikom.com.valetparking.service.ApiEndpoint;
 import valet.digikom.com.valetparking.service.ProcessRequest;
@@ -58,6 +59,10 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
     int mHour;
     int mMinute;
     int mSecond;
+
+    int reg;
+    int exc;
+    int total;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,11 +107,19 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
         String startDate = inputDateFrom.getText().toString();
         String endDate = inputDateUntil.getText().toString();
         closingDao.close(readInfo,startDate,endDate);
+
+        Toast.makeText(this, "printing closing data", Toast.LENGTH_SHORT).show();
+        PrintClosing printClosing = new PrintClosing(this, closingData, "Lobby Aaaaa", "SITE Aa", startDate,endDate,"Admin Aaaa", reg,exc,total);
+        printClosing.print();
     }
 
     @Override
     public void onClick(final View viewx) {
         if (viewx == btnClosing) {
+            if (closingData.isEmpty()) {
+                Toast.makeText(this, "Closing data empty. Closing aborted.", Toast.LENGTH_SHORT).show();
+                return;
+            }
             new SweetAlertDialog(this)
                     .setTitleText("Closing")
                     .setContentText("Closing transaction now?")
@@ -258,6 +271,10 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
                 exclusive +=1;
             }
         }
+
+        reg = regular;
+        exc = exclusive;
+        total = datas.size();
 
         textRegular.setText(String.valueOf(regular));
         textExclusive.setText(String.valueOf(exclusive));

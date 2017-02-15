@@ -19,11 +19,6 @@
         <activity
             android:name=".SplashActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
 
         <!-- MAIN ACTIVITY, SEARCHABLE ACTIVITY AND SEARCHING ACTIVITY -->
@@ -36,7 +31,10 @@
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
-
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
             <meta-data
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
@@ -118,18 +116,19 @@
 
             <intent-filter>
                 <action android:name="valet.digikom.com.valetparking.PreferenceActivity" />
-
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".ClosingActivity"
+        <activity
+            android:name=".ClosingActivity"
             android:label="@string/closing_activity"
             android:parentActivityName=".Main2Activity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="valet.digikom.com.valetparking.Main2Activity" />
-
         </activity>
+        <activity android:name=".WelcomeActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen"></activity>
     </application>
 
 </manifest>
