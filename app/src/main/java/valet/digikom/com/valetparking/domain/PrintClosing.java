@@ -3,6 +3,7 @@ package valet.digikom.com.valetparking.domain;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.text.TextUtils;
 import android.widget.Toast;
 
 import com.epson.epos2.Epos2CallbackCode;
@@ -80,6 +81,7 @@ public class PrintClosing implements ReceiveListener {
         Bitmap logoData = BitmapFactory.decodeResource(context.getResources(), R.mipmap.logo_1);
 
         try {
+            /*
             mPrinter.addTextAlign(Printer.ALIGN_CENTER);
             mPrinter.addImage(logoData, 0, 0,
                     logoData.getWidth(),
@@ -90,39 +92,55 @@ public class PrintClosing implements ReceiveListener {
                     Printer.PARAM_DEFAULT,
                     Printer.COMPRESS_AUTO);
             mPrinter.addFeedLine(1);
+            */
+            mPrinter.addTextAlign(Printer.ALIGN_CENTER);
             mPrinter.addTextSize(2,2);
-            mPrinter.addText("CLOSING DATA");
+            mPrinter.addText("REPORT");
             mPrinter.addFeedLine(2);
 
             mPrinter.addTextAlign(Printer.ALIGN_LEFT);
             mPrinter.addTextSize(1,1);
 
-            sb.append("LOBBY     : " + lobbyName + "\n");
-            sb.append("SITE      : " + siteName + "\n");
-            sb.append("ADMIN     : " + adminName + "\n");
-            sb.append("DATE FROM : " + dateFrom + "\n");
-            sb.append("DATE TO   : " + dateTo  + "\n");
-            sb.append("PRINT DATE: " + getCurrentDate() + "\n");
+            sb.append("LOKASI      : " + lobbyName + "\n");
+            //sb.append("LOKASI      : " + siteName + "\n");
+            //sb.append("ADMIN       : " + adminName + "\n");
+            //sb.append("WAKTU REPORT: " + dateFrom + "\n");
+            sb.append("WAKTU REPORT: " + getCurrentDate() + "\n");
+            //sb.append("DATE TO   : " + dateTo  + "\n");
+            //sb.append("PRINT DATE: " + getCurrentDate() + "\n");
             sb.append("------------------------------------------\n");
-            sb.append("NO.\tTransact. No\t\tVALET TYPE\n");
+            sb.append("NO.\tTiket\t\tIn\tOut\n");
             sb.append("------------------------------------------\n");
             mPrinter.addText(sb.toString());
             sb.delete(0, sb.length());
 
             int i = 1;
+            int totalCheckin = 0;
+            int totalCheckout = 0;
+            int totalOverNight = 0;
             for (ClosingData.Data data : closingData) {
                 String transactNo = data.getAttributes().getTransactionId();
-                String valetType = data.getAttributes().getValetTypeName();
-                sb.append(i + "\t" +  transactNo + "\t"  +  valetType + "\n");
+                //String valetType = data.getAttributes().getValetTypeName();
+                String checkinTime = data.getAttributes().getCheckIn();
+                if (checkinTime != null) {
+                    totalCheckin+=1;
+                }
+                String checkoutTime = (data.getAttributes().getCheckout() == null ? "":data.getAttributes().getCheckout());
+                if (!TextUtils.isEmpty(checkoutTime)) {
+                    totalCheckout+=1;
+                }else {
+                    totalOverNight+=1;
+                }
+                sb.append(i + "\t" +  transactNo + "\t"  +  checkinTime + "\t" + checkoutTime + "\n");
                 i++;
             }
             sb.append("------------------------------------------\n");
             mPrinter.addText(sb.toString());
             sb.delete(0, sb.length());
 
-            sb.append("REGULAR     : " + numRegular + "\n");
-            sb.append("EXCLUSIVE   : " + numExclusive + "\n");
-            sb.append("TOTAL       : " + total + "\n");
+            sb.append("Total Qty In       : " + totalCheckin + "\n");
+            sb.append("Total Qty Out      : " + totalCheckout + "\n");
+            sb.append("Total Qty Overnight: " + totalOverNight + "\n");
             mPrinter.addText(sb.toString());
             mPrinter.addFeedLine(1);
             mPrinter.addCut(Printer.CUT_FEED);

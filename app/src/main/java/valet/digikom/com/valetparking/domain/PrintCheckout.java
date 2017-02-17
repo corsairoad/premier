@@ -117,9 +117,9 @@ public class PrintCheckout implements ReceiveListener {
             mPrinter.addFeedLine(2);
             mPrinter.addTextAlign(Printer.ALIGN_LEFT);
             mPrinter.addTextSize(1,1);
+            sb.append(" No. Plat      :  " + noPol + "\n");
             sb.append(" Valet         :  " + valetType + "\n");
             sb.append(" No. Transaksi :  " + noTrans + "\n");
-            sb.append(" No. Plat      :  " + noPol + "\n");
             sb.append(" Jenis Mobil   :  " + jenis + "\n");
             if (warna != null) {
                 sb.append(" Warna         :  " + warna + "\n");

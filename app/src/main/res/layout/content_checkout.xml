@@ -201,6 +201,7 @@
                         android:paddingLeft="16dp"
                         android:paddingRight="16dp"
                         android:paddingTop="16dp"
+                        android:visibility="gone"
                         android:paddingBottom="16dp"
                         android:orientation="horizontal">
 
@@ -282,7 +283,6 @@
 
                     </LinearLayout>
 
-
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -338,7 +338,6 @@
                         android:orientation="horizontal">
 
 
-
                         <CheckBox
                             android:id="@+id/cb_fine_fee"
                             android:layout_width="0dp"
@@ -358,14 +357,14 @@
                     </LinearLayout>
 
                     <LinearLayout
+                        android:visibility="gone"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:paddingLeft="16dp"
                         android:paddingRight="16dp"
                         android:paddingTop="16dp"
                         android:paddingBottom="16dp"
-                        android:orientation="horizontal"
-                        android:visibility="gone">
+                        android:orientation="horizontal">
 
                         <CheckBox
                             android:id="@+id/cb_stay_overnight"

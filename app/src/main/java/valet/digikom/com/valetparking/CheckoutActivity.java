@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -16,6 +17,8 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.bumptech.glide.Glide;
+import com.google.gson.Gson;
+
 import java.util.ArrayList;
 import java.util.List;
 import cn.pedant.SweetAlert.SweetAlertDialog;
@@ -323,11 +326,6 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
                     @Override
                     public void onClick(SweetAlertDialog sweetAlertDialog) {
                         submitCheckout();
-                        sweetAlertDialog.setTitleText("success!")
-                                .setContentText("Checkout success")
-                                .setConfirmText("OK")
-                                .setConfirmClickListener(null)
-                                .changeAlertType(SweetAlertDialog.SUCCESS_TYPE);
                     }
                 })
                 .setCancelText("Cancel")
@@ -380,9 +378,9 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
 
         TokenDao.getToken(finishCheckoutDao, this);
 
-        //Gson gson = new Gson();
-        //String finishCheckOut = gson.toJson(builder.build());
-        //Log.d("json checkout", finishCheckOut);
+        Gson gson = new Gson();
+        String finishCheckOut = gson.toJson(builder.build());
+        Log.d("json checkout", finishCheckOut);
 
         //goToMain();
     }

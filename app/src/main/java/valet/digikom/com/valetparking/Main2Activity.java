@@ -34,7 +34,9 @@ import android.widget.Toast;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 import valet.digikom.com.valetparking.adapter.ParkedCarPagerAdapter;
@@ -66,20 +68,29 @@ public class Main2Activity extends AppCompatActivity
     Button btnLogout;
     TextView txtCountParkedCar;
     TextView txtCountCalledCar;
+    PrefManager prefManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main2);
 
-        if (PrefManager.getInstance(this).getAuthResponse() == null) {
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        prefManager = PrefManager.getInstance(this);
+        if(prefManager.getIdSite() == 0) {
+            startActivity(new Intent(this, WelcomeActivity.class));
+            finish();
+        }
+
+        if (prefManager.getAuthResponse() == null) {
             startActivity(new Intent(this, SplashActivity.class));
             finish();
         }
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        setTitle();
 
         checkPrinter();
 
@@ -115,6 +126,19 @@ public class Main2Activity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         startCheckoutEntryAlarm(this);
+    }
+
+    private void setTitle() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                DropDao dropDao = DropDao.getInstance(new ValetDbHelper(Main2Activity.this));
+                String idDropPoint = prefManager.getIdDefaultDropPoint();
+                String dropName = dropDao.getDropPointById(Integer.parseInt(idDropPoint)).getAttrib().getDropName();
+                String title = dropName + " " + getCurrentDate();
+                getSupportActionBar().setTitle(title);
+            }
+        }).run();
     }
 
     @Override
@@ -328,5 +352,10 @@ public class Main2Activity extends AppCompatActivity
                         }
                     }).show();
         }
+    }
+
+    private String getCurrentDate() {
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MMMM/yyyy");
+        return sdf.format(new Date());
     }
 }

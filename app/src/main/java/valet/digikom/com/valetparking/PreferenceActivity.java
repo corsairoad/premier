@@ -175,8 +175,8 @@ public class PreferenceActivity extends AppCompatPreferenceActivity {
 
         addPreferencesFromResource(R.xml.pref_premier);
 
-       prefDropPoint = (ListPreference)findPreference(getString(R.string.pref_drop_point_key));
-        new FetchDropPointTask().execute();
+        prefDropPoint = (ListPreference)findPreference(getString(R.string.pref_drop_point_key));
+        //new FetchDropPointTask().execute();
     }
 
     private class FetchDropPointTask extends AsyncTask<Void, Void,List<DropPointMaster>> {

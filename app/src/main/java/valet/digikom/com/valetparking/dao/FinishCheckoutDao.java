@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.widget.Toast;
+
+import cn.pedant.SweetAlert.SweetAlertDialog;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -140,7 +142,6 @@ public class FinishCheckoutDao implements ProcessRequest {
                     setCheckoutCar(id);
                     Toast.makeText(context,"Checkout success", Toast.LENGTH_SHORT).show();
                     new PrintCheckoutTask().execute();
-
                     //print();
                 }else {
                     Toast.makeText(context,"Checkout failed. Voucher number or member id invalid.", Toast.LENGTH_SHORT).show();

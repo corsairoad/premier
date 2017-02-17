@@ -55,7 +55,17 @@ public class ClosingData {
             @SerializedName("vthd_transact_id")
             private String transactionId;
             @SerializedName("vthd_vfsd_fee")
-            private String valetFee;
+            private int valetFee;
+            @SerializedName("vthd_finefee")
+            private int valetFineFee;
+            @SerializedName("vthd_total")
+            private int valetTotalFee;
+            @SerializedName("vthd_license_plat_trim")
+            private String platNo;
+            @SerializedName("vthd_man_citime")
+            private String checkIn;
+            @SerializedName("vthd_man_cotime")
+            private String checkout;
 
             public String getCreatedAt() {
                 return createdAt;
@@ -89,8 +99,28 @@ public class ClosingData {
                 return transactionId;
             }
 
-            public String getValetFee() {
+            public int getValetFee() {
                 return valetFee;
+            }
+
+            public int getValetFineFee() {
+                return valetFineFee;
+            }
+
+            public int getValetTotalFee() {
+                return valetTotalFee;
+            }
+
+            public String getPlatNo() {
+                return platNo;
+            }
+
+            public String getCheckIn() {
+                return checkIn;
+            }
+
+            public String getCheckout() {
+                return checkout;
             }
         }
     }

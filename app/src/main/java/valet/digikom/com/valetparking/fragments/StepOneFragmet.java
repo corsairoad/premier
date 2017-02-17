@@ -14,6 +14,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
@@ -84,7 +85,9 @@ public class StepOneFragmet extends Fragment implements View.OnClickListener {
     private TextInputLayout tilCarType;
     private TextInputLayout tilColorType;
 
-    OnValetTypeSelectedListener valetTypeSelectedListener;
+    private OnValetTypeSelectedListener valetTypeSelectedListener;
+
+    private InputMethodManager imm;
 
     public StepOneFragmet() {
         // Required empty public constructor
@@ -99,6 +102,7 @@ public class StepOneFragmet extends Fragment implements View.OnClickListener {
         dbHelper = new ValetDbHelper(getContext());
         adapter = new DropPointAdapter(getContext(), dpMasters);
 
+        imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
         filters = new InputFilter[]{new InputFilter.AllCaps()};
 
         if (getArguments() != null) {
@@ -124,6 +128,7 @@ public class StepOneFragmet extends Fragment implements View.OnClickListener {
         inputDropPoint = (EditText) view.findViewById(R.id.input_drop_point);
         inputDropPoint.setFilters(filters);
         inputPlatNo = (EditText) view.findViewById(R.id.input_plat_no);
+        inputPlatNo.requestFocus();
         inputPlatNo.setFilters(new InputFilter[] {new InputFilter.AllCaps()});
         inputCartype = (EditText) view.findViewById(R.id.input_car_type);
         inputCartype.setFilters(filters);
@@ -156,12 +161,14 @@ public class StepOneFragmet extends Fragment implements View.OnClickListener {
         btnDropPoint.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                closeKeyboard();
                 new FetchDropPointTask().execute();
             }
         });
         inputDropPoint.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                closeKeyboard();
                 new FetchDropPointTask().execute();
             }
         });
@@ -170,12 +177,14 @@ public class StepOneFragmet extends Fragment implements View.OnClickListener {
         btnCarType.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                closeKeyboard();
                 new FetchCarsTask().execute();
             }
         });
         inputCartype.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                closeKeyboard();
                 new FetchCarsTask().execute();
             }
         });
@@ -184,12 +193,14 @@ public class StepOneFragmet extends Fragment implements View.OnClickListener {
         btnColorType.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                closeKeyboard();
                 new FetchColorsTask().execute();
             }
         });
         inputColor.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                closeKeyboard();
                 new FetchColorsTask().execute();
             }
         });
@@ -494,6 +505,13 @@ public class StepOneFragmet extends Fragment implements View.OnClickListener {
 
     public interface OnValetTypeSelectedListener{
         void onValetTypeSelected(ValetTypeJson.Data data);
+    }
+
+    private void closeKeyboard() {
+        View v = getActivity().getCurrentFocus();
+        if (v != null) {
+            imm.hideSoftInputFromWindow(v.getWindowToken(),0);
+        }
     }
 
 }

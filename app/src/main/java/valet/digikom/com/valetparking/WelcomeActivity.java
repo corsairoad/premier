@@ -53,20 +53,21 @@ public class WelcomeActivity extends AppCompatActivity {
 
         valetDbHelper = ValetDbHelper.getInstance(this);
         dropDao = DropDao.getInstance(valetDbHelper);
-
+        prefManager = PrefManager.getInstance(this);
         spLobbies = (Spinner) findViewById(R.id.spinner_lobby);
         spSites = (Spinner) findViewById(R.id.spinner_site);
         btnSave = (Button) findViewById(R.id.btn_save);
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                prefManager.setIdSite(mRoleOption.getSiteId());
                 patch(dropPointMaster.getAttrib().getDropId());
                 startActivity(new Intent(WelcomeActivity.this, Main2Activity.class));
                 finish();
             }
         });
 
-        prefManager = PrefManager.getInstance(this);
+
         AuthResponse authResponse = prefManager.getAuthResponse();
         if (authResponse != null) {
             roleOptions = authResponse.getData().getRoleOptions();

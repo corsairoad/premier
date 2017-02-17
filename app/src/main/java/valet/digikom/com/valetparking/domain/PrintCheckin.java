@@ -304,9 +304,9 @@ public class PrintCheckin implements ReceiveListener {
 
             mPrinter.addTextAlign(Printer.ALIGN_LEFT);
             mPrinter.addTextSize(1, 1);
+            sb.append(" No. Plat      :  " + platNo + "\n");
             sb.append(" Valet         :  " + valetType + "\n");
             sb.append(" Checkin       :  " + date + "\n");
-            sb.append(" No. Plat      :  " + platNo + "\n");
             sb.append(" Tipe Mobil    :  " + response.getData().getAttribute().getCar() + "\n");
             if (response.getData().getAttribute().getColor() != null) {
                 sb.append(" Warna         :  " + response.getData().getAttribute().getColor() + "\n");
@@ -332,6 +332,7 @@ public class PrintCheckin implements ReceiveListener {
             /*
             ------------------- Receipt for keyguard
              */
+            /*
             mPrinter.addTextAlign(Printer.ALIGN_CENTER);
             mPrinter.addImage(logoData, 0, 0,
                     logoData.getWidth(),
@@ -343,7 +344,7 @@ public class PrintCheckin implements ReceiveListener {
                     Printer.COMPRESS_AUTO);
 
             mPrinter.addFeedLine(1);
-
+            */
             mPrinter.addTextAlign(Printer.ALIGN_CENTER);
             mPrinter.addText(site);
 
@@ -357,9 +358,9 @@ public class PrintCheckin implements ReceiveListener {
 
             mPrinter.addTextAlign(Printer.ALIGN_LEFT);
             mPrinter.addTextSize(1, 1);
+            sb.append(" No. Plat      :  " + platNo + "\n");
             sb.append(" Valet         :  " + valetType + "\n");
             sb.append(" Checkin       :  " + date + "\n");
-            sb.append(" No. Plat      :  " + platNo + "\n");
             sb.append(" Tipe Mobil    :  " + response.getData().getAttribute().getCar() + "\n");
             if (response.getData().getAttribute().getColor() != null) {
                 sb.append(" Warna         :  " + response.getData().getAttribute().getColor() + "\n");
@@ -427,7 +428,7 @@ public class PrintCheckin implements ReceiveListener {
             /*
             ---------- receipt to put on dashboard
              */
-
+            /*
             mPrinter.addTextAlign(Printer.ALIGN_CENTER);
             mPrinter.addImage(logoData, 0, 0,
                     logoData.getWidth(),
@@ -437,7 +438,7 @@ public class PrintCheckin implements ReceiveListener {
                     Printer.HALFTONE_DITHER,
                     Printer.PARAM_DEFAULT,
                     Printer.COMPRESS_AUTO);
-
+            */
             mPrinter.addFeedLine(1);
 
             mPrinter.addTextAlign(Printer.ALIGN_CENTER);
@@ -453,9 +454,9 @@ public class PrintCheckin implements ReceiveListener {
 
             mPrinter.addTextAlign(Printer.ALIGN_LEFT);
             mPrinter.addTextSize(1, 1);
+            sb.append(" No. Plat      :  " + platNo + "\n");
             sb.append(" Valet         :  " + valetType + "\n");
             sb.append(" Checkin       :  " + date + "\n");
-            sb.append(" No. Plat      :  " + platNo + "\n");
             sb.append(" Tipe Mobil    :  " + response.getData().getAttribute().getCar() + "\n");
             if (response.getData().getAttribute().getColor() != null) {
                 sb.append(" Warna         :  " + response.getData().getAttribute().getColor() + "\n");
