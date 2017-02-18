@@ -15,6 +15,8 @@ public class AuthResponse {
 
     @SerializedName("data")
     private Data data;
+    @SerializedName("meta")
+    private Meta meta;
 
     public AuthResponse() {
     }
@@ -25,6 +27,14 @@ public class AuthResponse {
 
     public Data getData() {
         return data;
+    }
+
+    public Meta getMeta() {
+        return meta;
+    }
+
+    public void setMeta(Meta meta) {
+        this.meta = meta;
     }
 
     public static class Data {
@@ -123,6 +133,8 @@ public class AuthResponse {
             private int urserRoleId;
             @SerializedName("usrl_enabled")
             private String userRoleEnabled;
+            @SerializedName("usrl_level")
+            private String userLevel;
             @SerializedName("csms_id")
             private int siteId;
             @SerializedName("csms_name")
@@ -173,6 +185,10 @@ public class AuthResponse {
 
             public String getLobbyName() {
                 return lobbyName;
+            }
+
+            public String getUserLevel() {
+                return userLevel;
             }
         }
 
@@ -225,6 +241,15 @@ public class AuthResponse {
             public String getLobbyName() {
                 return lobbyName;
             }
+        }
+    }
+
+    public static class Meta {
+        @SerializedName("token")
+        private String token;
+
+        public String getToken() {
+            return token;
         }
     }
 }

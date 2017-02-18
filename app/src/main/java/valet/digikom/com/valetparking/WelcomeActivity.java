@@ -61,6 +61,7 @@ public class WelcomeActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 prefManager.setIdSite(mRoleOption.getSiteId());
+                prefManager.setSiteName(mRoleOption.getSiteName());
                 patch(dropPointMaster.getAttrib().getDropId());
                 startActivity(new Intent(WelcomeActivity.this, Main2Activity.class));
                 finish();
@@ -98,8 +99,11 @@ public class WelcomeActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 dropPointMaster = (DropPointMaster) dropPointAdapter.getItem(i);
-                prefManager.setDefaultDropPoint(dropPointMaster.getAttrib().getDropId());
-                updateBtnSave();
+                if (dropPointMaster != null) {
+                    prefManager.setDefaultDropPoint(dropPointMaster.getAttrib().getDropId());
+                    prefManager.setDefaultDropPointName(dropPointMaster.getAttrib().getDropName());
+                    updateBtnSave();
+                }
             }
 
             @Override

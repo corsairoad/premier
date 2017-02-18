@@ -1,17 +1,24 @@
 package valet.digikom.com.valetparking;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.bumptech.glide.Glide;
 import com.orhanobut.dialogplus.DialogPlus;
 import com.orhanobut.dialogplus.GridHolder;
@@ -23,6 +30,7 @@ import java.util.List;
 import cn.pedant.SweetAlert.SweetAlertDialog;
 import de.hdodenhof.circleimageview.CircleImageView;
 import valet.digikom.com.valetparking.adapter.DropPointAdapter;
+import valet.digikom.com.valetparking.dao.AuthResDao;
 import valet.digikom.com.valetparking.dao.CallDao;
 import valet.digikom.com.valetparking.dao.DropDao;
 import valet.digikom.com.valetparking.dao.EntryDao;
@@ -49,6 +57,7 @@ public class ParkedCarDetailActivity extends AppCompatActivity implements View.O
     TextView txtEta;
     TextView txtValetType;
     Button btnSetEta;
+    Button btnCancelTicket;
     EditText inputDropTo;
     DropPointMaster dropPointMaster;
     CircleImageView imgCar;
@@ -62,6 +71,7 @@ public class ParkedCarDetailActivity extends AppCompatActivity implements View.O
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_parked_car_detail);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -79,6 +89,46 @@ public class ParkedCarDetailActivity extends AppCompatActivity implements View.O
         btnDropPoint = (ImageButton) findViewById(R.id.btn_drop);
         btnSetEta = (Button) findViewById(R.id.btn_set_time);
         btnDirectCheckout = (Button) findViewById(R.id.btn_direct_checkout);
+        btnCancelTicket = (Button) findViewById(R.id.btn_cancel_ticket);
+        //cancel ticket
+        btnCancelTicket.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new MaterialDialog.Builder(ParkedCarDetailActivity.this)
+                        .title("Cancel Ticket " + txtNoTrans.getText().toString() + " ?")
+                        .customView(R.layout.cancel_ticket_view, true)
+                        .positiveText("Yes")
+                        .positiveColor(Color.parseColor("#009688"))
+                        .negativeText("No")
+                        .onNegative(new MaterialDialog.SingleButtonCallback() {
+                            @Override
+                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                dialog.dismiss();
+                            }
+                        })
+                        .onPositive(new MaterialDialog.SingleButtonCallback() {
+                            @Override
+                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                View customView = dialog.getCustomView();
+                                EditText inputUserName = (EditText) customView.findViewById(R.id.input_username_spv);
+                                EditText inputPassword = (EditText) customView.findViewById(R.id.input_password_spv);
+                                EditText inputRemark = (EditText) customView.findViewById(R.id.input_remark_spv);
+                                String userName = inputUserName.getText().toString();
+                                String pwx = inputPassword.getText().toString();
+                                String remark = inputRemark.getText().toString();
+                                if (TextUtils.isEmpty(userName) && TextUtils.isEmpty(pwx) && TextUtils.isEmpty(remark)) {
+                                    Toast.makeText(ParkedCarDetailActivity.this, "Please fill all fields", Toast.LENGTH_SHORT).show();
+                                    return;
+                                }
+
+                                AuthResDao authResDao = AuthResDao.getInstance(ParkedCarDetailActivity.this);
+                                authResDao.loginSpvForCancelTicket(userName,pwx,remark, id);
+                                Toast.makeText(ParkedCarDetailActivity.this, "Cancelling ticket...", Toast.LENGTH_SHORT).show();
+                            }
+                        })
+                        .show();
+            }
+        });
 
         btnSetEta.setOnClickListener(this);
         btnDirectCheckout.setOnClickListener(this);
@@ -96,7 +146,6 @@ public class ParkedCarDetailActivity extends AppCompatActivity implements View.O
                     inputDropTo.setError("Please fill drop point.");
                     return;
                 }
-
                 showConfirmDialog();
             }
         });

@@ -15,6 +15,8 @@ import valet.digikom.com.valetparking.domain.AuthResponse;
 public class PrefManager {
 
     public static final String KEY_DEFAULT_DROPPOINT = "drop_pint";
+    public static final String KEY_DEFAULT_DROPPOINT_NAME = "drop_pint_name";
+    public static final String KEY_SITE_NAME = "site";
     public static final String KEY_PRINTER_ADDRESS = "mac_addres";
     public static final String KEY_ID_SITE = "csmsid";
 
@@ -38,6 +40,15 @@ public class PrefManager {
         return prefManager;
     }
 
+    public void setSiteName(String name) {
+        editor.putString(KEY_SITE_NAME, name);
+        editor.commit();
+    }
+
+    public String getSiteName() {
+        return sharedPreferences.getString(KEY_SITE_NAME, "");
+    }
+
     public void setDefaultDropPoint(int idMasterDropPoint) {
         editor.putString(KEY_DEFAULT_DROPPOINT, String.valueOf(idMasterDropPoint));
         editor.commit();
@@ -46,6 +57,15 @@ public class PrefManager {
     public String getIdDefaultDropPoint() {
         String id = sharedPreferences.getString(KEY_DEFAULT_DROPPOINT, null);
         return id;
+    }
+
+    public void setDefaultDropPointName(String name) {
+        editor.putString(KEY_DEFAULT_DROPPOINT_NAME, name);
+        editor.commit();
+    }
+
+    public String getDefaultDropPointName() {
+        return sharedPreferences.getString(KEY_DEFAULT_DROPPOINT_NAME, "");
     }
 
     public void setPrinterMacAddress(String macAddress) {

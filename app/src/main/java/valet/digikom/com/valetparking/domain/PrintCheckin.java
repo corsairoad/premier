@@ -56,7 +56,6 @@ public class PrintCheckin implements ReceiveListener {
         }else {
             this.bitmapDefect = scaleBitmap(bmpDefect, 400, 400);
         }
-
         initializeObject();
     }
 
@@ -290,7 +289,7 @@ public class PrintCheckin implements ReceiveListener {
                     Printer.COMPRESS_AUTO);
 
             mPrinter.addFeedLine(1);
-
+            /*
             mPrinter.addTextAlign(Printer.ALIGN_CENTER);
             mPrinter.addText(site);
 
@@ -301,18 +300,19 @@ public class PrintCheckin implements ReceiveListener {
             mPrinter.addText(noTransaksi);
 
             mPrinter.addFeedLine(2);
-
+            */
             mPrinter.addTextAlign(Printer.ALIGN_LEFT);
             mPrinter.addTextSize(1, 1);
-            sb.append(" No. Plat      :  " + platNo + "\n");
-            sb.append(" Valet         :  " + valetType + "\n");
-            sb.append(" Checkin       :  " + date + "\n");
-            sb.append(" Tipe Mobil    :  " + response.getData().getAttribute().getCar() + "\n");
+            sb.append(" No. Tiket     : " + noTransaksi + "\n");
+            sb.append(" No. Plat      : " + platNo + "\n");
+            sb.append(" Valet         : " + valetType + "\n");
+            sb.append(" Checkin       : " + date + "\n");
+            sb.append(" Tipe Mobil    : " + response.getData().getAttribute().getCar() + "\n");
             if (response.getData().getAttribute().getColor() != null) {
-                sb.append(" Warna         :  " + response.getData().getAttribute().getColor() + "\n");
+                sb.append(" Warna         : " + response.getData().getAttribute().getColor() + "\n");
             }
-            sb.append(" Drop Point    :  " + dropPoint + "\n");
-            sb.append(" Harga         :  " + MakeCurrencyString.fromInt(response.getData().getAttribute().getFee()));
+            sb.append(" Drop Point    : " + dropPoint + "\n");
+            sb.append(" Harga         : " + MakeCurrencyString.fromInt(response.getData().getAttribute().getFee()));
 
             mPrinter.addText(sb.toString());
             sb.delete(0, sb.length());
@@ -325,7 +325,7 @@ public class PrintCheckin implements ReceiveListener {
             mPrinter.addTextSize(1,1);
             mPrinter.addText(data.getAttrib().getDscDesc());
 
-            mPrinter.addFeedLine(2);
+            mPrinter.addFeedLine(1);
             mPrinter.addCut(Printer.CUT_FEED);
 
 
@@ -345,6 +345,8 @@ public class PrintCheckin implements ReceiveListener {
 
             mPrinter.addFeedLine(1);
             */
+
+            /*
             mPrinter.addTextAlign(Printer.ALIGN_CENTER);
             mPrinter.addText(site);
 
@@ -353,19 +355,19 @@ public class PrintCheckin implements ReceiveListener {
             mPrinter.addTextAlign(Printer.ALIGN_CENTER);
             mPrinter.addTextSize(2, 2);
             mPrinter.addText(noTransaksi);
-
-            mPrinter.addFeedLine(2);
-
+            */
+            //mPrinter.addFeedLine(1);
             mPrinter.addTextAlign(Printer.ALIGN_LEFT);
             mPrinter.addTextSize(1, 1);
-            sb.append(" No. Plat      :  " + platNo + "\n");
-            sb.append(" Valet         :  " + valetType + "\n");
-            sb.append(" Checkin       :  " + date + "\n");
-            sb.append(" Tipe Mobil    :  " + response.getData().getAttribute().getCar() + "\n");
+            sb.append(" No. Tiket     : " + noTransaksi + "\n");
+            sb.append(" No. Plat      : " + platNo + "\n");
+            sb.append(" Valet         : " + valetType + "\n");
+            sb.append(" Checkin       : " + date + "\n");
+            sb.append(" Tipe Mobil    : " + response.getData().getAttribute().getCar() + "\n");
             if (response.getData().getAttribute().getColor() != null) {
-                sb.append(" Warna         :  " + response.getData().getAttribute().getColor() + "\n");
+                sb.append(" Warna         : " + response.getData().getAttribute().getColor() + "\n");
             }
-            sb.append(" Drop Point    :  " + dropPoint + "\n");
+            sb.append(" Drop Point    : " + dropPoint + "\n");
             //sb.append(" Harga         :  " + MakeCurrencyString.fromInt(response.getData().getAttribute().getFee()));
 
             mPrinter.addText(sb.toString());
@@ -439,6 +441,8 @@ public class PrintCheckin implements ReceiveListener {
                     Printer.PARAM_DEFAULT,
                     Printer.COMPRESS_AUTO);
             */
+
+            /*
             mPrinter.addFeedLine(1);
 
             mPrinter.addTextAlign(Printer.ALIGN_CENTER);
@@ -449,19 +453,19 @@ public class PrintCheckin implements ReceiveListener {
             mPrinter.addTextAlign(Printer.ALIGN_CENTER);
             mPrinter.addTextSize(2, 2);
             mPrinter.addText(noTransaksi);
-
-            mPrinter.addFeedLine(2);
-
+            */
+            //mPrinter.addFeedLine(1);
             mPrinter.addTextAlign(Printer.ALIGN_LEFT);
             mPrinter.addTextSize(1, 1);
-            sb.append(" No. Plat      :  " + platNo + "\n");
-            sb.append(" Valet         :  " + valetType + "\n");
-            sb.append(" Checkin       :  " + date + "\n");
-            sb.append(" Tipe Mobil    :  " + response.getData().getAttribute().getCar() + "\n");
+            sb.append(" No. Tiket     : " + noTransaksi + "\n");
+            sb.append(" No. Plat      : " + platNo + "\n");
+            sb.append(" Valet         : " + valetType + "\n");
+            sb.append(" Checkin       : " + date + "\n");
+            sb.append(" Tipe Mobil    : " + response.getData().getAttribute().getCar() + "\n");
             if (response.getData().getAttribute().getColor() != null) {
-                sb.append(" Warna         :  " + response.getData().getAttribute().getColor() + "\n");
+                sb.append(" Warna         : " + response.getData().getAttribute().getColor() + "\n");
             }
-            sb.append(" Drop Point    :  " + dropPoint + "\n");
+            sb.append(" Drop Point    : " + dropPoint + "\n");
             //sb.append(" Harga         :  " + MakeCurrencyString.fromInt(response.getData().getAttribute().getFee()));
 
             mPrinter.addText(sb.toString());
@@ -472,7 +476,7 @@ public class PrintCheckin implements ReceiveListener {
             mPrinter.addTextSize(2,1);
             mPrinter.addText("DASHBOARD RECEIPT");
 
-            mPrinter.addFeedLine(2);
+            mPrinter.addFeedLine(1);
             mPrinter.addCut(Printer.CUT_FEED);
         } catch (Epos2Exception e) {
             e.printStackTrace();

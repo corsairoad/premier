@@ -301,14 +301,13 @@
 
                     </LinearLayout>
 
-                    <LinearLayout
+                    <RelativeLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:paddingLeft="16dp"
                         android:paddingRight="16dp"
                         android:paddingTop="16dp"
-                        android:paddingBottom="16dp"
-                        android:orientation="horizontal">
+                        android:paddingBottom="16dp">
 
                         <Button
                             android:id="@+id/btn_direct_checkout"
@@ -318,7 +317,16 @@
                             android:textColor="@android:color/white"
                             android:layout_height="wrap_content" />
 
-                    </LinearLayout>
+                        <Button
+                            android:id="@+id/btn_cancel_ticket"
+                            android:text="@string/cancel_ticket"
+                            android:layout_alignParentRight="true"
+                            android:background="@drawable/buttonshape_cancel_ticket"
+                            android:layout_width="wrap_content"
+                            android:textColor="@android:color/white"
+                            android:layout_height="wrap_content" />
+
+                    </RelativeLayout>
 
 
 

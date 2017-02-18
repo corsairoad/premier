@@ -14,6 +14,8 @@ import valet.digikom.com.valetparking.domain.AddCarCallBody;
 import valet.digikom.com.valetparking.domain.AddCarCallResponse;
 import valet.digikom.com.valetparking.domain.AdditionalItemsResponse;
 import valet.digikom.com.valetparking.domain.AuthResponse;
+import valet.digikom.com.valetparking.domain.CancelBody;
+import valet.digikom.com.valetparking.domain.CancelResponse;
 import valet.digikom.com.valetparking.domain.CarMasterResponse;
 import valet.digikom.com.valetparking.domain.ClosingBody;
 import valet.digikom.com.valetparking.domain.ClosingData;
@@ -95,4 +97,7 @@ public interface ApiEndpoint {
 
     @PATCH("me")
     Call<PatchMeResponse> patchMe(@Body PatchMeBody patchMeBody);
+
+    @PUT("ad_valet_cancelation/{id}")
+    Call<CancelResponse> cancelTicket(@Path("id") int id, @Body CancelBody cancelBody);
 }

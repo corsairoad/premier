@@ -9,6 +9,8 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import valet.digikom.com.valetparking.Main2Activity;
 import valet.digikom.com.valetparking.domain.AuthResponse;
+import valet.digikom.com.valetparking.domain.CancelBody;
+import valet.digikom.com.valetparking.domain.CancelResponse;
 import valet.digikom.com.valetparking.service.ApiClient;
 import valet.digikom.com.valetparking.service.ApiEndpoint;
 import valet.digikom.com.valetparking.util.PrefManager;
@@ -89,6 +91,58 @@ public class AuthResDao {
 
         });
         return isOke[0];
+    }
+
+    public void loginSpvForCancelTicket(String email, String password, final String cancelInfo, final int id) {
+        final boolean[] isOke = {false};
+        ApiEndpoint apiEndpoint = ApiClient.getClient().create(ApiEndpoint.class);
+        Call<AuthResponse> call = apiEndpoint.login(email, password);
+        call.enqueue(new Callback<AuthResponse>() {
+            @Override
+            public void onResponse(Call<AuthResponse> call, Response<AuthResponse> response) {
+                if (response != null && response.body() != null) {
+                    AuthResponse.Data.Role role = response.body().getData().getRole();
+                    AuthResponse.Meta meta = response.body().getMeta();
+                    if (role.getUserLevel().toLowerCase().contains("supervisor")) {
+                        CancelBody cancelBody = new CancelBody.Builder()
+                                .setCancelInfo(cancelInfo)
+                                .build();
+                        ApiEndpoint endpoint = ApiClient.createService(ApiEndpoint.class, meta.getToken());
+                        Call<CancelResponse> call1 = endpoint.cancelTicket(id,cancelBody);
+                        call1.enqueue(new Callback<CancelResponse>() {
+                            @Override
+                            public void onResponse(Call<CancelResponse> call, Response<CancelResponse> response) {
+                                if (response != null && response.body() != null) {
+                                    //delete data di database berdasarkan id;
+                                    Toast.makeText(context, "Cancel Ticket success", Toast.LENGTH_SHORT).show();
+                                    EntryDao entryDao = EntryDao.getInstance(context);
+                                    entryDao.removeEntryById(id);
+                                    Intent intent = new Intent(context, Main2Activity.class);
+                                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                    context.startActivity(intent);
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(Call<CancelResponse> call, Throwable t) {
+
+                            }
+                        });
+
+                    }else {
+                        Toast.makeText(context,"Cancel ticket failed. Account is not authorized.", Toast.LENGTH_SHORT).show();
+                    }
+                }else {
+                    Toast.makeText(context,"Cancel ticket failed. Account is not authorized.", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<AuthResponse> call, Throwable t) {
+                Toast.makeText(context,"Login Failed", Toast.LENGTH_SHORT).show();
+            }
+        });
+
     }
 
     public interface OnAuthListener {

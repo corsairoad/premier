@@ -89,7 +89,7 @@
 
     </string-array>
     <string name="title_activity_parked_car_detail">Call Car</string>
-    <string name="trans_code">TRANSACTION NO.</string>
+    <string name="trans_code">TICKET NO.</string>
     <string name="runner">RUNNER</string>
     <string name="fee">FEE</string>
     <string name="drop_to">DROP TO</string>
@@ -270,5 +270,8 @@
     <string name="remark">Remark (Optional)</string>
     <string name="site">Site</string>
     <string name="save">Save</string>
+    <string name="cancel_ticket">CANCEL TICKET</string>
+    <string name="supervisor_username">Supervisor Username</string>
+    <string name="supervisor_password">Supervisor Password</string>
 
 </resources>

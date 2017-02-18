@@ -117,42 +117,42 @@ public class PrintCheckout implements ReceiveListener {
             mPrinter.addFeedLine(2);
             mPrinter.addTextAlign(Printer.ALIGN_LEFT);
             mPrinter.addTextSize(1,1);
-            sb.append(" No. Plat      :  " + noPol + "\n");
-            sb.append(" Valet         :  " + valetType + "\n");
-            sb.append(" No. Transaksi :  " + noTrans + "\n");
-            sb.append(" Jenis Mobil   :  " + jenis + "\n");
+            sb.append(" No. Tiket     : " + noTrans + "\n");
+            sb.append(" No. Plat      : " + noPol + "\n");
+            sb.append(" Valet         : " + valetType + "\n");
+            sb.append(" Jenis Mobil   : " + jenis + "\n");
             if (warna != null) {
-                sb.append(" Warna         :  " + warna + "\n");
+                sb.append(" Warna         : " + warna + "\n");
             }
-            sb.append(" Checkin       :  " + checkinTime + "\n");
-            sb.append(" Checkout      :  " + checkoutTime + "\n");
-            sb.append(" Fee           :  " + feex + "\n");
+            sb.append(" Checkin       : " + checkinTime + "\n");
+            sb.append(" Checkout      : " + checkoutTime + "\n");
+            sb.append(" Fee           : " + feex + "\n");
 
             if (lostTicket > 0) {
-                sb.append(" Tiket Hilang  :  " + MakeCurrencyString.fromInt(lostTicket) + "\n");
+                sb.append(" Tiket Hilang  : " + MakeCurrencyString.fromInt(lostTicket) + "\n");
             }
             if (overNight > 0) {
-                sb.append(" Mobil Menginap:  " + MakeCurrencyString.fromInt(overNight) + "\n");
+                sb.append(" Mobil Menginap: " + MakeCurrencyString.fromInt(overNight) + "\n");
             }
 
             if (!TextUtils.isEmpty(noVoucher)) {
-                sb.append(" No Voucher    :  " + noVoucher + "\n");
+                sb.append(" No Voucher    : " + noVoucher + "\n");
             }
 
             if (dataMembership != null) {
-                sb.append(" Membership    :  " + dataMembership.getAttr().getName() + "\n");
-                sb.append(" Id Membership :  " + idMembership + "\n");
+                sb.append(" Membership    : " + dataMembership.getAttr().getName() + "\n");
+                sb.append(" Id Membership : " + idMembership + "\n");
                 int price = Integer.valueOf(dataMembership.getAttr().getPrice());
                 sb.append(" Discount Mmbr :  " + MakeCurrencyString.fromInt(price) + "\n");
             }
 
-            sb.append("----------------------------------------\n");
+            sb.append("----------------------------------------");
             mPrinter.addText(sb.toString());
             sb.delete(0, sb.length());
 
             mPrinter.addFeedLine(1);
-            mPrinter.addTextSize(2,2);
-            sb.append("Total:" + totalBayar);
+            mPrinter.addTextSize(1,1);
+            sb.append(" Total         : " + totalBayar);
             mPrinter.addText(sb.toString());
             mPrinter.addFeedLine(1);
             mPrinter.addCut(Printer.CUT_FEED);

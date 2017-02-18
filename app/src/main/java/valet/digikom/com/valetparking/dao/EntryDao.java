@@ -119,6 +119,12 @@ public class EntryDao {
 
     }
 
+    public int removeEntryById(int id) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        String[] args = new String[] {String.valueOf(id)};
+        return db.delete(EntryCheckinResponse.Table.TABLE_NAME, EntryCheckinResponse.Table.COL_RESPONSE_ID + "=?", args);
+    }
+
     public static class Table {
         public static final String TABLE_NAME = "entry_json";
 

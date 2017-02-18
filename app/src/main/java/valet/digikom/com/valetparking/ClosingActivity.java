@@ -32,6 +32,7 @@ import valet.digikom.com.valetparking.domain.PrintClosing;
 import valet.digikom.com.valetparking.service.ApiClient;
 import valet.digikom.com.valetparking.service.ApiEndpoint;
 import valet.digikom.com.valetparking.service.ProcessRequest;
+import valet.digikom.com.valetparking.util.PrefManager;
 
 public class ClosingActivity extends AppCompatActivity implements View.OnClickListener{
 
@@ -59,7 +60,6 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
     int mHour;
     int mMinute;
     int mSecond;
-
     int reg;
     int exc;
     int total;
@@ -102,14 +102,17 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     private synchronized void close() {
+        PrefManager prefManager = PrefManager.getInstance(this);
+        String lobbyName = prefManager.getDefaultDropPointName();
+        String siteName = prefManager.getSiteName();
+        String lokasi = siteName + ": " + lobbyName;
         ClosingDao closingDao = ClosingDao.getInstance(this);
         String readInfo = inputRemark.getText().toString();
         String startDate = inputDateFrom.getText().toString();
         String endDate = inputDateUntil.getText().toString();
         closingDao.close(readInfo,startDate,endDate);
-
-        Toast.makeText(this, "printing closing data", Toast.LENGTH_SHORT).show();
-        PrintClosing printClosing = new PrintClosing(this, closingData, "Lobby Aaaaa", "SITE Aa", startDate,endDate,"Admin Aaaa", reg,exc,total);
+        //Toast.makeText(this, "printing closing data", Toast.LENGTH_SHORT).show();
+        PrintClosing printClosing = new PrintClosing(this, closingData, lokasi, siteName, startDate,endDate,"Admin", reg,exc,total);
         printClosing.print();
     }
 
