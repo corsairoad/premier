@@ -54,7 +54,7 @@ public class ClosingData {
             private String valetType;
             @SerializedName("vthd_transact_id")
             private String transactionId;
-            @SerializedName("vthd_vfsd_fee")
+            @SerializedName("vthd_valetfee")
             private int valetFee;
             @SerializedName("vthd_finefee")
             private int valetFineFee;

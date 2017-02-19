@@ -157,7 +157,7 @@ public class PrintCheckin implements ReceiveListener {
 
     private boolean initializeObject() {
         try {
-            mPrinter = new Printer(Printer.TM_T88,Printer.LANG_EN,context);
+            mPrinter = PrintManager.getPrinterInstance(context);
         }
         catch (Exception e) {
             //ShowMsg.showException(e, "Printer", context);

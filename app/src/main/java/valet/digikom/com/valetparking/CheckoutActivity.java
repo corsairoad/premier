@@ -314,7 +314,13 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
 
     private void calculateTotal() {
         total = fee + lostTicketFine + overNightFine + feeMembership;
-        txtTotalPay.setText(MakeCurrencyString.fromInt(total));
+        String totalPay;
+        if (total < 0) {
+            totalPay = "Rp. 0.00";
+        }else {
+            totalPay = MakeCurrencyString.fromInt(total);
+        }
+        txtTotalPay.setText(totalPay);
     }
 
     private void showConfirmDialog() {

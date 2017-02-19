@@ -2,6 +2,7 @@ package valet.digikom.com.valetparking.domain;
 
 import android.content.Context;
 
+import com.epson.epos2.Epos2Exception;
 import com.epson.epos2.printer.Printer;
 
 /**
@@ -10,7 +11,14 @@ import com.epson.epos2.printer.Printer;
 
 public class PrintManager {
 
-    private Printer mPrinter;
-    private Context context;
+    private static Printer mPrinter;
 
+
+    public static Printer getPrinterInstance(Context context) throws Epos2Exception {
+        if (mPrinter == null) {
+            mPrinter = new Printer(Printer.TM_T88,Printer.LANG_EN,context);
+        }
+
+        return mPrinter;
+    }
 }

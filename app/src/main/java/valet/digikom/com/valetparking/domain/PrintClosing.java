@@ -12,12 +12,15 @@ import com.epson.epos2.printer.Printer;
 import com.epson.epos2.printer.PrinterStatusInfo;
 import com.epson.epos2.printer.ReceiveListener;
 
+import java.math.BigDecimal;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
 import valet.digikom.com.valetparking.ClosingActivity;
 import valet.digikom.com.valetparking.R;
+import valet.digikom.com.valetparking.util.MakeCurrencyString;
 import valet.digikom.com.valetparking.util.PrefManager;
 
 /**
@@ -109,7 +112,7 @@ public class PrintClosing implements ReceiveListener {
             //sb.append("DATE TO   : " + dateTo  + "\n");
             //sb.append("PRINT DATE: " + getCurrentDate() + "\n");
             sb.append("------------------------------------------\n");
-            sb.append("NO.\tTiket\t\tIn\tOut\n");
+            sb.append("#  No. Tiket\tIn\t\tOut\n");
             sb.append("------------------------------------------\n");
             mPrinter.addText(sb.toString());
             sb.delete(0, sb.length());
@@ -118,20 +121,51 @@ public class PrintClosing implements ReceiveListener {
             int totalCheckin = 0;
             int totalCheckout = 0;
             int totalOverNight = 0;
+            int totalVoid = 0;
+            int lostTicket = 0;
+            BigDecimal sumCash = new BigDecimal(0);
+            BigDecimal sumIncome = new BigDecimal(0);
+
             for (ClosingData.Data data : closingData) {
                 String transactNo = data.getAttributes().getTransactionId();
                 //String valetType = data.getAttributes().getValetTypeName();
+
+                int valetTotal = data.getAttributes().getValetTotalFee();
+                int valetFee = data.getAttributes().getValetFee();
+                int valetFineFee = data.getAttributes().getValetFineFee();
+
+                sumCash = sumCash.add(new BigDecimal(valetTotal));
+                sumIncome = sumIncome.add(new BigDecimal(valetFee + valetFineFee));
+
+                int lost = data.getAttributes().getValetFineFee();
+                if (lost != 0) {
+                    lostTicket +=1;
+                }
+
                 String checkinTime = data.getAttributes().getCheckIn();
                 if (checkinTime != null) {
+                    // count total checkin
+                    checkinTime = convertDateString(checkinTime);
                     totalCheckin+=1;
+                }else {
+                    // count total void
+                    checkinTime = "Cancel";
+                    totalVoid +=1;
                 }
-                String checkoutTime = (data.getAttributes().getCheckout() == null ? "":data.getAttributes().getCheckout());
-                if (!TextUtils.isEmpty(checkoutTime)) {
+                String checkoutTime = data.getAttributes().getCheckout();
+                if (checkoutTime != null) {
+                    //count total checkout
+                    checkoutTime = convertDateString(checkoutTime);
                     totalCheckout+=1;
                 }else {
-                    totalOverNight+=1;
+                    // count total overnight
+                    checkoutTime = "";
+                    if (!checkinTime.toLowerCase().equals("cancel")) {
+                        totalOverNight += 1;
+                    }
                 }
-                sb.append(i + "\t" +  transactNo + "\t"  +  checkinTime + "\t" + checkoutTime + "\n");
+
+                sb.append(i + " " +  transactNo + "\t"  +  checkinTime + " " + checkoutTime + "\n");
                 i++;
             }
             sb.append("------------------------------------------\n");
@@ -141,14 +175,16 @@ public class PrintClosing implements ReceiveListener {
             sb.append("Total Qty In       : " + totalCheckin + "\n");
             sb.append("Total Qty Out      : " + totalCheckout + "\n");
             sb.append("Total Qty Overnight: " + totalOverNight + "\n");
+            sb.append("Total Tiket Batal  : " + totalVoid + "\n");
+            sb.append("Total Tiket Hilang : " + lostTicket + "\n");
+            sb.append("Cash               : " + MakeCurrencyString.fromInt(sumCash.intValue()) + "\n");
+            sb.append("Income             : " + MakeCurrencyString.fromInt(sumIncome.intValue()) + "\n");
             mPrinter.addText(sb.toString());
             mPrinter.addFeedLine(1);
             mPrinter.addCut(Printer.CUT_FEED);
         } catch (Epos2Exception e) {
             e.printStackTrace();
         }
-
-
         return true;
     }
 
@@ -266,7 +302,7 @@ public class PrintClosing implements ReceiveListener {
 
     private boolean initializeObject() {
         try {
-            mPrinter = new Printer(Printer.TM_T88,Printer.LANG_EN,context);
+            mPrinter = PrintManager.getPrinterInstance(context);
         }
         catch (Exception e) {
             //ShowMsg.showException(e, "Printer", context);
@@ -311,7 +347,20 @@ public class PrintClosing implements ReceiveListener {
     }
 
     private String getCurrentDate() {
-        SimpleDateFormat sdf  = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        SimpleDateFormat sdf  = new SimpleDateFormat("dd/MM/yy HH:mm:ss");
         return sdf.format(new Date());
+    }
+
+    private String convertDateString(String dateString) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date date;
+        try {
+            date = sdf.parse(dateString);
+            sdf = new SimpleDateFormat("dd/MM/yy HH:mm:ss");
+            return sdf.format(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return dateString;
     }
 }
