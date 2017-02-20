@@ -17,6 +17,8 @@ import valet.digikom.com.valetparking.domain.AuthResponse;
 import valet.digikom.com.valetparking.domain.CancelBody;
 import valet.digikom.com.valetparking.domain.CancelResponse;
 import valet.digikom.com.valetparking.domain.CarMasterResponse;
+import valet.digikom.com.valetparking.domain.ChangePassword;
+import valet.digikom.com.valetparking.domain.ChangePasswordResponse;
 import valet.digikom.com.valetparking.domain.ClosingBody;
 import valet.digikom.com.valetparking.domain.ClosingData;
 import valet.digikom.com.valetparking.domain.ClosingResponse;
@@ -89,15 +91,23 @@ public interface ApiEndpoint {
     @GET("discount_site_detail")
     Call<MembershipResponse> getMemberships();
 
+    //GET CLOSING DATA
     @GET("ad_checkout_finish_fine")
     Call<ClosingData> getClosingData(@Query("page[size]")int pageSize);
 
+    // CLOSING EOD
     @POST("report_administrative")
     Call<ClosingResponse> close(@Body ClosingBody closingBody);
 
-    @PATCH("me")
+    // CHANGE SITE
+    @PUT("me/set_role")
     Call<PatchMeResponse> patchMe(@Body PatchMeBody patchMeBody);
 
+    // CANCEL TICKET
     @PUT("ad_valet_cancelation/{id}")
     Call<CancelResponse> cancelTicket(@Path("id") int id, @Body CancelBody cancelBody);
+
+    // CHANGE PASSWORD
+    @PUT("me/change_password")
+    Call<ChangePasswordResponse> changePassWord(@Body ChangePassword changePassword);
 }

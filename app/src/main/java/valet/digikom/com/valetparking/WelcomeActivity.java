@@ -75,7 +75,6 @@ public class WelcomeActivity extends AppCompatActivity {
         }
         spinnerSiteAdapter = new SpinnerSiteAdapter(this, roleOptions);
         spSites.setAdapter(spinnerSiteAdapter);
-
         spSites.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {

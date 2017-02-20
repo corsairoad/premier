@@ -9,6 +9,7 @@
     <string name="login">Login</string>
     <string name="login_error">Login gagal, username atau password salah</string>
     <string name="total_checkin">Total Checkin: </string>
+    <string name="change_password">Change Password</string>
 
     <array name="location">
         <item>Location 1</item>
@@ -274,4 +275,10 @@
     <string name="supervisor_username">Supervisor Username</string>
     <string name="supervisor_password">Supervisor Password</string>
 
+    <!-- custom keyboard strings -->
+    <string name="simple_ime">Premier Keyboard</string>
+    <string name="subtype_en_US">Premier Keyboard</string>
+    <string name="old_password">Old Password</string>
+    <string name="new_password">New Password</string>
+    <string name="retype_new_password">Retype New Password</string>
 </resources>

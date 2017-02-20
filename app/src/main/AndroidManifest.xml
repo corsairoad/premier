@@ -118,6 +118,10 @@
                 <action android:name="valet.digikom.com.valetparking.PreferenceActivity" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
+            <intent-filter>
+                <action android:name="valet.digikom.com.valetparking.PreferenceActivity.change.password"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
         </activity>
         <activity
             android:name=".ClosingActivity"
@@ -128,7 +132,16 @@
                 android:value="valet.digikom.com.valetparking.Main2Activity" />
         </activity>
         <activity android:name=".WelcomeActivity"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen"></activity>
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen"/>
+
+        <service android:name=".service.SimpeIME"
+            android:label="@string/simple_ime"
+            android:permission="android.permission.BIND_INPUT_METHOD">
+            <meta-data android:name="android.view.im" android:resource="@xml/method"/>
+            <intent-filter>
+                <action android:name="android.view.InputMethod" />
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>

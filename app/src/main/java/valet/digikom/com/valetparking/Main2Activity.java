@@ -63,7 +63,7 @@ public class Main2Activity extends AppCompatActivity
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         prefManager = PrefManager.getInstance(this);
-        if(prefManager.getIdSite() == 0) {
+        if(prefManager.getIdSite() == 0 && prefManager.getAuthResponse() != null) {
             startActivity(new Intent(this, WelcomeActivity.class));
             finish();
         }

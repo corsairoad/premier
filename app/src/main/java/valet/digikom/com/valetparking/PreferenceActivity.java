@@ -17,17 +17,33 @@ import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
+import android.support.annotation.NonNull;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
 import android.text.TextUtils;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.EditText;
 import android.widget.Toast;
+
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
+
 import java.util.List;
 import cc.cloudist.acplibrary.ACProgressConstant;
 import cc.cloudist.acplibrary.ACProgressFlower;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import valet.digikom.com.valetparking.dao.DropDao;
+import valet.digikom.com.valetparking.dao.TokenDao;
+import valet.digikom.com.valetparking.domain.ChangePassword;
+import valet.digikom.com.valetparking.domain.ChangePasswordResponse;
 import valet.digikom.com.valetparking.domain.DropPointMaster;
 import valet.digikom.com.valetparking.service.ApiClient;
+import valet.digikom.com.valetparking.service.ApiEndpoint;
+import valet.digikom.com.valetparking.service.ProcessRequest;
+import valet.digikom.com.valetparking.util.ObjectToJson;
 import valet.digikom.com.valetparking.util.ValetDbHelper;
 
 /**
@@ -106,7 +122,72 @@ public class PreferenceActivity extends AppCompatPreferenceActivity {
             }else {
                 Toast.makeText(this, "Can't sync data. Please check your internet connection", Toast.LENGTH_SHORT).show();
             }
+        } else if (intent.getAction() != null && intent.getAction().equals("valet.digikom.com.valetparking.PreferenceActivity.change.password")) {
+            changePwx();
         }
+    }
+
+    private void changePwx() {
+        new MaterialDialog.Builder(this)
+                .title("Change Password")
+                .customView(R.layout.layout_change_password_dialog, false)
+                .positiveText("Change")
+                .positiveColor(Color.parseColor("#009688"))
+                .negativeText("Cancel")
+                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        Toast.makeText(PreferenceActivity.this, "Changing password...", Toast.LENGTH_SHORT).show();
+                        View view = dialog.getCustomView();
+                        EditText inputOldPwx = (EditText) view.findViewById(R.id.input_old_password);
+                        EditText inputNewPwx = (EditText) view.findViewById(R.id.input_new_password);
+                        EditText inputRetype = (EditText) view.findViewById(R.id.input_retype_password);
+
+                        String oldPwx = inputOldPwx.getText().toString();
+                        String newPwx = inputNewPwx.getText().toString();
+                        String retype = inputRetype.getText().toString();
+
+                        final ChangePassword changePassword = new ChangePassword();
+                        ChangePassword.Data data = new ChangePassword.Data();
+                        ChangePassword.Data.Attr atr = new ChangePassword.Data.Attr();
+                        atr.setOldPassword(oldPwx);
+                        atr.setNewPassword(newPwx);
+                        atr.setRetypePassword(retype);
+                        data.setAttr(atr);
+                        changePassword.setData(data);
+
+                        String json = ObjectToJson.getJson(changePassword);
+
+                        TokenDao.getToken(new ProcessRequest() {
+                            @Override
+                            public void process(String token) {
+                                ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class, token);
+                                Call<ChangePasswordResponse> call = apiEndpoint.changePassWord(changePassword);
+                                call.enqueue(new Callback<ChangePasswordResponse>() {
+                                    @Override
+                                    public void onResponse(Call<ChangePasswordResponse> call, Response<ChangePasswordResponse> response) {
+                                        if (response != null && response.body() != null) {
+                                            ChangePasswordResponse res = response.body();
+                                            Toast.makeText(PreferenceActivity.this, res.getMessage(), Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onFailure(Call<ChangePasswordResponse> call, Throwable t) {
+                                        Toast.makeText(PreferenceActivity.this, "error occured while changing password", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                            }
+                        }, PreferenceActivity.this);
+                    }
+                })
+                .onNegative(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        dialog.dismiss();
+                    }
+                })
+                .show();
     }
 
     private class DownloadDataTask extends AsyncTask<Void, Void, Void> {
