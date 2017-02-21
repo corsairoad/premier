@@ -16,12 +16,14 @@ import okhttp3.Request;
 import okhttp3.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+import valet.digikom.com.valetparking.dao.BankDao;
 import valet.digikom.com.valetparking.dao.CarDao;
 import valet.digikom.com.valetparking.dao.ColorDao;
 import valet.digikom.com.valetparking.dao.DefectDao;
 import valet.digikom.com.valetparking.dao.DropDao;
 import valet.digikom.com.valetparking.dao.FineFeeDao;
 import valet.digikom.com.valetparking.dao.ItemsDao;
+import valet.digikom.com.valetparking.dao.PaymentDao;
 import valet.digikom.com.valetparking.dao.TokenDao;
 import valet.digikom.com.valetparking.dao.ValetTypeDao;
 import valet.digikom.com.valetparking.util.ValetDbHelper;
@@ -80,6 +82,8 @@ public class ApiClient {
         TokenDao.getToken(DropDao.getInstance(dbHelper), context);
         TokenDao.getToken(FineFeeDao.getInstance(context), context);
         TokenDao.getToken(ValetTypeDao.getInstance(context),context);
+        TokenDao.getToken(PaymentDao.getInstance(context), context);
+        TokenDao.getToken(BankDao.getInstance(context), context);
     }
 
     public static boolean isNetworkAvailable(final Context context) {

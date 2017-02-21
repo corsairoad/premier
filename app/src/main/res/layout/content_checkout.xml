@@ -252,6 +252,7 @@
 
                     </LinearLayout>
 
+                    <!-- visibility GONE -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -259,7 +260,8 @@
                         android:paddingRight="16dp"
                         android:paddingTop="16dp"
                         android:paddingBottom="16dp"
-                        android:orientation="horizontal">
+                        android:orientation="horizontal"
+                        android:visibility="gone">
 
 
                         <CheckBox
@@ -282,7 +284,7 @@
                             android:id="@+id/input_voucher" />
 
                     </LinearLayout>
-
+                    <!-- visibility GONE -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -290,8 +292,8 @@
                         android:paddingRight="16dp"
                         android:paddingTop="5dp"
                         android:paddingBottom="16dp"
-                        android:orientation="horizontal">
-
+                        android:orientation="horizontal"
+                        android:visibility="gone">
 
                         <CheckBox
                             android:id="@+id/cb_membership"
@@ -327,6 +329,59 @@
                         </LinearLayout>
 
                     </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingLeft="16dp"
+                        android:paddingRight="16dp"
+                        android:paddingTop="16dp"
+                        android:paddingBottom="16dp"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:textSize="18sp"
+                            android:textStyle="bold"
+                            android:gravity="center_vertical"
+                            android:text="@string/payment_method"
+                            android:layout_height="match_parent" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+
+                            <Spinner
+                                android:id="@+id/sp_payment_methods"
+                                android:layout_width="match_parent"
+                                android:layout_height="0dp"
+                                android:layout_weight="1"
+                                android:spinnerMode="dialog" />
+
+                            <Spinner
+                                android:id="@+id/sp_bank"
+                                android:layout_width="match_parent"
+                                android:layout_height="0dp"
+                                android:layout_weight="1"
+                                android:spinnerMode="dialog"
+                                android:visibility="gone"/>
+
+                            <EditText
+                                android:id="@+id/input_payment_token"
+                                android:layout_width="match_parent"
+                                android:layout_height="0dp"
+                                android:layout_weight="1"
+                                android:visibility="gone"/>
+
+                        </LinearLayout>
+
+
+
+                    </LinearLayout>
+
 
                     <LinearLayout
                         android:layout_width="match_parent"

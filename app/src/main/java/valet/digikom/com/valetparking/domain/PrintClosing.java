@@ -356,7 +356,7 @@ public class PrintClosing implements ReceiveListener {
         Date date;
         try {
             date = sdf.parse(dateString);
-            sdf = new SimpleDateFormat("dd/MM/yy HH:mm:ss");
+            sdf = new SimpleDateFormat("dd/MM/yyHH:mm:ss");
             return sdf.format(date);
         } catch (ParseException e) {
             e.printStackTrace();

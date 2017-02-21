@@ -47,9 +47,12 @@ public class PrintCheckout implements ReceiveListener {
     MembershipResponse.Data dataMembership;
     private CheckoutActivity checkoutActivity;
     String checkoutTime;
+    PaymentMethod.Data paymenData;
+    Bank.Data bankData;
 
     public PrintCheckout(Context context, String totalBayar, EntryCheckinResponse entryCheckinResponse, FinishCheckOut finishCheckOut,
-                         int overNightFine, int lostTicketFine,String noVoucher, MembershipResponse.Data dataMembership, String idMembersip, String checkoutTime) {
+                         int overNightFine, int lostTicketFine,String noVoucher,
+                         MembershipResponse.Data dataMembership, String idMembersip, String checkoutTime, PaymentMethod.Data paymentData, Bank.Data bankData) {
         this.context = context;
         checkoutActivity = (CheckoutActivity) context;
         this.totalBayar = totalBayar;
@@ -68,6 +71,8 @@ public class PrintCheckout implements ReceiveListener {
         this.finishCheckOut = finishCheckOut;
         this.idMembership = idMembersip;
         this.checkoutTime = checkoutTime;
+        this.paymenData = paymentData;
+        this.bankData = bankData;
 
         prefManager = PrefManager.getInstance(context);
     }
@@ -127,6 +132,8 @@ public class PrintCheckout implements ReceiveListener {
             sb.append(" Checkin       : " + checkinTime + "\n");
             sb.append(" Checkout      : " + checkoutTime + "\n");
             sb.append(" Fee           : " + feex + "\n");
+            sb.append(" Payment       : " + paymenData.getAttr().getPaymentName() + "\n");
+
 
             if (lostTicket > 0) {
                 sb.append(" Tiket Hilang  : " + MakeCurrencyString.fromInt(lostTicket) + "\n");
@@ -144,6 +151,12 @@ public class PrintCheckout implements ReceiveListener {
                 sb.append(" Id Membership : " + idMembership + "\n");
                 int price = Integer.valueOf(dataMembership.getAttr().getPrice());
                 sb.append(" Discount Mmbr :  " + MakeCurrencyString.fromInt(price) + "\n");
+            }
+
+            if (paymenData.getAttr().getPaymentId() == 4) {
+                if (bankData != null) {
+                    sb.append(" Bank          : " + bankData.getAttr().getBankName() + "\n");
+                }
             }
 
             sb.append("----------------------------------------");

@@ -13,10 +13,12 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import valet.digikom.com.valetparking.CheckoutActivity;
 import valet.digikom.com.valetparking.Main2Activity;
+import valet.digikom.com.valetparking.domain.Bank;
 import valet.digikom.com.valetparking.domain.EntryCheckinResponse;
 import valet.digikom.com.valetparking.domain.FinishCheckOut;
 import valet.digikom.com.valetparking.domain.FinishCheckoutResponse;
 import valet.digikom.com.valetparking.domain.MembershipResponse;
+import valet.digikom.com.valetparking.domain.PaymentMethod;
 import valet.digikom.com.valetparking.domain.PrintCheckout;
 import valet.digikom.com.valetparking.service.ApiClient;
 import valet.digikom.com.valetparking.service.ApiEndpoint;
@@ -43,6 +45,8 @@ public class FinishCheckoutDao implements ProcessRequest {
     private MembershipResponse.Data dataMembership;
     private String checkedOutTime;
     private CheckoutActivity checkoutActivity;
+    private PaymentMethod.Data paymentData;
+    private Bank.Data bankData;
 
     private FinishCheckoutDao(Context context) {
         this.context = context;
@@ -63,6 +67,14 @@ public class FinishCheckoutDao implements ProcessRequest {
 
     public String getIdMembership() {
         return idMembership;
+    }
+
+    public Bank.Data getBankData() {
+        return bankData;
+    }
+
+    public void setBankData(Bank.Data bankData) {
+        this.bankData = bankData;
     }
 
     public void setIdMembership(String idMembership) {
@@ -121,6 +133,14 @@ public class FinishCheckoutDao implements ProcessRequest {
         this.id = id;
     }
 
+    public PaymentMethod.Data getPaymentData() {
+        return paymentData;
+    }
+
+    public void setPaymentData(PaymentMethod.Data paymentData) {
+        this.paymentData = paymentData;
+    }
+
     public FinishCheckOut getFinishCheckOut() {
         return finishCheckOut;
     }
@@ -174,7 +194,7 @@ public class FinishCheckoutDao implements ProcessRequest {
         @Override
         protected String doInBackground(Void... voids) {
             PrintCheckout printCheckout = new PrintCheckout(context,getTotalBayar(), getEntryCheckinResponse(),getFinishCheckOut(),
-                    getOverNightFine(), getLostTicketFine(),getNomorVoucher(),getDataMembership(), getIdMembership(), checkedOutTime);
+                    getOverNightFine(), getLostTicketFine(),getNomorVoucher(),getDataMembership(), getIdMembership(), checkedOutTime, getPaymentData(), getBankData());
             printCheckout.print();
 
             return null;

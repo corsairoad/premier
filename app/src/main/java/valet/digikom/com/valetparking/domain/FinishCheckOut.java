@@ -45,7 +45,7 @@ public class FinishCheckOut {
             this.relationShip = relationShip;
         }
 
-        public  String getType() {
+        public String getType() {
             return type;
         }
 
@@ -58,7 +58,12 @@ public class FinishCheckOut {
         }
 
         public static class Attribute {
+            @SerializedName("vthdPytoId")
+            private String paymentId;
 
+            public void setPaymentId(String paymentId) {
+                this.paymentId = paymentId;
+            }
         }
 
         public static class RelationShip {
@@ -66,6 +71,8 @@ public class FinishCheckOut {
             private FineFeeDetail fineFeeDetail;
             @SerializedName("valet_discount_detail_transaction")
             private DiscountFeeDetail discountFeeDetail;
+            @SerializedName("valet_debit_bank_detail")
+            private DebitBankDetail debitBankDetail;
 
             public RelationShip() {
             }
@@ -84,6 +91,14 @@ public class FinishCheckOut {
 
             public void setDiscountFeeDetail(DiscountFeeDetail discountFeeDetail) {
                 this.discountFeeDetail = discountFeeDetail;
+            }
+
+            public void setDebitBankDetail(DebitBankDetail debitBankDetail) {
+                this.debitBankDetail = debitBankDetail;
+            }
+
+            public DebitBankDetail getDebitBankDetail() {
+                return debitBankDetail;
             }
         }
 
@@ -113,6 +128,15 @@ public class FinishCheckOut {
             }
 
             public void setData(List<DataRelationshipDiscount> data) {
+                this.data = data;
+            }
+        }
+
+        public static class DebitBankDetail {
+            @SerializedName("data")
+            private DataRelationshipBank data;
+
+            public void setData(DataRelationshipBank data) {
                 this.data = data;
             }
         }
@@ -186,13 +210,42 @@ public class FinishCheckOut {
                 }
             }
         }
+
+        public static class DataRelationshipBank {
+            @SerializedName("type")
+            private final String type = "valet_debit_bank_detail";
+            @SerializedName("attributes")
+            private Attr attr;
+
+            public void setAttr(Attr attr) {
+                this.attr = attr;
+            }
+
+            public static class Attr {
+                @SerializedName("vdbdBnmsId")
+                private String bankNameMasterId;
+                @SerializedName("vdbdValue")
+                private String noDebit;
+
+                public void setBankNameMasterId(String bankNameMasterId) {
+                    this.bankNameMasterId = bankNameMasterId;
+                }
+
+                public void setNoDebit(String noDebit) {
+                    this.noDebit = noDebit;
+                }
+            }
+        }
     }
 
     public static class Builder {
         private FineFee.Fine lostTicketFee;
         private FineFee.Fine overnightFee;
-        MembershipResponse.Data membership;
-        String voucher;
+        private MembershipResponse.Data membership;
+        private PaymentMethod.Data paymentData;
+        private Bank.Data bankData;
+        private String voucher;
+        private String cardNo;
 
         private Data data;
 
@@ -201,6 +254,18 @@ public class FinishCheckOut {
 
         public String getVoucher() {
             return voucher;
+        }
+
+        public void setCardNo(String cardNo) {
+            this.cardNo = cardNo;
+        }
+
+        public void setBankData(Bank.Data bankData) {
+            this.bankData = bankData;
+        }
+
+        public void setPaymentData(PaymentMethod.Data paymentData) {
+            this.paymentData = paymentData;
         }
 
         public void setVoucher(String voucher) {
@@ -242,11 +307,9 @@ public class FinishCheckOut {
         public FinishCheckOut build() {
             data = new Data();
             Data.Attribute attribute = new Data.Attribute();
-            data.setAttribute(attribute);
-
             Data.RelationShip relationShip = new Data.RelationShip();
 
-            // setup fine fee json object
+            // setup fine fee json object (lost ticket)
             Data.FineFeeDetail fineFeeDetail = new Data.FineFeeDetail();
             List<Data.DataRelationship> relationshipDataList = new ArrayList<>();
 
@@ -279,14 +342,30 @@ public class FinishCheckOut {
             Data.DiscountFeeDetail discountFeeDetail = new Data.DiscountFeeDetail();
             List<Data.DataRelationshipDiscount> relationshipDiscountList = new ArrayList<>();
 
-            if (membership != null) {
-                Data.DataRelationshipDiscount dataRelationshipDiscount = new Data.DataRelationshipDiscount();
-                Data.DataRelationshipDiscount.Attr attr = new Data.DataRelationshipDiscount.Attr();
+            Data.DebitBankDetail debitBankDetail = new Data.DebitBankDetail();
+            Data.DataRelationshipBank dataRelationshipBank = new Data.DataRelationshipBank();
+            if (paymentData != null) {
+                attribute.setPaymentId(String.valueOf(paymentData.getAttr().getPaymentId()));
+                data.setAttribute(attribute);
+                if (paymentData.getAttr().getPaymentId() != 1){ // not cash
+                    if (paymentData.getAttr().getPaymentId() != 4) { // not debit
+                        Data.DataRelationshipDiscount dataRelationshipDiscount = new Data.DataRelationshipDiscount();
+                        Data.DataRelationshipDiscount.Attr attr = new Data.DataRelationshipDiscount.Attr();
 
-                attr.setIdDiscount(membership.getAttr().getToken());
-                dataRelationshipDiscount.setAttrributes(attr);
+                        attr.setIdDiscount(cardNo);
+                        dataRelationshipDiscount.setAttrributes(attr);
 
-                relationshipDiscountList.add(dataRelationshipDiscount);
+                        relationshipDiscountList.add(dataRelationshipDiscount);
+                    } else { // debit
+                        Data.DataRelationshipBank.Attr attr = new Data.DataRelationshipBank.Attr();
+                        attr.setBankNameMasterId(String.valueOf(bankData.getAttr().getBankId()));
+                        attr.setNoDebit(cardNo);
+                        dataRelationshipBank.setAttr(attr);
+                        debitBankDetail.setData(dataRelationshipBank);
+                        relationShip.setDebitBankDetail(debitBankDetail);
+                    }
+                }
+
             }
 
             if (voucher != null) {
@@ -299,13 +378,15 @@ public class FinishCheckOut {
                 relationshipDiscountList.add(dataRelationshipDiscount);
             }
 
-
             if (!relationshipDiscountList.isEmpty()) {
                 discountFeeDetail.setData(relationshipDiscountList);
                 relationShip.setDiscountFeeDetail(discountFeeDetail);
+                data.setRelationShip(relationShip);
             }
 
-            data.setRelationShip(relationShip);
+            if (relationShip.getDebitBankDetail() != null) {
+                data.setRelationShip(relationShip);
+            }
 
             return new FinishCheckOut(this);
         }

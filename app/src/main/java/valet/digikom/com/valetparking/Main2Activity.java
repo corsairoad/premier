@@ -115,13 +115,18 @@ public class Main2Activity extends AppCompatActivity
         new Thread(new Runnable() {
             @Override
             public void run() {
-                DropDao dropDao = DropDao.getInstance(new ValetDbHelper(Main2Activity.this));
-                String idDropPoint = prefManager.getIdDefaultDropPoint();
-                if (idDropPoint != null) {
-                    String dropName = dropDao.getDropPointById(Integer.parseInt(idDropPoint)).getAttrib().getDropName();
-                    String title = dropName + " " + getCurrentDate();
-                    getSupportActionBar().setTitle(title);
-                }
+                final DropDao dropDao = DropDao.getInstance(new ValetDbHelper(Main2Activity.this));
+                final String idDropPoint = prefManager.getIdDefaultDropPoint();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (idDropPoint != null) {
+                            String dropName = dropDao.getDropPointById(Integer.parseInt(idDropPoint)).getAttrib().getDropName();
+                            String title = dropName + " " + getCurrentDate();
+                            getSupportActionBar().setTitle(title);
+                        }
+                    }
+                });
             }
         }).run();
     }

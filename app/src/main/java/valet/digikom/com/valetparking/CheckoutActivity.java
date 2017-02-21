@@ -18,7 +18,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
-
 import java.util.ArrayList;
 import java.util.List;
 import cn.pedant.SweetAlert.SweetAlertDialog;
@@ -26,23 +25,32 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import valet.digikom.com.valetparking.adapter.SpinnerBankAdapter;
 import valet.digikom.com.valetparking.adapter.SpinnerMembershipAdapter;
+import valet.digikom.com.valetparking.adapter.SpinnerPaymentAdapter;
+import valet.digikom.com.valetparking.dao.BankDao;
 import valet.digikom.com.valetparking.dao.CheckoutDao;
 import valet.digikom.com.valetparking.dao.EntryDao;
 import valet.digikom.com.valetparking.dao.FineFeeDao;
 import valet.digikom.com.valetparking.dao.FinishCheckoutDao;
+import valet.digikom.com.valetparking.dao.PaymentDao;
 import valet.digikom.com.valetparking.dao.TokenDao;
+import valet.digikom.com.valetparking.domain.Bank;
 import valet.digikom.com.valetparking.domain.EntryCheckinResponse;
 import valet.digikom.com.valetparking.domain.EntryCheckoutCont;
 import valet.digikom.com.valetparking.domain.FineFee;
 import valet.digikom.com.valetparking.domain.FinishCheckOut;
 import valet.digikom.com.valetparking.domain.MembershipResponse;
+import valet.digikom.com.valetparking.domain.PaymentMethod;
 import valet.digikom.com.valetparking.service.ApiClient;
 import valet.digikom.com.valetparking.service.ApiEndpoint;
 import valet.digikom.com.valetparking.service.ProcessRequest;
 import valet.digikom.com.valetparking.util.MakeCurrencyString;
 
 public class CheckoutActivity extends AppCompatActivity implements CompoundButton.OnCheckedChangeListener, View.OnClickListener, AdapterView.OnItemSelectedListener {
+
+    private static final String TAG_MEMBERSHIP = "mem";
+    private static final String TAG_PAYMENT = "pymnt";
 
     TextView txtPlatNo;
     TextView txtLokasiParkir;
@@ -58,6 +66,9 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
     CheckBox cbVoucher;
     CheckBox cbMembership;
     Spinner spMembership;
+    Spinner spPaymentS;
+    Spinner spBank;
+    EditText inputPaymentToken;
     EditText inputVoucher;
     EditText inputMembershipId;
     TextView txtFineFee;
@@ -74,12 +85,17 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
     int feeMembership = 0;
     int idValetHeader;
 
-    SpinnerMembershipAdapter membershipAdapter;
     List<MembershipResponse.Data> listMemberShip = new ArrayList<>();
+    List<PaymentMethod.Data> listPayment = new ArrayList<>();
+    List<Bank.Data> bankList = new ArrayList<>();
+    PaymentMethod.Data paymentData;
+    Bank.Data bankData;
+
+    SpinnerMembershipAdapter membershipAdapter;
+    SpinnerPaymentAdapter spinnerPaymentAdapter;
+    SpinnerBankAdapter spinnerBankAdapter;
     MembershipResponse.Data dataMembership;
-
     EntryCheckinResponse entryCheckinResponse;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,14 +106,6 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        if (getIntent() != null) {
-            idValetHeader = getIntent().getIntExtra(EntryCheckoutCont.KEY_ENTRY_CHECKOUT,0);
-            if (idValetHeader > 0) {
-                new LoadEntryTask().execute(idValetHeader);
-                new FetchCheckoutTask().execute(idValetHeader);
-                new LoadFineTask().execute();
-            }
-        }
 
         txtPlatNo = (TextView) findViewById(R.id.text_plat_no);
         txtLokasiParkir = (TextView) findViewById(R.id.text_lokasi_parkir);
@@ -116,11 +124,30 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
         cbVoucher = (CheckBox) findViewById(R.id.cb_voucher);
         inputVoucher = (EditText) findViewById(R.id.input_voucher);
         inputMembershipId = (EditText) findViewById(R.id.input_membership_id);
+        inputPaymentToken = (EditText) findViewById(R.id.input_payment_token);
         cbMembership = (CheckBox) findViewById(R.id.cb_membership);
         spMembership = (Spinner) findViewById(R.id.spinner_memebership);
+        spMembership.setTag(TAG_MEMBERSHIP);
+        spPaymentS = (Spinner) findViewById(R.id.sp_payment_methods);
+        spPaymentS.setTag(TAG_PAYMENT);
+        spBank = (Spinner) findViewById(R.id.sp_bank);
         imgCar = (CircleImageView) findViewById(R.id.img_car);
 
+        if (getIntent() != null) {
+            idValetHeader = getIntent().getIntExtra(EntryCheckoutCont.KEY_ENTRY_CHECKOUT,0);
+            if (idValetHeader > 0) {
+                new LoadEntryTask().execute(idValetHeader);
+                new FetchCheckoutTask().execute(idValetHeader);
+                new LoadFineTask().execute();
+                new LoadPaymentTask().execute();
+                new LoadBanksTask().execute();
+            }
+        }
+
         spMembership.setOnItemSelectedListener(this);
+        spPaymentS.setOnItemSelectedListener(this);
+        spBank.setOnItemSelectedListener(this);
+
         btnCheckout.setOnClickListener(this);
         cbFineFe.setOnCheckedChangeListener(this);
         cbOvernight.setOnCheckedChangeListener(this);
@@ -132,7 +159,13 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
         membershipAdapter = new SpinnerMembershipAdapter(this, R.layout.laoyut_spinner_membership,R.id.text_membership, listMemberShip);
         membershipAdapter.setDropDownViewResource(R.layout.text_item_membership);
         spMembership.setAdapter(membershipAdapter);
-        setupMembersip();
+        //setupMembersip();
+
+        spinnerPaymentAdapter = new SpinnerPaymentAdapter(this, listPayment);
+        spPaymentS.setAdapter(spinnerPaymentAdapter);
+
+        spinnerBankAdapter = new SpinnerBankAdapter(this, bankList);
+        spBank.setAdapter(spinnerBankAdapter);
     }
 
     private void setupMembersip() {
@@ -214,10 +247,32 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
 
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-        if (cbMembership.isChecked()) {
-            dataMembership = membershipAdapter.getItem(i);
-            feeMembership = Integer.valueOf(dataMembership.getAttr().getPrice());
-            calculateTotal();
+        Spinner spinner  = (Spinner) adapterView;
+        if (spinner.getId() == R.id.spinner_memebership) {
+            if (cbMembership.isChecked()) {
+                dataMembership = membershipAdapter.getItem(i);
+                feeMembership = Integer.valueOf(dataMembership.getAttr().getPrice());
+                calculateTotal();
+            }
+        }else if(spinner.getId() == R.id.sp_payment_methods) {
+            PaymentMethod.Data data = (PaymentMethod.Data) spinnerPaymentAdapter.getItem(i);
+            inputPaymentToken.setText("");
+            paymentData = data;
+            if (data.getAttr().getPaymentId() == 4) {
+                spBank.setVisibility(View.VISIBLE);
+            }else {
+                spBank.setVisibility(View.GONE);
+                bankData = null;
+            }
+
+            if (TextUtils.isEmpty(data.getAttr().getPaymentFieldPost())) {
+                inputPaymentToken.setVisibility(View.GONE);
+            }else {
+                inputPaymentToken.setVisibility(View.VISIBLE);
+                inputPaymentToken.setHint(data.getAttr().getPaymentName() + " No");
+            }
+        }else if(spinner.getId() == R.id.sp_bank) {
+            bankData = (Bank.Data) spinnerBankAdapter.getItem(i);
         }
     }
 
@@ -262,6 +317,40 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
             mLostTicketFine = fineFeeDao.getLostTickeFine();
             mOvernightFine = fineFeeDao.getOvernightFine();
             return null;
+        }
+    }
+
+    private class LoadPaymentTask extends AsyncTask<Void, Void, List<PaymentMethod.Data>> {
+
+        @Override
+        protected List<PaymentMethod.Data> doInBackground(Void... voids) {
+            return PaymentDao.getInstance(CheckoutActivity.this).fetchPaymentMethods();
+        }
+
+        @Override
+        protected void onPostExecute(List<PaymentMethod.Data> datas) {
+            super.onPostExecute(datas);
+            if (!datas.isEmpty()) {
+                listPayment.clear();
+                listPayment.addAll(datas);
+                spinnerPaymentAdapter.notifyDataSetChanged();
+            }
+        }
+    }
+
+    private class LoadBanksTask extends AsyncTask<Void, Void, List<Bank.Data>> {
+
+        @Override
+        protected List<Bank.Data> doInBackground(Void... voids) {
+            return BankDao.getInstance(CheckoutActivity.this).fetchBanks();
+        }
+
+        @Override
+        protected void onPostExecute(List<Bank.Data> datas) {
+            super.onPostExecute(datas);
+            bankList.clear();
+            bankList.addAll(datas);
+            spinnerBankAdapter.notifyDataSetChanged();
         }
     }
 
@@ -324,6 +413,13 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
     }
 
     private void showConfirmDialog() {
+
+        if (inputPaymentToken.getVisibility() == View.VISIBLE) {
+            if (TextUtils.isEmpty(inputPaymentToken.getText().toString())) {
+                Toast.makeText(this, "Please fill " + inputPaymentToken.getHint(), Toast.LENGTH_SHORT).show();
+            }
+        }
+
         new SweetAlertDialog(this, SweetAlertDialog.NORMAL_TYPE)
                 .setTitleText("Process Checkout")
                 .setContentText("Checkout transaction?")
@@ -368,6 +464,17 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
             builder.setVoucher(inputVoucher.getText().toString());
         }
 
+        String token = inputPaymentToken.getText().toString();
+        if (!TextUtils.isEmpty(token)) {
+            builder.setCardNo(token);
+        }
+
+        if (bankData != null) {
+            builder.setBankData(bankData);
+        }
+
+        builder.setPaymentData(paymentData);
+
         FinishCheckoutDao finishCheckoutDao = FinishCheckoutDao.getInstance(this);
         finishCheckoutDao.setFinishCheckOut(builder.build());
         finishCheckoutDao.setId(idValetHeader);
@@ -381,12 +488,14 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
         }
         finishCheckoutDao.setDataMembership(dataMembership);
         finishCheckoutDao.setIdMembership(inputMembershipId.getText().toString());
+        finishCheckoutDao.setPaymentData(paymentData);
+        finishCheckoutDao.setBankData(bankData);
 
         TokenDao.getToken(finishCheckoutDao, this);
 
-        Gson gson = new Gson();
-        String finishCheckOut = gson.toJson(builder.build());
-        Log.d("json checkout", finishCheckOut);
+        //Gson gson = new Gson();
+        //String finishCheckOut = gson.toJson(builder.build());
+        //Log.d("json checkout", finishCheckOut);
 
         //goToMain();
     }

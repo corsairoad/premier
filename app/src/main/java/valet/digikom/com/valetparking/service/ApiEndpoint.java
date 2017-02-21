@@ -14,6 +14,7 @@ import valet.digikom.com.valetparking.domain.AddCarCallBody;
 import valet.digikom.com.valetparking.domain.AddCarCallResponse;
 import valet.digikom.com.valetparking.domain.AdditionalItemsResponse;
 import valet.digikom.com.valetparking.domain.AuthResponse;
+import valet.digikom.com.valetparking.domain.Bank;
 import valet.digikom.com.valetparking.domain.CancelBody;
 import valet.digikom.com.valetparking.domain.CancelResponse;
 import valet.digikom.com.valetparking.domain.CarMasterResponse;
@@ -35,6 +36,7 @@ import valet.digikom.com.valetparking.domain.FinishCheckoutResponse;
 import valet.digikom.com.valetparking.domain.MembershipResponse;
 import valet.digikom.com.valetparking.domain.PatchMeBody;
 import valet.digikom.com.valetparking.domain.PatchMeResponse;
+import valet.digikom.com.valetparking.domain.PaymentMethod;
 import valet.digikom.com.valetparking.domain.TokenResponse;
 import valet.digikom.com.valetparking.domain.ValetTypeJson;
 
@@ -110,4 +112,12 @@ public interface ApiEndpoint {
     // CHANGE PASSWORD
     @PUT("me/change_password")
     Call<ChangePasswordResponse> changePassWord(@Body ChangePassword changePassword);
+
+    // GET PAYMENT METHODS
+    @GET("payment_methods")
+    Call<PaymentMethod> getPaymentMethods();
+
+    // GET BANKS FOR PAYMENT METHOD REF
+    @GET("bank_master")
+    Call<Bank> getBanks();
 }

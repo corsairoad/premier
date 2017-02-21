@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import valet.digikom.com.valetparking.dao.EntryDao;
 import valet.digikom.com.valetparking.domain.AdditionalItems;
+import valet.digikom.com.valetparking.domain.Bank;
 import valet.digikom.com.valetparking.domain.CarMaster;
 import valet.digikom.com.valetparking.domain.Checkin;
 import valet.digikom.com.valetparking.domain.ColorMaster;
@@ -14,6 +15,7 @@ import valet.digikom.com.valetparking.domain.DropPointMaster;
 import valet.digikom.com.valetparking.domain.EntryCheckinResponse;
 import valet.digikom.com.valetparking.domain.EntryCheckoutCont;
 import valet.digikom.com.valetparking.domain.FineFee;
+import valet.digikom.com.valetparking.domain.PaymentMethod;
 import valet.digikom.com.valetparking.domain.ValetTypeJson;
 
 /**
@@ -53,6 +55,8 @@ public class ValetDbHelper extends SQLiteOpenHelper {
         db.execSQL(EntryCheckoutCont.Table.CREATE);
         db.execSQL(FineFee.Table.CREATE);
         db.execSQL(ValetTypeJson.Table.CREATE);
+        db.execSQL(PaymentMethod.Table.CREATE);
+        db.execSQL(Bank.Table.CREATE);
     }
 
     @Override
@@ -68,6 +72,8 @@ public class ValetDbHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + EntryCheckoutCont.Table.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + FineFee.Table.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + ValetTypeJson.Table.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + PaymentMethod.Table.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + Bank.Table.TABLE_NAME);
 
         onCreate(db);
     }

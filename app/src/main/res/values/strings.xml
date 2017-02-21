@@ -281,4 +281,5 @@
     <string name="old_password">Old Password</string>
     <string name="new_password">New Password</string>
     <string name="retype_new_password">Retype New Password</string>
+    <string name="payment_method">PAYMENT METHOD</string>
 </resources>
