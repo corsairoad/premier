@@ -93,7 +93,7 @@ public class PaymentDao implements ProcessRequest {
 
             }while (c.moveToNext());
         }
-
+        c.close();
         return listPayment;
     }
 }

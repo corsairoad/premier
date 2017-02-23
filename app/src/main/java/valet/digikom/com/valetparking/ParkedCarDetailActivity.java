@@ -10,10 +10,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.Gravity;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -62,10 +64,11 @@ public class ParkedCarDetailActivity extends AppCompatActivity implements View.O
     DropPointMaster dropPointMaster;
     CircleImageView imgCar;
     ImageButton btnDropPoint;
-    ValetDbHelper dbHelper;
+    private ValetDbHelper dbHelper;
     private String arrivedTime;
     private Button btnDirectCheckout;
     private int id;
+    private LinearLayout containerClosing;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +79,7 @@ public class ParkedCarDetailActivity extends AppCompatActivity implements View.O
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        containerClosing = (LinearLayout) findViewById(R.id.container_closing);
         txtPlatNo = (TextView) findViewById(R.id.text_plat_no);
         txtLokasiParkir = (TextView) findViewById(R.id.text_lokasi_parkir);
         txtNoTrans = (TextView) findViewById(R.id.text_no_transaksi);
@@ -151,9 +155,25 @@ public class ParkedCarDetailActivity extends AppCompatActivity implements View.O
         });
 
         if (getIntent() != null) {
+            if ("DETAIL_FOR_CLOSING_ITEM".equals(getIntent().getAction())) {
+                containerClosing.setVisibility(View.GONE);
+                fab.setVisibility(View.GONE);
+                getSupportActionBar().setTitle("Car Detail");
+            }
             id = getIntent().getIntExtra(EntryCheckinResponse.ID_ENTRY_CHECKIN, 0);
             new LoadEntryTask().execute(id);
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+      if (containerClosing.getVisibility() == View.GONE) {
+          if (item.getItemId() == android.R.id.home) {
+              startActivity(new Intent(ParkedCarDetailActivity.this, ClosingActivity.class));
+              return true;
+          }
+      }
+        return super.onOptionsItemSelected(item);
     }
 
     private void init() {

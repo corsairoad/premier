@@ -48,9 +48,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_marginBottom="16dp">
+                android:layout_marginBottom="20dp">
 
                 <ImageView
+                    android:visibility="gone"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:src="@drawable/ic_pin_drop_black_24dp" />
@@ -66,6 +67,7 @@
                         android:id="@+id/input_drop_point"
                         android:layout_width="match_parent"
                         android:editable="false"
+                        android:background="@android:color/transparent"
                         android:layout_height="wrap_content"
                         android:hint="@string/drop_point"/>
 
@@ -76,7 +78,7 @@
                     android:layout_width="0dp"
                     android:layout_weight="2"
                     android:layout_height="match_parent"
-                    android:background="@null"
+                    android:background="@drawable/drop_down_button"
                     android:src="@drawable/ic_arrow_drop_down_black_24dp"/>
 
             </LinearLayout>
@@ -85,9 +87,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_marginBottom="16dp">
+                android:layout_marginBottom="20dp">
 
                 <ImageView
+                    android:visibility="gone"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:src="@drawable/ic_filter_1_black_24dp"
@@ -107,13 +110,15 @@
 
                 </android.support.design.widget.TextInputLayout>
 
-                <ImageButton
+                <TextView
+                    android:text="@string/plat_no"
+                    android:visibility="invisible"
+                    android:gravity="center_vertical|center_horizontal"
+                    android:textSize="20sp"
                     android:layout_width="0dp"
                     android:layout_weight="2"
                     android:layout_height="match_parent"
-                    android:visibility="invisible"
-                    android:background="@null"
-                    android:src="@drawable/ic_arrow_drop_down_black_24dp"/>
+                    android:background="@null" />
 
 
             </LinearLayout>
@@ -127,9 +132,11 @@
                     android:id="@+id/container_car"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="20dp">
 
                     <ImageView
+                        android:visibility="gone"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:src="@drawable/ic_directions_car_black_24dp" />
@@ -145,6 +152,8 @@
                             android:layout_width="match_parent"
                             android:editable="false"
                             android:layout_height="match_parent"
+                            android:textSize="25sp"
+                            android:background="@android:color/transparent"
                             android:hint="@string/car_type"/>
 
                     </android.support.design.widget.TextInputLayout>
@@ -154,7 +163,7 @@
                         android:layout_width="0dp"
                         android:layout_weight="2"
                         android:layout_height="match_parent"
-                        android:background="@null"
+                        android:background="@drawable/drop_down_button"
                         android:src="@drawable/ic_arrow_drop_down_black_24dp"/>
 
                 </LinearLayout>
@@ -196,6 +205,7 @@
                 android:layout_marginBottom="16dp">
 
                 <ImageView
+                    android:visibility="gone"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:src="@drawable/ic_format_color_fill_black_24dp" />
@@ -209,8 +219,10 @@
                     <EditText
                         android:id="@+id/input_color"
                         android:editable="false"
+                        android:textSize="25sp"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:background="@android:color/transparent"
                         android:hint="@string/color"/>
 
                 </android.support.design.widget.TextInputLayout>
@@ -220,7 +232,7 @@
                     android:layout_width="0dp"
                     android:layout_weight="2"
                     android:layout_height="match_parent"
-                    android:background="@null"
+                    android:background="@drawable/drop_down_button"
                     android:src="@drawable/ic_arrow_drop_down_black_24dp"/>
 
             </LinearLayout>
@@ -229,16 +241,17 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginBottom="16dp">
+                android:orientation="horizontal">
 
                 <ImageView
+                    android:visibility="gone"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:src="@drawable/ic_email_black_24dp" />
 
                 <android.support.design.widget.TextInputLayout
                     android:layout_width="0dp"
+                    android:visibility="gone"
                     android:layout_height="match_parent"
                     android:layout_weight="5">
 
@@ -255,7 +268,7 @@
                     android:layout_width="0dp"
                     android:layout_weight="2"
                     android:layout_height="match_parent"
-                    android:visibility="invisible"
+                    android:visibility="gone"
                     android:background="@null"
                     android:src="@drawable/ic_arrow_drop_down_black_24dp"/>
 

@@ -1,5 +1,6 @@
 package valet.digikom.com.valetparking;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -28,13 +29,14 @@ import valet.digikom.com.valetparking.adapter.ListClosingAdapter;
 import valet.digikom.com.valetparking.dao.ClosingDao;
 import valet.digikom.com.valetparking.dao.TokenDao;
 import valet.digikom.com.valetparking.domain.ClosingData;
+import valet.digikom.com.valetparking.domain.EntryCheckinResponse;
 import valet.digikom.com.valetparking.domain.PrintClosing;
 import valet.digikom.com.valetparking.service.ApiClient;
 import valet.digikom.com.valetparking.service.ApiEndpoint;
 import valet.digikom.com.valetparking.service.ProcessRequest;
 import valet.digikom.com.valetparking.util.PrefManager;
 
-public class ClosingActivity extends AppCompatActivity implements View.OnClickListener{
+public class ClosingActivity extends AppCompatActivity implements View.OnClickListener, ListClosingAdapter.OnClosingItemClickListener{
 
     private static final String TAG = ClosingActivity.class.getSimpleName();
     private static final int OPEN = 1;
@@ -208,6 +210,14 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
                 calendar.get(Calendar.HOUR_OF_DAY),
                 calendar.get(Calendar.MINUTE),
                 calendar.get(Calendar.SECOND));
+    }
+
+    @Override
+    public void OnClosingItemClick(int vthdId) {
+        Intent intent = new Intent(this, ParkedCarDetailActivity.class);
+        intent.putExtra(EntryCheckinResponse.ID_ENTRY_CHECKIN, vthdId);
+        intent.setAction("DETAIL_FOR_CLOSING_ITEM");
+        startActivity(intent);
     }
 
     private class DownloadClosingDataTask extends AsyncTask<Void, Void, List<ClosingData.Data>> {

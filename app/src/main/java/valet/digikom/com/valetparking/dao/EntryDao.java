@@ -106,7 +106,10 @@ public class EntryDao {
         EntryCheckinResponse checkinResponse = null;
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         String[] args = new String[] {String.valueOf(id)};
-        Cursor c = db.query(EntryCheckinResponse.Table.TABLE_NAME,null, EntryCheckinResponse.Table.COL_RESPONSE_ID + "=? AND " + EntryCheckinResponse.Table.COL_IS_CHECKOUT + " =0",args,null,null,null);
+        // Cursor c = db.query(EntryCheckinResponse.Table.TABLE_NAME,null, EntryCheckinResponse.Table.COL_RESPONSE_ID + "=? AND " + EntryCheckinResponse.Table.COL_IS_CHECKOUT + " = 0",args,null,null,null);
+        Cursor c = db.query(EntryCheckinResponse.Table.TABLE_NAME,null, EntryCheckinResponse.Table.COL_RESPONSE_ID + "=?",args,null,null,null);
+
+
         if (c.moveToFirst()) {
             do {
                 String jsonResponse = c.getString(c.getColumnIndex(EntryCheckinResponse.Table.COL_JSON_RESPONSE));
@@ -116,7 +119,6 @@ public class EntryDao {
         }
 
         return checkinResponse;
-
     }
 
     public int removeEntryById(int id) {
@@ -135,6 +137,11 @@ public class EntryDao {
         public static final String CREATE = "CREATE TABLE " + TABLE_NAME + "(" + COL_ID + " INTEGER PRIMARY KEY, " +
                 COL_ID_CHECKIN + " INTEGER, " +
                 COL_JSON_ENTRY + " TEXT)";
+    }
+
+    public void deleteUncheckedOutEntry() {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        db.execSQL("DELETE FROM " + EntryCheckinResponse.Table.TABLE_NAME + " WHERE " + EntryCheckinResponse.Table.COL_IS_CHECKOUT + " != 0");
     }
 
 }

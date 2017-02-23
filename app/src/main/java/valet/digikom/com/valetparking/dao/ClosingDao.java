@@ -60,6 +60,7 @@ public class ClosingDao{
                     public void onResponse(Call<ClosingResponse> call, Response<ClosingResponse> response) {
                         if (response != null && response.body() != null) {
                             Toast.makeText(context, "Closing success", Toast.LENGTH_SHORT).show();
+                            EntryDao.getInstance(context).deleteUncheckedOutEntry();
                         }else {
                             Toast.makeText(context, "Closing failed", Toast.LENGTH_SHORT).show();
                         }
