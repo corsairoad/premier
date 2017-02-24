@@ -49,6 +49,7 @@ public class DiscoveryActivity extends Activity implements View.OnClickListener,
 
         mFilterOption = new FilterOption();
         mFilterOption.setDeviceType(Discovery.TYPE_PRINTER);
+        mFilterOption.setPortType(Discovery.PORTTYPE_TCP);
         mFilterOption.setEpsonFilter(Discovery.FILTER_NAME);
 
         try {
@@ -136,7 +137,7 @@ public class DiscoveryActivity extends Activity implements View.OnClickListener,
                 public synchronized void run() {
                     HashMap<String, String> item = new HashMap<String, String>();
                     item.put("PrinterName", deviceInfo.getDeviceName());
-                    item.put("Target", deviceInfo.getTarget());
+                    item.put("Target", "TCP:" + deviceInfo.getIpAddress());
                     mPrinterList.add(item);
                     mPrinterListAdapter.notifyDataSetChanged();
                 }

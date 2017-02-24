@@ -16,7 +16,7 @@ public class PrintManager {
 
     public static Printer getPrinterInstance(Context context) throws Epos2Exception {
         if (mPrinter == null) {
-            mPrinter = new Printer(Printer.TM_T88,Printer.LANG_EN,context);
+            mPrinter = new Printer(Printer.TM_T88,Printer.MODEL_ANK,context);
         }
 
         return mPrinter;

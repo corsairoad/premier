@@ -235,11 +235,8 @@ public class PrintCheckin implements ReceiveListener {
         if (mPrinter == null) {
             return;
         }
-
         mPrinter.clearCommandBuffer();
-
         mPrinter.setReceiveEventListener(null);
-
         mPrinter = null;
     }
 
