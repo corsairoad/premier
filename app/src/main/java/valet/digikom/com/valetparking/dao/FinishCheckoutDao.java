@@ -179,6 +179,7 @@ public class FinishCheckoutDao implements ProcessRequest {
         PrintCheckout printCheckout = new PrintCheckout(context,getTotalBayar(), getEntryCheckinResponse(),getFinishCheckOut(),
                 getOverNightFine(), getLostTicketFine(),getNomorVoucher(),getDataMembership(), getIdMembership(), checkedOutTime, getPaymentData(), getBankData());
         printCheckout.print();
+        goToMain();
     }
 
     private void goToMain() {
