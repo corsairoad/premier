@@ -35,11 +35,19 @@
                 android:orientation="horizontal"
                 android:layout_marginBottom="16dp">
 
+                <!-- Visibility GONE -->
                 <Spinner
                     android:id="@+id/spinner_valet_type_x"
+                    android:visibility="gone"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"/>
 
+                <RadioGroup
+                    android:id="@+id/rgroup_valet_type"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                </RadioGroup>
 
             </LinearLayout>
 
@@ -67,6 +75,7 @@
                         android:id="@+id/input_drop_point"
                         android:layout_width="match_parent"
                         android:editable="false"
+                        android:textSize="25sp"
                         android:background="@android:color/transparent"
                         android:layout_height="wrap_content"
                         android:hint="@string/drop_point"/>

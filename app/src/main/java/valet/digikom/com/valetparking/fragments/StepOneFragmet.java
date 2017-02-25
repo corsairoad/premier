@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
 import android.text.InputFilter;
@@ -16,20 +17,19 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.Toast;
 import com.orhanobut.dialogplus.DialogPlus;
 import com.orhanobut.dialogplus.GridHolder;
 import com.orhanobut.dialogplus.OnItemClickListener;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -80,14 +80,12 @@ public class StepOneFragmet extends Fragment implements View.OnClickListener {
     private List<ValetTypeJson.Data> valetTypeJsonList = new ArrayList<>();
     private Spinner spValetType;
     private ListValetTypeAdapter valetTypeAdapter;
-
     private TextInputLayout tilDropPoint;
     private TextInputLayout tilCarType;
     private TextInputLayout tilColorType;
-
     private OnValetTypeSelectedListener valetTypeSelectedListener;
-
     private InputMethodManager imm;
+    private RadioGroup rGroupValetType;
 
     public StepOneFragmet() {
         // Required empty public constructor
@@ -137,6 +135,17 @@ public class StepOneFragmet extends Fragment implements View.OnClickListener {
         inputEmail = (EditText) view.findViewById(R.id.input_email);
         inputColor = (EditText) view.findViewById(R.id.input_color);
         inputColor.setFilters(filters);
+
+        rGroupValetType = (RadioGroup) view.findViewById(R.id.rgroup_valet_type);
+        rGroupValetType.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                ValetTypeJson.Data data = findValetTypeById(checkedId);
+                if (data != null) {
+                    valetTypeSelectedListener.onValetTypeSelected(data);
+                }
+            }
+        });
 
         spValetType = (Spinner) view.findViewById(R.id.spinner_valet_type_x);
         spValetType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -209,6 +218,15 @@ public class StepOneFragmet extends Fragment implements View.OnClickListener {
         //downloadValetType();
         new FetchValetTypeTask().execute();
         return view;
+    }
+
+    private ValetTypeJson.Data findValetTypeById(int checkedId) {
+        for (ValetTypeJson.Data data : valetTypeJsonList) {
+            if (data.getAttrib().getId() == checkedId) {
+                return data;
+            }
+        }
+        return null;
     }
 
     @Override
@@ -494,12 +512,25 @@ public class StepOneFragmet extends Fragment implements View.OnClickListener {
             super.onPostExecute(datas);
             if (datas != null && !datas.isEmpty()) {
                 valetTypeSelectedListener.onValetTypeSelected(datas.get(0));
-
                 valetTypeJsonList.clear();
                 valetTypeJsonList.addAll(datas);
                 valetTypeAdapter.notifyDataSetChanged();
-
+                setupRadioGroudValetType(datas);
             }
+        }
+    }
+
+    private void setupRadioGroudValetType(List<ValetTypeJson.Data> datas) {
+        for(ValetTypeJson.Data data : datas) {
+            String valetTypeName = data.getAttrib().getValetTypeName();
+            RadioButton rb = new RadioButton(getContext());
+            rb.setId(data.getAttrib().getId());
+            rb.setText(valetTypeName);
+            rb.setTextSize(20);
+            if ("regular".equals(valetTypeName.toLowerCase())) {
+                rb.setChecked(true);
+            }
+            rGroupValetType.addView(rb);
         }
     }
 

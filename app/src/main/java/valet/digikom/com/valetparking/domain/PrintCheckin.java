@@ -204,7 +204,7 @@ public class PrintCheckin implements ReceiveListener {
             return false;
         }
         try {
-            mPrinter.connect(target,Printer.PARAM_DEFAULT);
+            mPrinter.connect(target,15000);
         }
         catch (Exception e) {
             //ShowMsg.showException(e, "connect", context);

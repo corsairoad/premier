@@ -231,9 +231,13 @@ public class AddCarActivity extends FragmentActivity implements StepOneFragmet.O
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                PrintCheckin printCheckin = new PrintCheckin(AddCarActivity.this, response,fragmentReview.getBitmapDefect(), fragmentReview.getSignatureBmp(), fragmentReview.getItemsList());
-                printCheckin.print();
+                print(response);
             }
         });
+    }
+
+    private void print(EntryCheckinResponse response) {
+        PrintCheckin printCheckin = new PrintCheckin(AddCarActivity.this, response,fragmentReview.getBitmapDefect(), fragmentReview.getSignatureBmp(), fragmentReview.getItemsList());
+        printCheckin.print();
     }
 }

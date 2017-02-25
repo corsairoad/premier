@@ -161,8 +161,8 @@ public class FinishCheckoutDao implements ProcessRequest {
                     checkedOutTime = response.body().getData().getAttrib().getUpdatedAt();
                     setCheckoutCar(id);
                     Toast.makeText(context,"Checkout success", Toast.LENGTH_SHORT).show();
-                    new PrintCheckoutTask().execute();
-                    //print();
+                    //new PrintCheckoutTask().execute();
+                    print();
                 }else {
                     Toast.makeText(context,"Checkout failed. Voucher number or member id invalid.", Toast.LENGTH_SHORT).show();
                 }
@@ -173,6 +173,12 @@ public class FinishCheckoutDao implements ProcessRequest {
                 Toast.makeText(context,"Checkout failed. Try again later", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void print() {
+        PrintCheckout printCheckout = new PrintCheckout(context,getTotalBayar(), getEntryCheckinResponse(),getFinishCheckOut(),
+                getOverNightFine(), getLostTicketFine(),getNomorVoucher(),getDataMembership(), getIdMembership(), checkedOutTime, getPaymentData(), getBankData());
+        printCheckout.print();
     }
 
     private void goToMain() {
@@ -193,10 +199,7 @@ public class FinishCheckoutDao implements ProcessRequest {
     private class PrintCheckoutTask extends AsyncTask<Void, Void, String> {
         @Override
         protected String doInBackground(Void... voids) {
-            PrintCheckout printCheckout = new PrintCheckout(context,getTotalBayar(), getEntryCheckinResponse(),getFinishCheckOut(),
-                    getOverNightFine(), getLostTicketFine(),getNomorVoucher(),getDataMembership(), getIdMembership(), checkedOutTime, getPaymentData(), getBankData());
-            printCheckout.print();
-
+            print();
             return null;
         }
 
