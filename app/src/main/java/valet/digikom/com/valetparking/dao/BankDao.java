@@ -89,6 +89,7 @@ public class BankDao implements ProcessRequest {
                 banks.add(data);
             }while (c.moveToNext());
         }
+        c.close();
         return banks;
     }
 }

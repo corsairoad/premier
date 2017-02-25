@@ -48,6 +48,8 @@ public class ClosingData {
             private String logoMobil;
             @SerializedName("vthd_id")
             private String valetHeaderId;
+            @SerializedName("vthd_vfsd_key")
+            private String valetTpyeKey;
             @SerializedName("vthd_vfsd_name")
             private String valetTypeName;
             @SerializedName("vthd_vfsd_type")
@@ -121,6 +123,10 @@ public class ClosingData {
 
             public String getCheckout() {
                 return checkout;
+            }
+
+            public String getValetTpyeKey() {
+                return valetTpyeKey;
             }
         }
     }

@@ -99,9 +99,14 @@ public class PrintCheckout implements ReceiveListener {
         }
 
         try {
-
             Bitmap logoData = BitmapFactory.decodeResource(context.getResources(), R.mipmap.logo_1);
+            Bitmap logoExlusive = BitmapFactory.decodeResource(context.getResources(), R.mipmap.logo_exclusive);
+
             StringBuilder sb = new StringBuilder();
+
+            if ("exclusive".equals(valetType.toLowerCase())) {
+                logoData = PrintCheckin.combineImages(logoExlusive, logoData);
+            }
 
             mPrinter.addTextAlign(Printer.ALIGN_CENTER);
             mPrinter.addImage(logoData, 0, 0,
@@ -131,9 +136,8 @@ public class PrintCheckout implements ReceiveListener {
             }
             sb.append(" Checkin       : " + checkinTime + "\n");
             sb.append(" Checkout      : " + checkoutTime + "\n");
-            sb.append(" Fee           : " + feex + "\n");
             sb.append(" Payment       : " + paymenData.getAttr().getPaymentName() + "\n");
-
+            sb.append(" Fee           : " + feex + "\n");
 
             if (lostTicket > 0) {
                 sb.append(" Tiket Hilang  : " + MakeCurrencyString.fromInt(lostTicket) + "\n");
@@ -196,6 +200,7 @@ public class PrintCheckout implements ReceiveListener {
         PrinterStatusInfo status = mPrinter.getStatus();
         if (isPrintable(status)) {
             try {
+                mPrinter.sendData(Printer.PARAM_DEFAULT);
                 mPrinter.sendData(Printer.PARAM_DEFAULT);
             } catch (Epos2Exception e) {
                 try {

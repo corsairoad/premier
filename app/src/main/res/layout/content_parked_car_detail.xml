@@ -195,138 +195,147 @@
                     </LinearLayout>
 
                     <LinearLayout
+                        android:id="@+id/container_closing"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:paddingLeft="16dp"
-                        android:paddingRight="16dp"
-                        android:paddingTop="16dp"
-                        android:paddingBottom="16dp"
-                        android:orientation="horizontal">
+                        android:orientation="vertical">
 
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_weight="1"
-                            android:textSize="16sp"
-                            android:textStyle="bold"
-                            android:text="@string/fee"
-                            android:layout_height="wrap_content" />
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_weight="1"
-                            android:textSize="18sp"
-                            android:textStyle="bold"
+                        <LinearLayout
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:id="@+id/text_fee" />
+                            android:paddingLeft="16dp"
+                            android:paddingRight="16dp"
+                            android:paddingTop="16dp"
+                            android:paddingBottom="16dp"
+                            android:orientation="horizontal">
 
-                    </LinearLayout>
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_weight="1"
+                                android:textSize="16sp"
+                                android:textStyle="bold"
+                                android:text="@string/fee"
+                                android:layout_height="wrap_content" />
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:paddingLeft="16dp"
-                        android:paddingRight="16dp"
-                        android:paddingTop="16dp"
-                        android:paddingBottom="16dp"
-                        android:orientation="horizontal">
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_weight="2"
-                            android:textSize="16sp"
-                            android:textStyle="bold"
-                            android:text="@string/time_arrived"
-                            android:layout_height="wrap_content" />
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_weight="1"
-                            android:textSize="14sp"
-                            android:textStyle="bold"
-                            android:layout_height="wrap_content"
-                            android:id="@+id/text_arrived_time" />
-
-                        <Button
-                            android:id="@+id/btn_set_time"
-                            android:layout_width="0dp"
-                            android:layout_weight="1"
-                            android:layout_height="wrap_content"
-                            android:background="@null"
-                            android:text="@string/set"/>
-
-                    </LinearLayout>
-
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:paddingLeft="16dp"
-                        android:paddingRight="16dp"
-                        android:paddingTop="16dp"
-                        android:paddingBottom="16dp"
-                        android:layout_marginBottom="16dp">
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_weight="2"
-                            android:textSize="16sp"
-                            android:textStyle="bold"
-                            android:text="@string/drop_to"
-                            android:gravity="center_vertical"
-                            android:layout_height="match_parent"
-                            android:id="@+id/textView" />
-
-                        <android.support.design.widget.TextInputLayout
-                            android:layout_width="0dp"
-                            android:layout_weight="10"
-                            android:layout_height="wrap_content">
-
-                            <EditText
-                                android:id="@+id/input_drop_point"
-                                android:layout_width="match_parent"
-                                android:editable="false"
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_weight="1"
+                                android:textSize="18sp"
+                                android:textStyle="bold"
                                 android:layout_height="wrap_content"
-                                android:hint="@string/drop_point"/>
+                                android:id="@+id/text_fee" />
 
-                        </android.support.design.widget.TextInputLayout>
+                        </LinearLayout>
 
-                        <ImageButton
-                            android:id="@+id/btn_drop"
-                            android:layout_width="0dp"
-                            android:layout_weight="1"
-                            android:layout_height="match_parent"
-                            android:background="@null"
-                            android:src="@drawable/ic_arrow_drop_down_black_24dp"/>
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:paddingLeft="16dp"
+                            android:paddingRight="16dp"
+                            android:paddingTop="16dp"
+                            android:paddingBottom="16dp"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_weight="2"
+                                android:textSize="16sp"
+                                android:textStyle="bold"
+                                android:text="@string/time_arrived"
+                                android:layout_height="wrap_content" />
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_weight="1"
+                                android:textSize="14sp"
+                                android:textStyle="bold"
+                                android:layout_height="wrap_content"
+                                android:id="@+id/text_arrived_time" />
+
+                            <Button
+                                android:id="@+id/btn_set_time"
+                                android:layout_width="0dp"
+                                android:layout_weight="1"
+                                android:layout_height="wrap_content"
+                                android:background="@null"
+                                android:text="@string/set"/>
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:paddingLeft="16dp"
+                            android:paddingRight="16dp"
+                            android:paddingTop="16dp"
+                            android:paddingBottom="16dp"
+                            android:layout_marginBottom="16dp">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_weight="2"
+                                android:textSize="16sp"
+                                android:textStyle="bold"
+                                android:text="@string/drop_to"
+                                android:gravity="center_vertical"
+                                android:layout_height="match_parent"
+                                android:id="@+id/textView" />
+
+                            <android.support.design.widget.TextInputLayout
+                                android:layout_width="0dp"
+                                android:layout_weight="10"
+                                android:layout_height="wrap_content">
+
+                                <EditText
+                                    android:id="@+id/input_drop_point"
+                                    android:layout_width="match_parent"
+                                    android:editable="false"
+                                    android:layout_height="wrap_content"
+                                    android:hint="@string/drop_point"/>
+
+                            </android.support.design.widget.TextInputLayout>
+
+                            <ImageButton
+                                android:id="@+id/btn_drop"
+                                android:layout_width="0dp"
+                                android:layout_weight="1"
+                                android:layout_height="match_parent"
+                                android:background="@null"
+                                android:src="@drawable/ic_arrow_drop_down_black_24dp"/>
+
+                        </LinearLayout>
+
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:paddingLeft="16dp"
+                            android:paddingRight="16dp"
+                            android:paddingTop="16dp"
+                            android:paddingBottom="16dp">
+
+                            <Button
+                                android:id="@+id/btn_direct_checkout"
+                                android:text="@string/direct_checkout"
+                                android:background="@drawable/buttonshape"
+                                android:layout_width="wrap_content"
+                                android:textColor="@android:color/white"
+                                android:layout_height="wrap_content" />
+
+                            <Button
+                                android:id="@+id/btn_cancel_ticket"
+                                android:text="@string/cancel_ticket"
+                                android:layout_alignParentRight="true"
+                                android:background="@drawable/buttonshape_cancel_ticket"
+                                android:layout_width="wrap_content"
+                                android:textColor="@android:color/white"
+                                android:layout_height="wrap_content" />
+
+                        </RelativeLayout>
+
 
                     </LinearLayout>
 
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:paddingLeft="16dp"
-                        android:paddingRight="16dp"
-                        android:paddingTop="16dp"
-                        android:paddingBottom="16dp">
-
-                        <Button
-                            android:id="@+id/btn_direct_checkout"
-                            android:text="@string/direct_checkout"
-                            android:background="@drawable/buttonshape"
-                            android:layout_width="wrap_content"
-                            android:textColor="@android:color/white"
-                            android:layout_height="wrap_content" />
-
-                        <Button
-                            android:id="@+id/btn_cancel_ticket"
-                            android:text="@string/cancel_ticket"
-                            android:layout_alignParentRight="true"
-                            android:background="@drawable/buttonshape_cancel_ticket"
-                            android:layout_width="wrap_content"
-                            android:textColor="@android:color/white"
-                            android:layout_height="wrap_content" />
-
-                    </RelativeLayout>
 
 
 

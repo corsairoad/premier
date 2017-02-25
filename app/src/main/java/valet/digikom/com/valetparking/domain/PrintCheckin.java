@@ -42,6 +42,7 @@ public class PrintCheckin implements ReceiveListener {
     private Bitmap bitmapSign;
     private List<AdditionalItems> itemsList;
     private AddCarActivity addCarActivity;
+    private Disclaimer.Data mDisclaimerData;
 
     public PrintCheckin(Context context, EntryCheckinResponse response, Bitmap  bmpDefect, Bitmap bmpSign, List<AdditionalItems> items) {
         this.context = context;
@@ -49,13 +50,14 @@ public class PrintCheckin implements ReceiveListener {
         this.response = response;
         prefManager = PrefManager.getInstance(context);
         itemsList = items;
-        this.bitmapSign = scaleBitmap(bmpSign, 200,200);
+        this.bitmapSign = scaleBitmap(bmpSign, 100,100);
         this.bitmapSign = createBorder(bitmapSign,2);
         if (bmpDefect == null) {
-            this.bitmapDefect = scaleBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.car_vector_update_72),400,400);
+            this.bitmapDefect = scaleBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.car_vector_update_72),300,300);
         }else {
-            this.bitmapDefect = scaleBitmap(bmpDefect, 400, 400);
+            this.bitmapDefect = scaleBitmap(bmpDefect, 300, 300);
         }
+        this.bitmapDefect = combineImages(bitmapDefect, bitmapSign);
         initializeObject();
     }
 
@@ -69,7 +71,8 @@ public class PrintCheckin implements ReceiveListener {
                     @Override
                     public void onResponse(Call<Disclaimer> call, Response<Disclaimer> response) {
                         if (response != null && response.body() != null) {
-                            if (runPrintCheckinData(response.body().getDataList().get(0))){
+                            mDisclaimerData = response.body().getDataList().get(0);
+                            if (buildPrintCheckin(mDisclaimerData)){
                                 Toast.makeText(context, "Print success", Toast.LENGTH_SHORT).show();
                             }else {
                                 Toast.makeText(context, "Print failed", Toast.LENGTH_SHORT).show();
@@ -232,11 +235,8 @@ public class PrintCheckin implements ReceiveListener {
         if (mPrinter == null) {
             return;
         }
-
         mPrinter.clearCommandBuffer();
-
         mPrinter.setReceiveEventListener(null);
-
         mPrinter = null;
     }
 
@@ -276,7 +276,13 @@ public class PrintCheckin implements ReceiveListener {
             String platNo = response.getData().getAttribute().getPlatNo();
             String valetType = response.getData().getAttribute().getValetType();
             Bitmap logoData = BitmapFactory.decodeResource(context.getResources(), R.mipmap.logo_1);
+            Bitmap logoExlusive = BitmapFactory.decodeResource(context.getResources(), R.mipmap.logo_exclusive);
+
             StringBuilder sb = new StringBuilder();
+
+            if ("exclusive".equals(valetType.toLowerCase())) {
+                logoData = combineImages(logoExlusive, logoData);
+            }
 
             mPrinter.addTextAlign(Printer.ALIGN_CENTER);
             mPrinter.addImage(logoData, 0, 0,
@@ -332,19 +338,20 @@ public class PrintCheckin implements ReceiveListener {
             /*
             ------------------- Receipt for keyguard
              */
-            /*
-            mPrinter.addTextAlign(Printer.ALIGN_CENTER);
-            mPrinter.addImage(logoData, 0, 0,
-                    logoData.getWidth(),
-                    logoData.getHeight(),
-                    Printer.COLOR_1,
-                    Printer.MODE_MONO,
-                    Printer.HALFTONE_DITHER,
-                    Printer.PARAM_DEFAULT,
-                    Printer.COMPRESS_AUTO);
+            if ("exclusive".equals(valetType.toLowerCase())) {
+                mPrinter.addTextAlign(Printer.ALIGN_CENTER);
+                mPrinter.addImage(logoData, 0, 0,
+                        logoData.getWidth(),
+                        logoData.getHeight(),
+                        Printer.COLOR_1,
+                        Printer.MODE_MONO,
+                        Printer.HALFTONE_DITHER,
+                        Printer.PARAM_DEFAULT,
+                        Printer.COMPRESS_AUTO);
 
-            mPrinter.addFeedLine(1);
-            */
+                mPrinter.addFeedLine(1);
+
+            }
 
             /*
             mPrinter.addTextAlign(Printer.ALIGN_CENTER);
@@ -409,7 +416,8 @@ public class PrintCheckin implements ReceiveListener {
                 mPrinter.addFeedLine(1);
             }
 
-            // tanda tangan
+            // ----------------- tanda tangan
+            /*
             mPrinter.addTextAlign(Printer.ALIGN_LEFT);
             mPrinter.addText("Ttd");
             mPrinter.addFeedLine(1);
@@ -421,27 +429,27 @@ public class PrintCheckin implements ReceiveListener {
                     Printer.HALFTONE_DITHER,
                     Printer.PARAM_DEFAULT,
                     Printer.COMPRESS_AUTO);
-
+            */
             mPrinter.addFeedLine(1);
-            //mPrinter.addCut(Printer.CUT_FEED);
-
             mPrinter.addCut(Printer.CUT_FEED);
 
             /*
             ---------- receipt to put on dashboard
              */
-            /*
-            mPrinter.addTextAlign(Printer.ALIGN_CENTER);
-            mPrinter.addImage(logoData, 0, 0,
-                    logoData.getWidth(),
-                    logoData.getHeight(),
-                    Printer.COLOR_1,
-                    Printer.MODE_MONO,
-                    Printer.HALFTONE_DITHER,
-                    Printer.PARAM_DEFAULT,
-                    Printer.COMPRESS_AUTO);
-            */
+            if ("exclusive".equals(valetType.toLowerCase())) {
+                mPrinter.addTextAlign(Printer.ALIGN_CENTER);
+                mPrinter.addImage(logoData, 0, 0,
+                        logoData.getWidth(),
+                        logoData.getHeight(),
+                        Printer.COLOR_1,
+                        Printer.MODE_MONO,
+                        Printer.HALFTONE_DITHER,
+                        Printer.PARAM_DEFAULT,
+                        Printer.COMPRESS_AUTO);
 
+                mPrinter.addFeedLine(1);
+
+            }
             /*
             mPrinter.addFeedLine(1);
 
@@ -497,5 +505,39 @@ public class PrintCheckin implements ReceiveListener {
         canvas.drawColor(Color.BLACK);
         canvas.drawBitmap(bmp, borderSize, borderSize, null);
         return bmpWithBorder;
+    }
+
+    public static  Bitmap combineImages(Bitmap c, Bitmap s) { // can add a 3rd parameter 'String loc' if you want to save the new image - left some code to do that at the bottom
+        Bitmap cs = null;
+
+        int width, height = 0;
+
+        if(c.getWidth() > s.getWidth()) {
+            width = c.getWidth() + s.getWidth();
+            height = c.getHeight();
+        } else {
+            width = s.getWidth() + s.getWidth();
+            height = c.getHeight();
+        }
+
+        cs = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+
+        Canvas comboImage = new Canvas(cs);
+
+        comboImage.drawBitmap(c, 0f, 0f, null);
+        comboImage.drawBitmap(s, c.getWidth(), 0f, null);
+
+        // this is an extra bit I added, just incase you want to save the new image somewhere and then return the location
+    /*String tmpImg = String.valueOf(System.currentTimeMillis()) + ".png";
+
+    OutputStream os = null;
+    try {
+      os = new FileOutputStream(loc + tmpImg);
+      cs.compress(CompressFormat.PNG, 100, os);
+    } catch(IOException e) {
+      Log.e("combineImages", "problem combining images", e);
+    }*/
+
+        return cs;
     }
 }

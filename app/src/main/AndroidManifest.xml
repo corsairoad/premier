@@ -62,6 +62,10 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="valet.digikom.com.valetparking.Main2Activity" />
+
+            <intent-filter>
+                <action android:name="DETAIL_FOR_CLOSING_ITEM"/>
+            </intent-filter>
         </activity>
 
         <receiver

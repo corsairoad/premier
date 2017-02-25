@@ -33,129 +33,7 @@ public class PrinterActivity extends AppCompatActivity implements View.OnClickLi
     private Spinner mSpnLang = null;
     private Printer mPrinter = null;
     private Button btnPrintCheckin;
-    private final String jsonResponseCheckin = "{\n" +
-            "  \"data\": {\n" +
-            "    \"type\": \"ad_entry_checkin\",\n" +
-            "    \"id\": \"16\",\n" +
-            "    \"attributes\": {\n" +
-            "      \"vthd_cbms_logo\": \"http://premier.intelligence.id/car/masters/brands/logo_default.png\",\n" +
-            "      \"vthd_clms_name\": \"Blue\",\n" +
-            "      \"vthd_coms_name\": \"Premier Parking\",\n" +
-            "      \"vthd_crms_name\": \"Acura Default\",\n" +
-            "      \"vthd_csms_name\": \"Pacific Place\",\n" +
-            "      \"vthd_drms_name_ci\": \"West Lobby\",\n" +
-            "      \"vthd_flms_floor_name_ci\": \"1\",\n" +
-            "      \"vthd_id\": 16,\n" +
-            "      \"vthd_license_plat\": \"B 3000 NED\",\n" +
-            "      \"vthd_license_plat_trim\": \"B3000NED\",\n" +
-            "      \"vthd_man_citime\": \"2017-01-28 14:23:50\",\n" +
-            "      \"vthd_padt_name\": \"1\",\n" +
-            "      \"vthd_padt_status\": \"BOOKED\",\n" +
-            "      \"vthd_pafm_name\": \"P1\",\n" +
-            "      \"vthd_pafm_status\": \"INSIDE\",\n" +
-            "      \"vthd_pasm_name\": \"A-1\",\n" +
-            "      \"vthd_transact_id\": \"123213X/X/X\",\n" +
-            "      \"vthd_usms_id_admv_ci\": 3,\n" +
-            "      \"vthd_usms_name_admv_ci\": \"Administrative Tester\",\n" +
-            "      \"vthd_valetfee\": 80000,\n" +
-            "      \"vthd_vfsd_name\": \"REGULAR\",\n" +
-            "      \"vthd_vfsd_type\": \"DEFAULT\",\n" +
-            "      \"vthd_vmos_id\": 41,\n" +
-            "      \"vthd_vmos_name\": \"Administrative - Valet Manual type Checkin\"\n" +
-            "    },\n" +
-            "    \"links\": {\n" +
-            "      \"self\": {\n" +
-            "        \"href\": \"http://premier.intelligence.id/v1/valet_header_transaction/16\"\n" +
-            "      }\n" +
-            "    },\n" +
-            "    \"relationships\": {\n" +
-            "      \"valet_defect_detail_transaction\": {\n" +
-            "        \"data\": [\n" +
-            "          {\n" +
-            "            \"type\": \"valet_defect_detail_transaction\",\n" +
-            "            \"id\": \"8\"\n" +
-            "          }\n" +
-            "        ]\n" +
-            "      },\n" +
-            "      \"valet_additional_item_detail_transaction\": {\n" +
-            "        \"data\": [\n" +
-            "          {\n" +
-            "            \"type\": \"valet_additional_item_detail_transaction\",\n" +
-            "            \"id\": \"14\"\n" +
-            "          },\n" +
-            "          {\n" +
-            "            \"type\": \"valet_additional_item_detail_transaction\",\n" +
-            "            \"id\": \"15\"\n" +
-            "          }\n" +
-            "        ]\n" +
-            "      }\n" +
-            "    }\n" +
-            "  },\n" +
-            "  \"included\": [\n" +
-            "    {\n" +
-            "      \"type\": \"valet_defect_detail_transaction\",\n" +
-            "      \"id\": \"8\",\n" +
-            "      \"attributes\": {\n" +
-            "        \"vddtVthdId\": 16,\n" +
-            "        \"vddtDfdtId\": 1,\n" +
-            "        \"vddtDfmsId\": 1,\n" +
-            "        \"vddtDfmsName\": \"Left Defect\",\n" +
-            "        \"created_at\": \"2017-01-28 14:23:50\",\n" +
-            "        \"updated_at\": \"2017-01-28 14:23:50\",\n" +
-            "        \"deleted_at\": null\n" +
-            "      },\n" +
-            "      \"links\": {\n" +
-            "        \"self\": {\n" +
-            "          \"href\": \"http://premier.intelligence.id/v1/valet_defect_detail_transaction/8\"\n" +
-            "        }\n" +
-            "      }\n" +
-            "    },\n" +
-            "    {\n" +
-            "      \"type\": \"valet_additional_item_detail_transaction\",\n" +
-            "      \"id\": \"14\",\n" +
-            "      \"attributes\": {\n" +
-            "        \"vidtVthdId\": 16,\n" +
-            "        \"vidtAidtId\": 1,\n" +
-            "        \"vidtAimsId\": 1,\n" +
-            "        \"vidtAimsName\": \"Notebook\",\n" +
-            "        \"created_at\": \"2017-01-28 14:23:50\",\n" +
-            "        \"updated_at\": \"2017-01-28 14:23:50\",\n" +
-            "        \"deleted_at\": null\n" +
-            "      },\n" +
-            "      \"links\": {\n" +
-            "        \"self\": {\n" +
-            "          \"href\": \"http://premier.intelligence.id/v1/valet_additional_item_detail/14\"\n" +
-            "        }\n" +
-            "      }\n" +
-            "    },\n" +
-            "    {\n" +
-            "      \"type\": \"valet_additional_item_detail_transaction\",\n" +
-            "      \"id\": \"15\",\n" +
-            "      \"attributes\": {\n" +
-            "        \"vidtVthdId\": 16,\n" +
-            "        \"vidtAidtId\": 2,\n" +
-            "        \"vidtAimsId\": 2,\n" +
-            "        \"vidtAimsName\": \"Laptop\",\n" +
-            "        \"created_at\": \"2017-01-28 14:23:50\",\n" +
-            "        \"updated_at\": \"2017-01-28 14:23:50\",\n" +
-            "        \"deleted_at\": null\n" +
-            "      },\n" +
-            "      \"links\": {\n" +
-            "        \"self\": {\n" +
-            "          \"href\": \"http://premier.intelligence.id/v1/valet_additional_item_detail/15\"\n" +
-            "        }\n" +
-            "      }\n" +
-            "    }\n" +
-            "  ],\n" +
-            "  \"links\": {\n" +
-            "    \"self\": {\n" +
-            "      \"href\": \"http://premier.intelligence.id/v1/valet_header_transaction/16\"\n" +
-            "    }\n" +
-            "  },\n" +
-            "  \"jsonapi\": {\n" +
-            "    \"version\": \"1.0\"\n" +
-            "  }\n" +
-            "}";
+
     Gson gson = new Gson();
 
     @Override
@@ -246,8 +124,6 @@ public class PrinterActivity extends AppCompatActivity implements View.OnClickLi
         Intent intent = null;
 
         if (v == btnPrintCheckin) {
-            EntryCheckinResponse response = gson.fromJson(jsonResponseCheckin, EntryCheckinResponse.class);
-            printCheckin(response);
             return;
         }
 
