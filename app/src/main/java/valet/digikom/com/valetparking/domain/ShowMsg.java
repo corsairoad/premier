@@ -6,10 +6,14 @@ import android.content.DialogInterface;
 
 import com.epson.epos2.Epos2CallbackCode;
 import com.epson.epos2.Epos2Exception;
+import com.epson.eposprint.Print;
 
 import valet.digikom.com.valetparking.R;
 
 public class ShowMsg {
+
+    static final int BITCNT_INT = 32;
+
     public static void showException(Exception e, String method, Context context) {
         String msg = "";
         if (e instanceof Epos2Exception) {
@@ -179,4 +183,98 @@ public class ShowMsg {
         }
         return return_text;
     }
+
+    static void showStatus(int result, int status, int battery, Context context){
+        String msg;
+        msg = String.format(
+                "%s\n\t%s\n%s\n%s\n%s\n\t0x%04X",
+                "STATUS",
+                getEposExceptionText(result),
+               "STATUS",
+                getEposStatusText(status),
+               "BATTERY STATUS",
+                battery);
+        show(msg, context);
+    }
+
+    private static String getEposStatusText(int status){
+        String result = "";
+
+        for(int bit = 0; bit <BITCNT_INT; bit++){
+            int value = 1 << bit;
+            if((value & status) != 0){
+                String msg = "";
+                switch(value){
+                    case    Print.ST_NO_RESPONSE:
+                        msg = "NO_RESPONSE";
+                        break;
+                    case    Print.ST_PRINT_SUCCESS:
+                        msg = "PRINT_SUCCESS";
+                        break;
+                    case    Print.ST_DRAWER_KICK:
+                        msg = "DRAWER_KICK";
+                        break;
+                    case    Print.ST_OFF_LINE:
+                        msg = "OFF_LINE";
+                        break;
+                    case    Print.ST_COVER_OPEN:
+                        msg = "COVER_OPEN";
+                        break;
+                    case    Print.ST_PAPER_FEED:
+                        msg = "PAPER_FEED";
+                        break;
+                    case    Print.ST_WAIT_ON_LINE:
+                        msg = "WAIT_ON_LINE";
+                        break;
+                    case    Print.ST_PANEL_SWITCH:
+                        msg = "PANEL_SWITCH";
+                        break;
+                    case    Print.ST_MECHANICAL_ERR:
+                        msg = "MECHANICAL_ERR";
+                        break;
+                    case    Print.ST_AUTOCUTTER_ERR:
+                        msg = "AUTOCUTTER_ERR";
+                        break;
+                    case    Print.ST_UNRECOVER_ERR:
+                        msg = "UNRECOVER_ERR";
+                        break;
+                    case    Print.ST_AUTORECOVER_ERR:
+                        msg = "AUTORECOVER_ERR";
+                        break;
+                    case    Print.ST_RECEIPT_NEAR_END:
+                        msg = "RECEIPT_NEAR_END";
+                        break;
+                    case    Print.ST_RECEIPT_END:
+                        msg = "RECEIPT_END";
+                        break;
+                    case    Print.ST_BUZZER:
+                        break;
+                    case	Print.ST_HEAD_OVERHEAT:
+                        msg = "HEAD_OVERHEAT";
+                        break;
+                    case	Print.ST_MOTOR_OVERHEAT:
+                        msg = "MOTOR_OVERHEAT";
+                        break;
+                    case	Print.ST_BATTERY_OVERHEAT:
+                        msg = "BATTERY_OVERHEAT";
+                        break;
+                    case	Print.ST_WRONG_PAPER:
+                        msg = "WRONG_PAPER";
+                        break;
+                    default:
+                        msg = String.format("%d", value);
+                        break;
+                }
+                if(!msg.isEmpty()){
+                    if(!result.isEmpty()){
+                        result += "\n";
+                    }
+                    result += "\t" + msg;
+                }
+            }
+        }
+
+        return result;
+    }
+
 }

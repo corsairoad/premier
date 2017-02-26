@@ -28,6 +28,7 @@ import valet.digikom.com.valetparking.domain.DefectMaster;
 import valet.digikom.com.valetparking.domain.EntryCheckinContainer;
 import valet.digikom.com.valetparking.domain.EntryCheckinResponse;
 import valet.digikom.com.valetparking.domain.PrintCheckin;
+import valet.digikom.com.valetparking.domain.PrintReceiptChekin;
 import valet.digikom.com.valetparking.domain.ValetTypeJson;
 import valet.digikom.com.valetparking.fragments.DefectFragment;
 import valet.digikom.com.valetparking.fragments.ReviewFragment;
@@ -237,7 +238,9 @@ public class AddCarActivity extends FragmentActivity implements StepOneFragmet.O
     }
 
     private void print(EntryCheckinResponse response) {
-        PrintCheckin printCheckin = new PrintCheckin(AddCarActivity.this, response,fragmentReview.getBitmapDefect(), fragmentReview.getSignatureBmp(), fragmentReview.getItemsList());
-        printCheckin.print();
+        //PrintCheckin printCheckin = new PrintCheckin(AddCarActivity.this, response,fragmentReview.getBitmapDefect(), fragmentReview.getSignatureBmp(), fragmentReview.getItemsList());
+        //printCheckin.print();
+        PrintReceiptChekin printReceiptChekin = new PrintReceiptChekin(this,response, fragmentReview.getBitmapDefect(), fragmentReview.getSignatureBmp(), fragmentReview.getItemsList());
+        printReceiptChekin.buildPrintData();
     }
 }

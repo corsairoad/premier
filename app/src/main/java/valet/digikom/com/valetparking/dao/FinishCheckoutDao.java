@@ -186,7 +186,6 @@ public class FinishCheckoutDao implements ProcessRequest {
         Intent intent = new Intent(context, Main2Activity.class);
         context.startActivity(intent);
         checkoutActivity.finish();
-
     }
 
     private void setCheckoutCar(int id) {

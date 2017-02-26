@@ -493,13 +493,13 @@ public class PrintCheckin implements ReceiveListener {
         return true;
     }
 
-    private Bitmap scaleBitmap(Bitmap b, int x, int y) {
+    public static Bitmap scaleBitmap(Bitmap b, int x, int y) {
         Matrix m = new Matrix();
         m.setRectToRect(new RectF(0, 0, b.getWidth(), b.getHeight()), new RectF(0, 0, x, y), Matrix.ScaleToFit.CENTER);
         return Bitmap.createBitmap(b, 0, 0, b.getWidth(), b.getHeight(), m, true);
     }
 
-    private Bitmap createBorder(Bitmap bmp, int borderSize) {
+    public static Bitmap createBorder(Bitmap bmp, int borderSize) {
         Bitmap bmpWithBorder = Bitmap.createBitmap(bmp.getWidth() + borderSize * 2, bmp.getHeight() + borderSize * 2, bmp.getConfig());
         Canvas canvas = new Canvas(bmpWithBorder);
         canvas.drawColor(Color.BLACK);
@@ -507,7 +507,7 @@ public class PrintCheckin implements ReceiveListener {
         return bmpWithBorder;
     }
 
-    public static  Bitmap combineImages(Bitmap c, Bitmap s) { // can add a 3rd parameter 'String loc' if you want to save the new image - left some code to do that at the bottom
+    public static Bitmap combineImages(Bitmap c, Bitmap s) { // can add a 3rd parameter 'String loc' if you want to save the new image - left some code to do that at the bottom
         Bitmap cs = null;
 
         int width, height = 0;

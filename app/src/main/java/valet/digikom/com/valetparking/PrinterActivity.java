@@ -17,6 +17,8 @@ import com.epson.epos2.Log;
 import com.epson.epos2.printer.Printer;
 import com.epson.epos2.printer.PrinterStatusInfo;
 import com.epson.epos2.printer.ReceiveListener;
+import com.epson.eposprint.EposException;
+import com.epson.epsonio.EpsonIoException;
 import com.google.gson.Gson;
 
 import valet.digikom.com.valetparking.domain.EntryCheckinResponse;
@@ -459,9 +461,9 @@ public class PrinterActivity extends AppCompatActivity implements View.OnClickLi
 
         try {
             mPrinter.connect(mEditTarget.getText().toString(), Printer.PARAM_DEFAULT);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             ShowMsg.showException(e, "connect", mContext);
+            ((Epos2Exception)e).printStackTrace();
             return false;
         }
 
@@ -469,6 +471,7 @@ public class PrinterActivity extends AppCompatActivity implements View.OnClickLi
             mPrinter.beginTransaction();
             isBeginTransaction = true;
         }
+
         catch (Exception e) {
             ShowMsg.showException(e, "beginTransaction", mContext);
         }
@@ -476,6 +479,7 @@ public class PrinterActivity extends AppCompatActivity implements View.OnClickLi
         if (isBeginTransaction == false) {
             try {
                 mPrinter.disconnect();
+                android.util.Log.d("printer", "closed");
             }
             catch (Epos2Exception e) {
                 // Do nothing
