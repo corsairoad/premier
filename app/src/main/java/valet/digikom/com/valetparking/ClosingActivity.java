@@ -31,6 +31,8 @@ import valet.digikom.com.valetparking.dao.TokenDao;
 import valet.digikom.com.valetparking.domain.ClosingData;
 import valet.digikom.com.valetparking.domain.EntryCheckinResponse;
 import valet.digikom.com.valetparking.domain.PrintClosing;
+import valet.digikom.com.valetparking.domain.PrintClosingParam;
+import valet.digikom.com.valetparking.domain.PrintReceiptClosing;
 import valet.digikom.com.valetparking.service.ApiClient;
 import valet.digikom.com.valetparking.service.ApiEndpoint;
 import valet.digikom.com.valetparking.service.ProcessRequest;
@@ -113,9 +115,31 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
         String startDate = inputDateFrom.getText().toString();
         String endDate = inputDateUntil.getText().toString();
         closingDao.close(readInfo,startDate,endDate);
-        //Toast.makeText(this, "printing closing data", Toast.LENGTH_SHORT).show();
+
+        /*
+        ------------ PRINTER CARA LAMA
+
         PrintClosing printClosing = new PrintClosing(this, closingData, lokasi, siteName, startDate,endDate,"Admin", reg,exc,total);
         printClosing.print();
+        */
+
+        // CREATE CLOSING PARAMETER
+        PrintClosingParam closingParam = new PrintClosingParam.Builder()
+                .setClosingData(closingData)
+                .setSiteName(siteName)
+                .setLobbyName(lokasi)
+                .setSiteName(siteName)
+                .setDateFrom(startDate)
+                .setDateTo(endDate)
+                .setAdminName("Admin")
+                .setNumRegular(reg)
+                .setNumExClusive(exc)
+                .setNumTotal(total)
+                .build();
+
+        // BUILD AND PRINT CLOSING DATA
+        PrintReceiptClosing printReceiptClosing = new PrintReceiptClosing(this, closingParam);
+        printReceiptClosing.buildPrintData();
     }
 
     @Override

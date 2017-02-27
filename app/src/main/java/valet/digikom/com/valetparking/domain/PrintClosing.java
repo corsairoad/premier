@@ -168,6 +168,7 @@ public class PrintClosing implements ReceiveListener {
                 sb.append(i + " " +  transactNo + "\t"  +  checkinTime + " " + checkoutTime + "\n");
                 i++;
             }
+
             sb.append("------------------------------------------\n");
             mPrinter.addText(sb.toString());
             sb.delete(0, sb.length());

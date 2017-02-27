@@ -114,9 +114,9 @@ public class PrinterActivity extends AppCompatActivity implements View.OnClickLi
         if (data != null && resultCode == RESULT_OK) {
             String target = data.getStringExtra(getString(R.string.title_target));
             if (target != null) {
-                EditText mEdtTarget = (EditText)findViewById(R.id.edtTarget);
-                mEdtTarget.setText(target);
                 PrefManager.getInstance(this).setPrinterMacAddress(target);
+                EditText mEdtTarget = (EditText)findViewById(R.id.edtTarget);
+                mEdtTarget.setText("TCP:"+target);
             }
         }
     }

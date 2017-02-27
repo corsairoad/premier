@@ -3,17 +3,13 @@ package valet.digikom.com.valetparking.domain;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-
-import com.epson.epos2.printer.Printer;
 import com.epson.eposprint.Builder;
 import com.epson.eposprint.EposException;
-import com.epson.eposprint.Print;
-
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-
 import valet.digikom.com.valetparking.R;
+import valet.digikom.com.valetparking.dao.DisclaimerDao;
 import valet.digikom.com.valetparking.util.MakeCurrencyString;
 
 /**
@@ -27,56 +23,82 @@ public class PrintReceiptChekin extends PrintReceipt {
     private Bitmap bitmapSign;
     private List<AdditionalItems> itemsList;
 
+    String noTransaksi;
+    String date;
+    String dropPoint;
+    String site;
+    String platNo;
+    String valetType;
+    String disclaimer;
+    Bitmap logoData;
+    Bitmap logoExlusive;
+
     public PrintReceiptChekin(Context context, EntryCheckinResponse response, Bitmap bmpDefect, Bitmap bmpSign, List<AdditionalItems> items) {
         super(context);
         this.response = response;
         this.itemsList = items;
         setBitmapSignature(bmpSign);
         setBitmapDefect(bmpDefect);
+        initFields();
     }
 
-    public void setBitmapDefect(Bitmap bitmapDefect) {
-        if (bitmapDefect == null) {
-            this.bitmapDefect = PrintCheckin.scaleBitmap(BitmapFactory.decodeResource(getContext().getResources(), R.drawable.car_vector_update_72),300,300);
-        }else {
-            this.bitmapDefect = PrintCheckin.scaleBitmap(bitmapDefect, 300, 300);
+    private void initFields() {
+        noTransaksi = response.getData().getAttribute().getIdTransaksi();
+        date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+        dropPoint = response.getData().getAttribute().getDropPoint();
+        Disclaimer.Data disclaimerObj = DisclaimerDao.getInstance(getContext()).getDisclaimer(DisclaimerDao.FLAG_CHECKIN_DISCLAIMER);
+        if (disclaimerObj != null) {
+            disclaimer = disclaimerObj.getAttrib().getDscDesc();
         }
-        this.bitmapDefect = PrintCheckin.combineImages(this.bitmapDefect, bitmapSign);
+
+        site = response.getData().getAttribute().getSiteName();
+        platNo = response.getData().getAttribute().getPlatNo();
+        valetType = response.getData().getAttribute().getValetType();
+        logoData = BitmapFactory.decodeResource(getContext().getResources(), R.mipmap.logo_1);
+        logoExlusive = BitmapFactory.decodeResource(getContext().getResources(), R.mipmap.logo_exclusive);
+
+        if ("exclusive".equals(valetType.toLowerCase())) {
+            logoData = combineImages(logoExlusive, logoData);
+        }
     }
 
-    public void setBitmapSignature(Bitmap bitmapSign) {
-        this.bitmapSign = PrintCheckin.scaleBitmap(bitmapSign, 100,100);
-        this.bitmapSign = PrintCheckin.createBorder(bitmapSign,2);
+    private void setBitmapSignature(Bitmap bitmapSign) {
+        this.bitmapSign = scaleBitmap(bitmapSign, 100,100);
+        this.bitmapSign = createBorder(this.bitmapSign,1);
+    }
+
+    private void setBitmapDefect(Bitmap bitmapDefect) {
+        if (bitmapDefect == null) {
+            this.bitmapDefect = scaleBitmap(BitmapFactory.decodeResource(getContext().getResources(), R.drawable.car_vector_update_72),300,300);
+        }else {
+            this.bitmapDefect = scaleBitmap(bitmapDefect, 300, 300);
+        }
+        this.bitmapDefect = combineImages(this.bitmapDefect, this.bitmapSign);
     }
 
     @Override
     public void buildPrintData() {
-        String noTransaksi = response.getData().getAttribute().getIdTransaksi();
-        String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
-        String dropPoint = response.getData().getAttribute().getDropPoint();
-        String site = response.getData().getAttribute().getSiteName();
-        String platNo = response.getData().getAttribute().getPlatNo();
-        String valetType = response.getData().getAttribute().getValetType();
-        Bitmap logoData = BitmapFactory.decodeResource(getContext().getResources(), R.mipmap.logo_1);
-        Bitmap logoExlusive = BitmapFactory.decodeResource(getContext().getResources(), R.mipmap.logo_exclusive);
-        if ("exclusive".equals(valetType.toLowerCase())) {
-            logoData = PrintCheckin.combineImages(logoExlusive, logoData);
-        }
+
         try {
             Builder builder = getBuilder();
             StringBuilder sb = new StringBuilder();
 
-            builder.addTextAlign(Builder.ALIGN_CENTER);
-            builder.addImage(logoData, 0, 0,
-                    logoData.getWidth(),
-                    logoData.getHeight(),
-                    Builder.COLOR_1,
-                    Builder.MODE_MONO,
-                    Builder.HALFTONE_DITHER,
-                    Builder.PARAM_DEFAULT);
-            builder.addFeedLine(1);
+            buildDataForCustomer(builder, sb);
+            buildDataForKeyGuard(builder, sb);
+            buildDataForDashboard(builder, sb);
 
-            builder.addTextAlign(Printer.ALIGN_LEFT);
+            print();
+        } catch (EposException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void buildDataForCustomer(Builder builder, StringBuilder sb) {
+        try {
+
+            addLogo(builder, logoData);
+
+            builder.addTextAlign(Builder.ALIGN_LEFT);
             builder.addTextSize(1, 1);
             sb.append(" No. Tiket     : " + noTransaksi + "\n");
             sb.append(" No. Plat      : " + platNo + "\n");
@@ -88,37 +110,27 @@ public class PrintReceiptChekin extends PrintReceipt {
             }
             sb.append(" Drop Point    : " + dropPoint + "\n");
             sb.append(" Harga         : " + MakeCurrencyString.fromInt(response.getData().getAttribute().getFee()) + "\n");
-            sb.append("------------------------------------------\n");
 
             builder.addText(sb.toString());
             sb.delete(0, sb.length());
             builder.addFeedLine(1);
-            builder.addTextAlign(Printer.ALIGN_CENTER);
+            builder.addTextAlign(Builder.ALIGN_CENTER);
             builder.addTextSize(1,1);
-            builder.addText("disclaimer");
+            builder.addText(disclaimer);
             builder.addFeedLine(1);
-            builder.addCut(Printer.CUT_FEED);
+            builder.addCut(Builder.CUT_FEED);
+        } catch (EposException e) {
+            e.printStackTrace();
+        }
+    }
 
+    private void buildDataForKeyGuard(Builder builder, StringBuilder sb) {
 
-            /*
-            ------------------- Receipt for keyguard
-             */
+        try{
             if ("exclusive".equals(valetType.toLowerCase())) {
-                builder.addTextAlign(Printer.ALIGN_CENTER);
-                builder.addImage(logoData, 0, 0,
-                        logoData.getWidth(),
-                        logoData.getHeight(),
-                        Printer.COLOR_1,
-                        Printer.MODE_MONO,
-                        Printer.HALFTONE_DITHER,
-                        Printer.PARAM_DEFAULT,
-                        Printer.COMPRESS_AUTO);
-
-                builder.addFeedLine(1);
-
+                addLogo(builder, logoData);
             }
-
-            builder.addTextAlign(Printer.ALIGN_LEFT);
+            builder.addTextAlign(Builder.ALIGN_LEFT);
             builder.addTextSize(1, 1);
             sb.append(" No. Tiket     : " + noTransaksi + "\n");
             sb.append(" No. Plat      : " + platNo + "\n");
@@ -136,21 +148,21 @@ public class PrintReceiptChekin extends PrintReceipt {
             // image defect
             if (bitmapDefect != null) {
                 builder.addFeedLine(1);
-                builder.addTextAlign(Printer.ALIGN_CENTER);
+                builder.addTextAlign(Builder.ALIGN_CENTER);
                 builder.addText("CHECK MOBIL");
                 builder.addFeedLine(1);
                 builder.addImage(bitmapDefect, 0, 0,
                         bitmapDefect.getWidth(),
                         bitmapDefect.getHeight(),
-                        Printer.COLOR_1,
-                        Printer.MODE_MONO,
-                        Printer.HALFTONE_DITHER,
-                        Printer.PARAM_DEFAULT);
+                        Builder.COLOR_1,
+                        Builder.MODE_MONO,
+                        Builder.HALFTONE_DITHER,
+                        Builder.PARAM_DEFAULT);
             }
             builder.addFeedLine(1);
 
             if (itemsList != null && !itemsList.isEmpty()) {
-                builder.addTextAlign(Printer.ALIGN_LEFT);
+                builder.addTextAlign(Builder.ALIGN_LEFT);
                 sb.append("Barang Berharga: ");
                 builder.addFeedLine(1);
                 int loop = 1;
@@ -166,26 +178,20 @@ public class PrintReceiptChekin extends PrintReceipt {
                 builder.addFeedLine(1);
             }
             builder.addFeedLine(1);
-            builder.addCut(Printer.CUT_FEED);
+            builder.addCut(Builder.CUT_FEED);
+        }catch (EposException e) {
+            e.printStackTrace();
+        }
+    }
 
-            /*
-            ---------- receipt to put on dashboard
-             */
+    private void buildDataForDashboard(Builder builder, StringBuilder sb) {
+
+        try {
             if ("exclusive".equals(valetType.toLowerCase())) {
-                builder.addTextAlign(Printer.ALIGN_CENTER);
-                builder.addImage(logoData, 0, 0,
-                        logoData.getWidth(),
-                        logoData.getHeight(),
-                        Printer.COLOR_1,
-                        Printer.MODE_MONO,
-                        Printer.HALFTONE_DITHER,
-                        Printer.PARAM_DEFAULT,
-                        Printer.COMPRESS_AUTO);
-
-                builder.addFeedLine(1);
+                addLogo(builder, logoData);
             }
 
-            builder.addTextAlign(Printer.ALIGN_LEFT);
+            builder.addTextAlign(Builder.ALIGN_LEFT);
             builder.addTextSize(1, 1);
             sb.append(" No. Tiket     : " + noTransaksi + "\n");
             sb.append(" No. Plat      : " + platNo + "\n");
@@ -202,14 +208,12 @@ public class PrintReceiptChekin extends PrintReceipt {
             sb.delete(0, sb.length());
             builder.addFeedLine(2);
 
-            builder.addTextAlign(Printer.ALIGN_CENTER);
+            builder.addTextAlign(Builder.ALIGN_CENTER);
             builder.addTextSize(2,1);
             builder.addText("DASHBOARD RECEIPT");
 
             builder.addFeedLine(1);
-            builder.addCut(Printer.CUT_FEED);
-
-            print();
+            builder.addCut(Builder.CUT_FEED);
         } catch (EposException e) {
             e.printStackTrace();
         }

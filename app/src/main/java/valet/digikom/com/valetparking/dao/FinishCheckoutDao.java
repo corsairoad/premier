@@ -20,6 +20,8 @@ import valet.digikom.com.valetparking.domain.FinishCheckoutResponse;
 import valet.digikom.com.valetparking.domain.MembershipResponse;
 import valet.digikom.com.valetparking.domain.PaymentMethod;
 import valet.digikom.com.valetparking.domain.PrintCheckout;
+import valet.digikom.com.valetparking.domain.PrintCheckoutParam;
+import valet.digikom.com.valetparking.domain.PrintReceiptCheckout;
 import valet.digikom.com.valetparking.service.ApiClient;
 import valet.digikom.com.valetparking.service.ApiEndpoint;
 import valet.digikom.com.valetparking.service.ProcessRequest;
@@ -50,7 +52,7 @@ public class FinishCheckoutDao implements ProcessRequest {
 
     private FinishCheckoutDao(Context context) {
         this.context = context;
-        dbHelper = ValetDbHelper.getInstance(context.getApplicationContext());
+        dbHelper = ValetDbHelper.getInstance(context);
         checkoutActivity = (CheckoutActivity) context;
     }
 
@@ -176,10 +178,35 @@ public class FinishCheckoutDao implements ProcessRequest {
     }
 
     private void print() {
-        PrintCheckout printCheckout = new PrintCheckout(context,getTotalBayar(), getEntryCheckinResponse(),getFinishCheckOut(),
-                getOverNightFine(), getLostTicketFine(),getNomorVoucher(),getDataMembership(), getIdMembership(), checkedOutTime, getPaymentData(), getBankData());
-        printCheckout.print();
+
+        // create print checkout param
+        PrintCheckoutParam.Builder paramBuilder = new PrintCheckoutParam.Builder()
+                .setTotalBayar(getTotalBayar())
+                .setEntryCheckinResponse(getEntryCheckinResponse())
+                .setFinishCheckout(getFinishCheckOut())
+                .setOvernigthFine(getOverNightFine())
+                .setLostTicketFine(getLostTicketFine())
+                .setNovoucher(getNomorVoucher())
+                .setDataMembership(getDataMembership())
+                .setIdMembership(getIdMembership())
+                .setCheckoutTime(checkedOutTime)
+                .setPaymentData(getPaymentData())
+                .setBankData(getBankData());
+
+        // print data
+        PrintReceiptCheckout printReceiptCheckout = new PrintReceiptCheckout(context,paramBuilder.build());
+        printReceiptCheckout.buildPrintData();
+
         goToMain();
+
+        /*
+        ---------- cara print lama -------------------
+        ----------------------------------------------
+        PrintCheckout printCheckout = new PrintCheckout(context,getTotalBayar(), getEntryCheckinResponse(),getFinishCheckOut(),
+                getOverNightFine(), getLostTicketFine(),getNomorVoucher(),getDataMembership(), getIdMembership(),
+                checkedOutTime, getPaymentData(), getBankData());
+        printCheckout.print();
+      */
     }
 
     private void goToMain() {

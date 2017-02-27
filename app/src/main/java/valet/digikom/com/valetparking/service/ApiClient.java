@@ -20,6 +20,7 @@ import valet.digikom.com.valetparking.dao.BankDao;
 import valet.digikom.com.valetparking.dao.CarDao;
 import valet.digikom.com.valetparking.dao.ColorDao;
 import valet.digikom.com.valetparking.dao.DefectDao;
+import valet.digikom.com.valetparking.dao.DisclaimerDao;
 import valet.digikom.com.valetparking.dao.DropDao;
 import valet.digikom.com.valetparking.dao.FineFeeDao;
 import valet.digikom.com.valetparking.dao.ItemsDao;
@@ -85,6 +86,7 @@ public class ApiClient {
         TokenDao.getToken(ValetTypeDao.getInstance(context),context);
         TokenDao.getToken(PaymentDao.getInstance(context), context);
         TokenDao.getToken(BankDao.getInstance(context), context);
+        TokenDao.getToken(DisclaimerDao.getInstance(context), context);
     }
 
     public static boolean isNetworkAvailable(final Context context) {

@@ -82,17 +82,10 @@ public class AddCarActivity extends FragmentActivity implements StepOneFragmet.O
                             entryDao.insertEntryResponse(res, EntryCheckinResponse.FLAG_UPLOAD_SUCCESS);
 
                             //new PrintCheckinTask().execute(res);
+                            print(res);
 
                             startActivity(new Intent(AddCarActivity.this, Main2Activity.class));
                             finish();
-
-                            printCheckin(res);
-                            //Log.d("Post checkin success: ", res.getData().getType());
-                            sweetAlertDialog.setTitleText("success!")
-                                    .setContentText("Registration success")
-                                    .setConfirmText("OK")
-                                    .setConfirmClickListener(null)
-                                    .changeAlertType(SweetAlertDialog.SUCCESS_TYPE);
                         }else {
                             Log.d("Post entry", "post entry checkin failed.");
                             //Toast.makeText(AddCarActivity.this,"Post Entry Checkin failed", Toast.LENGTH_SHORT).show();

@@ -92,4 +92,16 @@ public class Disclaimer {
         }
     }
 
+    public static class Table {
+        public static final String TABLE_NAME = "disclaimer";
+
+        public static final String COL_ID = "_id";
+        public static final String COL_ID_DISCLAIMER = "id_disclaimer";
+        public static final String COL_JSON_DATA = "json_data";
+
+        public static final String CREATE = "CREATE TABLE " + TABLE_NAME + "(" + COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                COL_ID_DISCLAIMER + " INTEGER, " +
+                COL_JSON_DATA + " TEXT);";
+    }
+
 }

@@ -137,7 +137,7 @@ public class DiscoveryActivity extends Activity implements View.OnClickListener,
                 public synchronized void run() {
                     HashMap<String, String> item = new HashMap<String, String>();
                     item.put("PrinterName", deviceInfo.getDeviceName());
-                    item.put("Target", "TCP:" + deviceInfo.getIpAddress());
+                    item.put("Target", deviceInfo.getMacAddress());
                     mPrinterList.add(item);
                     mPrinterListAdapter.notifyDataSetChanged();
                 }

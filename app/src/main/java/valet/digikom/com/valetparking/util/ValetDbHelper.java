@@ -11,6 +11,7 @@ import valet.digikom.com.valetparking.domain.CarMaster;
 import valet.digikom.com.valetparking.domain.Checkin;
 import valet.digikom.com.valetparking.domain.ColorMaster;
 import valet.digikom.com.valetparking.domain.DefectMaster;
+import valet.digikom.com.valetparking.domain.Disclaimer;
 import valet.digikom.com.valetparking.domain.DropPointMaster;
 import valet.digikom.com.valetparking.domain.EntryCheckinResponse;
 import valet.digikom.com.valetparking.domain.EntryCheckoutCont;
@@ -57,6 +58,7 @@ public class ValetDbHelper extends SQLiteOpenHelper {
         db.execSQL(ValetTypeJson.Table.CREATE);
         db.execSQL(PaymentMethod.Table.CREATE);
         db.execSQL(Bank.Table.CREATE);
+        db.execSQL(Disclaimer.Table.CREATE);
     }
 
     @Override
@@ -74,6 +76,7 @@ public class ValetDbHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + ValetTypeJson.Table.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + PaymentMethod.Table.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + Bank.Table.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + Disclaimer.Table.TABLE_NAME);
 
         onCreate(db);
     }
