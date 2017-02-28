@@ -4,7 +4,10 @@ import android.graphics.Bitmap;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.math.BigInteger;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import valet.digikom.com.valetparking.util.BitmapToString;
@@ -17,6 +20,8 @@ public class EntryCheckin {
 
     @SerializedName("type")
     private String type = "ad_entry_checkin";
+    @SerializedName("id")
+    private String id;
     @SerializedName("attributes")
     private EntryCheckin.Attrib attrib;
     @SerializedName("relationships")
@@ -45,6 +50,14 @@ public class EntryCheckin {
 
     public Attrib getAttrib() {
         return attrib;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public void setAttrib(Attrib attrib) {
@@ -284,24 +297,47 @@ public class EntryCheckin {
     }
 
     public static class Builder{
-
         private Attrib attrib;
         private RelationShip relationShip;
+        private DropPointMaster dropPointMaster;
+        private String platNo;
+        private CarMaster carMaster;
+        private ColorMaster colorMaster;
+        private String email;
+        private Bitmap bitmapDefect;
+        private Bitmap bitmapSignature;
+        private ValetTypeJson.Data  valetType;
+        private String checkInTime;
+        private int vthdId;
+
+        private static final String FORMAT_DATE_FORMAL = "yyyy-MM-dd HH:mm:ss";
+        private static final String FORMAT_DATE_FOR_ID = "yyMMddHHmmss";
 
         public Builder() {
         }
 
-        public Builder setAttribute(DropPointMaster dropPointMaster, String platNo, CarMaster carMaster, ColorMaster colorMaster, String email, Bitmap bmpDefects, Bitmap bmpSignature, int valetTypeId) {
+        public Builder setAttribute(DropPointMaster dropPointMaster, String platNo, CarMaster carMaster, ColorMaster colorMaster, String email, Bitmap bmpDefects, Bitmap bmpSignature, ValetTypeJson.Data valetType) {
+            this.dropPointMaster = dropPointMaster;
+            this.carMaster = carMaster;
+            this.colorMaster = colorMaster;
+            this.email = email;
+            this.bitmapDefect = bmpDefects;
+            this.bitmapSignature = bmpSignature;
+            this.valetType = valetType;
+            this.checkInTime = getCurrentDate(FORMAT_DATE_FORMAL);
+            this.vthdId = generateId();
             attrib = new Attrib();
             attrib.setDropMasterId(String.valueOf(dropPointMaster.getAttrib().getDropId()));
+
             String p = platNo;
 
             if (Character.isDigit(p.trim().charAt(0))) {
                 platNo = "B " + platNo;
             }
+            this.platNo = platNo;
             attrib.setPlatNo(platNo);
 
-            attrib.setValetType(String.valueOf(valetTypeId));
+            attrib.setValetType(String.valueOf(valetType.getAttrib().getId()));
             attrib.setCarType(String.valueOf(carMaster.getAttrib().getId_attrib()));
 
             if (colorMaster != null) {
@@ -364,6 +400,66 @@ public class EntryCheckin {
         public EntryCheckin build() {
             return new EntryCheckin(this);
         }
-    }
 
+        public DropPointMaster getDropPointMaster() {
+            return dropPointMaster;
+        }
+
+        public String getPlatNo() {
+            return platNo;
+        }
+
+        public CarMaster getCarMaster() {
+            return carMaster;
+        }
+
+        public ColorMaster getColorMaster() {
+            return colorMaster;
+        }
+
+        public String getEmail() {
+            return email;
+        }
+
+        public Bitmap getBitmapDefect() {
+            return bitmapDefect;
+        }
+
+        public Bitmap getBitmapSignature() {
+            return bitmapSignature;
+        }
+
+        public int getVthdId() {
+            return vthdId;
+        }
+
+        public ValetTypeJson.Data getValetType() {
+            return valetType;
+        }
+
+        public String getCurrentDate(String format) {
+            SimpleDateFormat sdf = new SimpleDateFormat(format);
+            return sdf.format(new Date());
+        }
+
+        public String getCheckInTime() {
+            return checkInTime;
+        }
+
+        public int generateId() {
+            BigInteger bigInteger = new BigInteger(getCurrentDate(FORMAT_DATE_FOR_ID));
+            return Math.abs(bigInteger.intValue());
+            //return bigInteger.longValue();
+            //return Integer.parseInt(getCurrentDate(FORMAT_DATE_FOR_ID));
+        }
+
+        public String generateTicketNo() {
+            String prefix = "R-";
+            if ("exclusive".equals(valetType.getAttrib().getValetTypeName().toLowerCase())) {
+                prefix = "E-";
+            }
+
+            return prefix + getVthdId();
+        }
+    }
 }

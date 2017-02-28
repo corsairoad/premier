@@ -87,7 +87,7 @@ public class CallDao implements ProcessRequest {
         db.close();
     }
 
-    public void setCheckoutReady(int id, int isReady) {
+    public void setCheckoutReady(long id, int isReady) {
         ValetDbHelper dbHelper = new ValetDbHelper(context);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 

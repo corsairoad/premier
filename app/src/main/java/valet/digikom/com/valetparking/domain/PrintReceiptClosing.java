@@ -81,7 +81,7 @@ public class PrintReceiptClosing extends PrintReceipt {
                 String checkoutTime = data.getAttributes().getCheckout();
 
                 if (checkinTime != null && checkoutTime != null) {
-                    status = "Checkedout";
+                    status = "Checkout";
                     totalCheckin +=1;
                     totalCheckout +=1;
                     checkinTime = convertDateString(checkinTime);

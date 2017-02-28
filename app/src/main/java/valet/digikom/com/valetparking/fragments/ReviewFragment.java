@@ -63,6 +63,7 @@ public class ReviewFragment extends Fragment {
     private Bitmap bitmapDefect;
     private ValetTypeJson.Data  valetType;
     private Bitmap signBitmap;
+    private EntryCheckin.Builder builder;
 
     public ReviewFragment() {
         // Required empty public constructor
@@ -236,17 +237,17 @@ public class ReviewFragment extends Fragment {
         imgDefect.setImageBitmap(null);
     }
 
+    public EntryCheckin.Builder getBuilder() {
+        return builder;
+    }
+
     public EntryCheckinContainer getEntryCheckinContainer() {
         return buildCheckinEntry();
     }
 
     private EntryCheckinContainer buildCheckinEntry() {
-        EntryCheckin.Builder builder = new EntryCheckin.Builder();
-        int idValetType = 1;
-        if (valetType!=null) {
-            idValetType = valetType.getAttrib().getId();
-        }
-        builder.setAttribute(dropPoint,textPlatNo.getText().toString(), carMaster, colorMaster,textEmail.getText().toString(),bitmapDefect, signBitmap, idValetType);
+        builder = new EntryCheckin.Builder();
+        builder.setAttribute(dropPoint,textPlatNo.getText().toString(), carMaster, colorMaster,textEmail.getText().toString(),bitmapDefect, signBitmap, valetType);
         builder.setRelationShip(getDefectMasterList(), getItemsList());
         EntryCheckin entryCheckin = builder.build();
         EntryCheckinContainer entryCheckinContainer = new EntryCheckinContainer();

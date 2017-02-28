@@ -135,13 +135,11 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
 
         if (getIntent() != null) {
             idValetHeader = getIntent().getIntExtra(EntryCheckoutCont.KEY_ENTRY_CHECKOUT,0);
-            if (idValetHeader > 0) {
-                new LoadEntryTask().execute(idValetHeader);
-                new FetchCheckoutTask().execute(idValetHeader);
-                new LoadFineTask().execute();
-                new LoadPaymentTask().execute();
-                new LoadBanksTask().execute();
-            }
+            new LoadEntryTask().execute(idValetHeader);
+            new FetchCheckoutTask().execute(idValetHeader);
+            new LoadFineTask().execute();
+            new LoadPaymentTask().execute();
+            new LoadBanksTask().execute();
         }
 
         spMembership.setOnItemSelectedListener(this);

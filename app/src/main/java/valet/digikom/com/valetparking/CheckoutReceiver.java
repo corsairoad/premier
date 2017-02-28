@@ -18,8 +18,13 @@ public class CheckoutReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        CheckoutDao checkoutDao = CheckoutDao.getInstance(context, CalledCarFragment.getInstance(), ParkedCarFragment.getInstance());
-        TokenDao.getToken(checkoutDao, context);
+        try {
+            CheckoutDao checkoutDao = CheckoutDao.getInstance(context, CalledCarFragment.getInstance(), ParkedCarFragment.getInstance());
+            TokenDao.getToken(checkoutDao, context);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
         //Toast.makeText(context, "Receiver called",Toast.LENGTH_SHORT).show();
     }
 }

@@ -5,6 +5,23 @@
     android:layout_height="match_parent">
 
     <LinearLayout
+        android:id="@+id/layout_grey"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#B0000000"
+        android:orientation="vertical"
+        android:visibility="gone">
+    </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:visibility="gone"
+        android:layout_centerVertical="true"/>
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
@@ -26,14 +43,14 @@
                 <fragment
                     android:id="@+id/step_one_fragment"
                     android:layout_width="0dp"
-                    android:layout_weight="1"
+                    android:layout_weight="4"
                     android:layout_height="match_parent"
                     android:name="valet.digikom.com.valetparking.fragments.StepOneFragmet"/>
 
                 <fragment
                     android:id="@+id/stuff_fragment"
                     android:layout_width="0dp"
-                    android:layout_weight="1"
+                    android:layout_weight="2"
                     android:layout_height="match_parent"
                     android:name="valet.digikom.com.valetparking.fragments.StepThreeFragment"/>
 
@@ -92,8 +109,8 @@
         </LinearLayout>
 
 
+
+
     </LinearLayout>
-
-
 
 </RelativeLayout>

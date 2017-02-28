@@ -12,6 +12,7 @@ public class EntryCheckinResponse {
     public static final int FLAG_CANCEL_CALL = 0;
     public static final int FLAG_UPLOAD_SUCCESS = 1;
     public static final int FLAG_UPLOAD_FAILED = 0;
+    public static final int FLAG_UPLOAD_PENDING = 2;
     public static final String ID_ENTRY_CHECKIN = "entry_id";
 
     @SerializedName("data")
@@ -38,7 +39,7 @@ public class EntryCheckinResponse {
         isReadyToCheckout = readyToCheckout;
     }
 
-    public class Data {
+    public static class Data {
         @SerializedName("id")
         private String id;
         @SerializedName("type")
@@ -74,7 +75,7 @@ public class EntryCheckinResponse {
         }
     }
 
-    public class Attribute {
+    public static class Attribute {
         @SerializedName("vthd_id")
         private int id;
         @SerializedName("vthd_clms_name")
