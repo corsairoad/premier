@@ -41,7 +41,8 @@ public class PrintReceiptClosing extends PrintReceipt {
             builder.addTextAlign(Printer.ALIGN_LEFT);
             builder.addTextSize(1,1);
 
-            sb.append("LOKASI      : " + closingParam.getLobbyName() + "\n");
+            sb.append("LOKASI      : " + closingParam.getSiteName() + "\n");
+            sb.append("LOBBY       : " + closingParam.getLobbyName() + "\n");
             sb.append("WAKTU REPORT: " + getCurrentDate() + "\n");
             sb.append("------------------------------------------\n");
             sb.append("Tiket  No. Pol   In     Out     Status\n");

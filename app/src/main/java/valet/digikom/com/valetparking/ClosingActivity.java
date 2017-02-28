@@ -118,7 +118,6 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
 
         /*
         ------------ PRINTER CARA LAMA
-
         PrintClosing printClosing = new PrintClosing(this, closingData, lokasi, siteName, startDate,endDate,"Admin", reg,exc,total);
         printClosing.print();
         */
@@ -127,7 +126,7 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
         PrintClosingParam closingParam = new PrintClosingParam.Builder()
                 .setClosingData(closingData)
                 .setSiteName(siteName)
-                .setLobbyName(lokasi)
+                .setLobbyName(lobbyName)
                 .setSiteName(siteName)
                 .setDateFrom(startDate)
                 .setDateTo(endDate)
