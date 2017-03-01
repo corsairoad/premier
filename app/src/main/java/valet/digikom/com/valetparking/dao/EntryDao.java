@@ -76,6 +76,20 @@ public class EntryDao {
         db.update(EntryCheckinResponse.Table.TABLE_NAME, cv, EntryCheckinResponse.Table.COL_RESPONSE_ID + "=?", args);
     }
 
+    public void insertListCheckin(List<EntryCheckinResponse.Data> checkinList) {
+        if (!checkinList.isEmpty()) {
+            for (EntryCheckinResponse.Data e : checkinList) {
+                if (e != null) {
+                    removeEntryById(e.getAttribute().getId());
+
+                    EntryCheckinResponse entryCheckinResponse = new EntryCheckinResponse();
+                    entryCheckinResponse.setData(e);
+                    insertEntryResponse(entryCheckinResponse,EntryCheckinResponse.FLAG_UPLOAD_SUCCESS);
+                }
+            }
+        }
+    }
+
     public List<EntryCheckinResponse> fetchAllCheckinResponse() {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         // Cursor c = db.query(EntryCheckinResponse.Table.TABLE_NAME,null, EntryCheckinResponse.Table.COL_IS_CHECKOUT + "=? AND " + EntryCheckinResponse.Table.COL_IS_CALLED + "=0",new String[]{"0"},null,null,EntryCheckinResponse.Table.COL_RESPONSE_ID + " DESC");
@@ -92,7 +106,7 @@ public class EntryDao {
 
 
         c.close();
-        db.close();
+
 
         return responseList;
     }

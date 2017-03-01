@@ -133,7 +133,8 @@
         <activity
             android:name=".ClosingActivity"
             android:label="@string/closing_activity"
-            android:parentActivityName=".Main2Activity">
+            android:parentActivityName=".Main2Activity"
+            android:launchMode="singleTask">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="valet.digikom.com.valetparking.Main2Activity" />

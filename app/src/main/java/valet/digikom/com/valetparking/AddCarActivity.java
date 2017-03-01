@@ -98,9 +98,8 @@ public class AddCarActivity extends FragmentActivity implements StepOneFragmet.O
                             progressBar.setVisibility(View.GONE);
                             if (response != null && response.body() != null) {
                                 EntryCheckinResponse res = response.body();
-                                entryDao.insertEntryResponse(res, EntryCheckinResponse.FLAG_UPLOAD_SUCCESS);
+                                //entryDao.insertEntryResponse(res, EntryCheckinResponse.FLAG_UPLOAD_SUCCESS);
 
-                                //new PrintCheckinTask().execute(res);
                                 print(res);
                             } else {
                                 Log.d("Post entry", "post entry checkin failed.");
@@ -312,7 +311,9 @@ public class AddCarActivity extends FragmentActivity implements StepOneFragmet.O
     }
 
     private void goToMain() {
-        startActivity(new Intent(AddCarActivity.this, Main2Activity.class));
+        Intent intent = new Intent(this, Main2Activity.class);
+        intent.setAction(Main2Activity.ACTION_DOWNLOAD_CHECKIN);
+        startActivity(intent);
         finish();
     }
 }

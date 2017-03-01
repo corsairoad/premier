@@ -1,5 +1,7 @@
 package valet.digikom.com.valetparking.service;
 
+import java.util.List;
+
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.Field;
@@ -20,6 +22,7 @@ import valet.digikom.com.valetparking.domain.CancelResponse;
 import valet.digikom.com.valetparking.domain.CarMasterResponse;
 import valet.digikom.com.valetparking.domain.ChangePassword;
 import valet.digikom.com.valetparking.domain.ChangePasswordResponse;
+import valet.digikom.com.valetparking.domain.CheckinList;
 import valet.digikom.com.valetparking.domain.ClosingBody;
 import valet.digikom.com.valetparking.domain.ClosingData;
 import valet.digikom.com.valetparking.domain.ClosingResponse;
@@ -71,6 +74,9 @@ public interface ApiEndpoint {
 
     @POST("ad_entry_checkin")
     Call<EntryCheckinResponse> postCheckin(@Body EntryCheckinContainer checkinContainer);
+
+    @GET("ad_entry_checkin")
+    Call<CheckinList> getCheckinList(@Query("page[size]") int pageSize);
 
     @PUT("ad_car_call/{id}")
     Call<AddCarCallResponse> postCallCar(@Path("id") int id, @Body AddCarCallBody addCarCallBody);

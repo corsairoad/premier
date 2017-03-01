@@ -104,8 +104,7 @@ public class FailedTransactionService extends IntentService {
             fOut.close();
             Toast.makeText(this,"Done writing SD 'mysdfile.txt'", Toast.LENGTH_SHORT).show();
 
-        }
-        catch (Exception e)
+        } catch (Exception e)
         {
             Toast.makeText(this, e.getMessage(),Toast.LENGTH_SHORT).show();
         }

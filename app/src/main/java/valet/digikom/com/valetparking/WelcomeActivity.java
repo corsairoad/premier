@@ -63,8 +63,8 @@ public class WelcomeActivity extends AppCompatActivity {
                 prefManager.setIdSite(mRoleOption.getSiteId());
                 prefManager.setSiteName(mRoleOption.getSiteName());
                 patch(dropPointMaster.getAttrib().getDropId());
-                startActivity(new Intent(WelcomeActivity.this, Main2Activity.class));
-                finish();
+
+                goToMain();
             }
         });
 
@@ -110,6 +110,13 @@ public class WelcomeActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    private void goToMain() {
+        Intent intent = new Intent(this, Main2Activity.class);
+        intent.setAction(Main2Activity.ACTION_DOWNLOAD_CHECKIN);
+        startActivity(intent);
+        finish();
     }
 
     private void patch(final int idLobby) {

@@ -501,6 +501,7 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
     private void goToMain() {
         Intent intent = new Intent(this, Main2Activity.class);
         intent.putExtra("refresh", 1);
+        intent.setAction(Main2Activity.ACTION_DOWNLOAD_CHECKIN);
         startActivity(intent);
         finish();
     }

@@ -12,15 +12,26 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import java.util.ArrayList;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import valet.digikom.com.valetparking.ParkedCarDetailActivity;
 import valet.digikom.com.valetparking.R;
 import valet.digikom.com.valetparking.adapter.ListCheckinAdapter;
 import valet.digikom.com.valetparking.dao.CheckoutDao;
 import valet.digikom.com.valetparking.dao.EntryDao;
+import valet.digikom.com.valetparking.dao.TokenDao;
 import valet.digikom.com.valetparking.domain.Checkin;
+import valet.digikom.com.valetparking.domain.CheckinList;
 import valet.digikom.com.valetparking.domain.EntryCheckinResponse;
+import valet.digikom.com.valetparking.service.ApiClient;
+import valet.digikom.com.valetparking.service.ApiEndpoint;
+import valet.digikom.com.valetparking.service.ProcessRequest;
 
 public class ParkedCarFragment extends Fragment implements ListCheckinAdapter.OnItemCheckinListener, CheckoutDao.OnCarReadyListener {
 
@@ -32,6 +43,7 @@ public class ParkedCarFragment extends Fragment implements ListCheckinAdapter.On
     TextView textTotalCheckin;
     CountParkedCarListener listener;
     public static ParkedCarFragment parkedCarFragment;
+    EntryDao entryDao;
 
     public ParkedCarFragment() {
     }
@@ -40,6 +52,7 @@ public class ParkedCarFragment extends Fragment implements ListCheckinAdapter.On
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         parkedCarFragment = this;
+        entryDao = EntryDao.getInstance(getContext());
     }
 
     public static ParkedCarFragment getInstance() {
@@ -61,7 +74,7 @@ public class ParkedCarFragment extends Fragment implements ListCheckinAdapter.On
         adapter = new ListCheckinAdapter(checkins, responseList,getContext(), this);
         listCheckin.setAdapter(adapter);
 
-        new LoadCheckinTask().execute();
+         new LoadCheckinTask().execute();
 
         return view;
     }
@@ -104,7 +117,6 @@ public class ParkedCarFragment extends Fragment implements ListCheckinAdapter.On
 
         @Override
         protected List<EntryCheckinResponse> doInBackground(Void... voids) {
-            EntryDao entryDao = EntryDao.getInstance(getContext());
             return entryDao.fetchAllCheckinResponse();
         }
 
@@ -128,5 +140,30 @@ public class ParkedCarFragment extends Fragment implements ListCheckinAdapter.On
 
     public interface CountParkedCarListener {
         void setCountParkedCar (int count);
+    }
+
+    public void downloadCheckinList() {
+        TokenDao.getToken(new ProcessRequest() {
+            @Override
+            public void process(String token) {
+                Toast.makeText(getContext(), "Downloading data..", Toast.LENGTH_SHORT).show();
+                ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class, token);
+                Call<CheckinList> call = apiEndpoint.getCheckinList(999);
+                call.enqueue(new Callback<CheckinList>() {
+                    @Override
+                    public void onResponse(Call<CheckinList> call, Response<CheckinList> response) {
+                        if (response != null && response.body() != null) {
+                            entryDao.insertListCheckin(response.body().getCheckinResponseList());
+                        }
+                        new LoadCheckinTask().execute();
+                    }
+
+                    @Override
+                    public void onFailure(Call<CheckinList> call, Throwable t) {
+                        new LoadCheckinTask().execute();
+                    }
+                });
+            }
+        }, getContext());
     }
 }

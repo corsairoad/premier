@@ -11,6 +11,7 @@ import android.util.Log;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.util.Calendar;
+import java.util.concurrent.TimeUnit;
 
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
@@ -41,7 +42,9 @@ import static com.bumptech.glide.gifdecoder.GifHeaderParser.TAG;
 public class ApiClient {
     public static final String BASE_URL = "http://premier.intelligence.id/v1/";
     //public static final String BASE_URL = "http://valet-dev.donny.id/v1/";
-    private static OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+    private static OkHttpClient.Builder httpClient = new OkHttpClient.Builder()
+            .readTimeout(30, TimeUnit.SECONDS)
+            .connectTimeout(30, TimeUnit.SECONDS);
 
     private static Retrofit.Builder builder =
             new Retrofit.Builder()

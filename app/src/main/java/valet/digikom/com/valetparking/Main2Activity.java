@@ -42,6 +42,8 @@ public class Main2Activity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener, ParkedCarFragment.CountParkedCarListener,
         CalledCarFragment.CountCalledCarListener{
 
+    public static final String ACTION_DOWNLOAD_CHECKIN = "com.valet.download.data.checkin";
+
     ViewPager viewPager;
     ParkedCarPagerAdapter pagerAdapter;
     TabLayout tabLayout;
@@ -53,6 +55,7 @@ public class Main2Activity extends AppCompatActivity
     TextView txtCountCalledCar;
     PrefManager prefManager;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,6 +64,8 @@ public class Main2Activity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+
 
         prefManager = PrefManager.getInstance(this);
         if(prefManager.getIdSite() == 0 && prefManager.getAuthResponse() != null) {
@@ -78,7 +83,6 @@ public class Main2Activity extends AppCompatActivity
         checkPrinter();
 
         setDefaultKeyMode(DEFAULT_KEYS_SEARCH_LOCAL);
-        handleIntent(getIntent());
 
         tabLayout = (TabLayout) findViewById(R.id.tabs);
         viewPager = (ViewPager) findViewById(R.id.viewpager);
@@ -107,6 +111,8 @@ public class Main2Activity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        handleIntent(getIntent());
 
         startCheckoutEntryAlarm(this);
     }
@@ -316,6 +322,9 @@ public class Main2Activity extends AppCompatActivity
             Uri uri = intent.getData();
             String queryId = uri.getLastPathSegment();
             startParkDetailActivity(queryId);
+        }else if (ACTION_DOWNLOAD_CHECKIN.equals(intent.getAction())) {
+            ParkedCarFragment parkedCarFragment = (ParkedCarFragment) pagerAdapter.getItem(0);
+            parkedCarFragment.downloadCheckinList();
         }
     }
 
