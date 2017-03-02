@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.RectF;
 
+import com.epson.eposdevice.printer.Printer;
 import com.epson.eposprint.Builder;
 import com.epson.eposprint.EposException;
 import com.epson.eposprint.Print;
@@ -38,16 +39,19 @@ public abstract class PrintReceipt implements StatusChangeEventListener {
         prefManager = prefManager.getInstance(context);
         logoData = BitmapFactory.decodeResource(context.getResources(), R.mipmap.logo_1);
         logoExclusive = BitmapFactory.decodeResource(context.getResources(), R.mipmap.logo_exclusive);
+        printer = new Print(context.getApplicationContext());
     }
 
     private boolean openPrinter() {
-        String printerTarget = prefManager.getPrinterMacAddress();
-        printer = new Print(context);
-        printer.setStatusChangeEventCallback(this);
         try {
-            printer.openPrinter(Print.DEVTYPE_TCP, printerTarget,Print.TRUE,Print.PARAM_DEFAULT);
-        }catch (Exception e) {
-            ShowMsg.showException(e,"OPEN_PRINTER", context);
+            String printerTarget = prefManager.getPrinterMacAddress();
+            if (printer != null) {
+                printer.setStatusChangeEventCallback(this);
+                printer.openPrinter(Print.DEVTYPE_TCP, printerTarget,Print.TRUE, Print.PARAM_DEFAULT);
+            }
+        }catch (EposException e) {
+            //ShowMsg.showException(e,"OPEN_PRINTER", context.getApplicationContext());
+            e.printStackTrace();
             return false;
         }
         return true;
@@ -104,17 +108,7 @@ public abstract class PrintReceipt implements StatusChangeEventListener {
             //ShowMsg.showStatus(EposException.SUCCESS, status[0], battery[0], context);
         } catch (EposException e) {
             e.printStackTrace();
-            ShowMsg.showStatus(e.getErrorStatus(), e.getPrinterStatus(), e.getBatteryStatus(), context);
-        }
-
-        //remove builder
-        if(mBuilder != null){
-            try{
-                mBuilder.clearCommandBuffer();
-                mBuilder = null;
-            }catch(Exception e){
-                mBuilder = null;
-            }
+            //ShowMsg.showStatus(e.getErrorStatus(), e.getPrinterStatus(), e.getBatteryStatus(), context);
         }
 
         closePrinter();
@@ -123,6 +117,15 @@ public abstract class PrintReceipt implements StatusChangeEventListener {
     private void closePrinter() {
         if(printer != null){
             try{
+                //remove builder
+                if(mBuilder != null){
+                    try{
+                        mBuilder.clearCommandBuffer();
+                        mBuilder = null;
+                    }catch(Exception e){
+                        mBuilder = null;
+                    }
+                }
                 printer.closePrinter();
                 printer = null;
             }catch(Exception e){

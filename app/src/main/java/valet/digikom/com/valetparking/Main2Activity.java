@@ -35,6 +35,7 @@ import valet.digikom.com.valetparking.dao.DropDao;
 import valet.digikom.com.valetparking.domain.EntryCheckinResponse;
 import valet.digikom.com.valetparking.fragments.CalledCarFragment;
 import valet.digikom.com.valetparking.fragments.ParkedCarFragment;
+import valet.digikom.com.valetparking.util.CheckoutReadyAlarm;
 import valet.digikom.com.valetparking.util.PrefManager;
 import valet.digikom.com.valetparking.util.ValetDbHelper;
 
@@ -114,7 +115,7 @@ public class Main2Activity extends AppCompatActivity
 
         handleIntent(getIntent());
 
-        startCheckoutEntryAlarm(this);
+        startCheckoutEntryAlarm();
     }
 
     private void setTitle() {
@@ -251,7 +252,10 @@ public class Main2Activity extends AppCompatActivity
         return true;
     }
 
-    private void startCheckoutEntryAlarm(Context context) {
+    private void startCheckoutEntryAlarm() {
+        CheckoutReadyAlarm checkoutReadyAlarm = CheckoutReadyAlarm.getInstance(this);
+        checkoutReadyAlarm.startAlarm();
+        /*
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         //Intent intent = new Intent(context, EntryCheckoutService.class);
         Intent intent = new Intent();
@@ -263,6 +267,7 @@ public class Main2Activity extends AppCompatActivity
         PendingIntent alarmIntent = PendingIntent.getBroadcast(context,0,intent,0);
         alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 10000, alarmIntent);
         //alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, System.currentTimeMillis(),8000,alarmIntent);
+        */
     }
 
     @Override

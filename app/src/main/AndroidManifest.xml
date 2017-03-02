@@ -78,6 +78,9 @@
         <service android:name=".service.FailedTransactionService"
             android:exported="false"/>
 
+        <service android:name=".service.ReadyCheckoutService"
+            android:exported="false"/>
+
         <activity
             android:name=".CheckoutActivity"
             android:label="@string/title_activity_checkout"

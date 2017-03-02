@@ -93,9 +93,7 @@ public class PrintReceiptChekin extends PrintReceipt {
         }
     }
 
-    private void buildDataForCustomer(Builder builder, StringBuilder sb) {
-        try {
-
+    private void buildDataForCustomer(Builder builder, StringBuilder sb) throws EposException {
             addLogo(builder, logoData);
 
             builder.addTextAlign(Builder.ALIGN_LEFT);
@@ -119,14 +117,10 @@ public class PrintReceiptChekin extends PrintReceipt {
             builder.addText(disclaimer);
             builder.addFeedLine(1);
             builder.addCut(Builder.CUT_FEED);
-        } catch (EposException e) {
-            e.printStackTrace();
-        }
+
     }
 
-    private void buildDataForKeyGuard(Builder builder, StringBuilder sb) {
-
-        try{
+    private void buildDataForKeyGuard(Builder builder, StringBuilder sb) throws EposException {
             if ("exclusive".equals(valetType.toLowerCase())) {
                 addLogo(builder, logoData);
             }
@@ -179,14 +173,12 @@ public class PrintReceiptChekin extends PrintReceipt {
             }
             builder.addFeedLine(1);
             builder.addCut(Builder.CUT_FEED);
-        }catch (EposException e) {
-            e.printStackTrace();
-        }
+
     }
 
-    private void buildDataForDashboard(Builder builder, StringBuilder sb) {
+    private void buildDataForDashboard(Builder builder, StringBuilder sb) throws EposException {
 
-        try {
+
             if ("exclusive".equals(valetType.toLowerCase())) {
                 addLogo(builder, logoData);
             }
@@ -214,8 +206,6 @@ public class PrintReceiptChekin extends PrintReceipt {
 
             builder.addFeedLine(1);
             builder.addCut(Builder.CUT_FEED);
-        } catch (EposException e) {
-            e.printStackTrace();
-        }
+
     }
 }

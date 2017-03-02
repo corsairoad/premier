@@ -256,6 +256,7 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
             PaymentMethod.Data data = (PaymentMethod.Data) spinnerPaymentAdapter.getItem(i);
             inputPaymentToken.setText("");
             paymentData = data;
+
             if (data.getAttr().getPaymentId() == 4) {
                 spBank.setVisibility(View.VISIBLE);
             }else {
@@ -481,6 +482,7 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
         finishCheckoutDao.setLostTicketFine(lostTicketFine);
         finishCheckoutDao.setOverNightFine(overNightFine);
         finishCheckoutDao.setNomorVoucher(inputVoucher.getText().toString());
+
         if (dataMembership != null) {
             dataMembership.getAttr().setToken(inputMembershipId.getText().toString());
         }
@@ -502,6 +504,7 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
         Intent intent = new Intent(this, Main2Activity.class);
         intent.putExtra("refresh", 1);
         intent.setAction(Main2Activity.ACTION_DOWNLOAD_CHECKIN);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
         finish();
     }

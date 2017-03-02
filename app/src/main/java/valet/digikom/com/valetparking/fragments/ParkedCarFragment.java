@@ -146,7 +146,10 @@ public class ParkedCarFragment extends Fragment implements ListCheckinAdapter.On
         TokenDao.getToken(new ProcessRequest() {
             @Override
             public void process(String token) {
-                Toast.makeText(getContext(), "Downloading data..", Toast.LENGTH_SHORT).show();
+                if (getContext() != null) {
+                    Toast.makeText(getContext(), "Downloading data..", Toast.LENGTH_SHORT).show();
+                }
+
                 ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class, token);
                 Call<CheckinList> call = apiEndpoint.getCheckinList(999);
                 call.enqueue(new Callback<CheckinList>() {
