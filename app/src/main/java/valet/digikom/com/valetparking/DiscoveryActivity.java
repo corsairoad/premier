@@ -54,6 +54,7 @@ public class DiscoveryActivity extends Activity implements View.OnClickListener,
 
         try {
             Discovery.start(this, mFilterOption, mDiscoveryListener);
+
         } catch (Epos2Exception e) {
             e.printStackTrace();
         }

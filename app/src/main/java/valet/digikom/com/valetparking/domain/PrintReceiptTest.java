@@ -33,6 +33,7 @@ public class PrintReceiptTest extends PrintReceipt {
 
             buildData(builder, sb);
             print();
+            closePrinter();
             
         } catch (EposException e) {
             e.printStackTrace();
@@ -42,7 +43,8 @@ public class PrintReceiptTest extends PrintReceipt {
     private void buildData(Builder builder, StringBuilder textData) throws EposException {
         builder.addFeedLine(1);
 
-        builder.addText("test");
+        builder.addText("the quick brown fox jumped over the lazy dog\n" +
+                "1234567890\n");
 
         builder.addFeedLine(1);
 

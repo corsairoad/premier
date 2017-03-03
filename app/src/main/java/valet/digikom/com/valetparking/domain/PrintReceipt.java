@@ -7,6 +7,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.RectF;
+import android.util.Log;
 
 import com.epson.eposdevice.printer.Printer;
 import com.epson.eposprint.Builder;
@@ -27,7 +28,7 @@ public abstract class PrintReceipt implements StatusChangeEventListener {
     private static final int PRINTER_LANGUAGE = com.epson.eposprint.Builder.LANG_EN;
     private static final int SEND_TIMEOUT = 10 * 1000;
 
-    private Print printer;
+    private static Print printer;
     private Context context;
     private PrefManager prefManager;
     private static Builder mBuilder;
@@ -45,13 +46,21 @@ public abstract class PrintReceipt implements StatusChangeEventListener {
     private boolean openPrinter() {
         try {
             String printerTarget = prefManager.getPrinterMacAddress();
-            if (printer != null) {
-                printer.setStatusChangeEventCallback(this);
-                printer.openPrinter(Print.DEVTYPE_TCP, printerTarget,Print.TRUE, Print.PARAM_DEFAULT);
-            }
+
+            printer = new Print(context.getApplicationContext());
+            printer.setStatusChangeEventCallback(this);
+            printer.openPrinter(Print.DEVTYPE_TCP, printerTarget,Print.TRUE, Print.PARAM_DEFAULT);
+
         }catch (EposException e) {
             //ShowMsg.showException(e,"OPEN_PRINTER", context.getApplicationContext());
+            try {
+                printer.closePrinter();
+            } catch (EposException e1) {
+                e1.printStackTrace();
+            }
             e.printStackTrace();
+            Log.e("open printer", "error status " + ShowMsg.getEposExceptionText(e.getErrorStatus()));
+            Log.e("open printer", "printer status " + e.getPrinterStatus());
             return false;
         }
         return true;
@@ -114,7 +123,7 @@ public abstract class PrintReceipt implements StatusChangeEventListener {
         closePrinter();
     }
 
-    private void closePrinter() {
+    public void closePrinter() {
         if(printer != null){
             try{
                 //remove builder

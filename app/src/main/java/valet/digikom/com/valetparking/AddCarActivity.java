@@ -82,6 +82,8 @@ public class AddCarActivity extends FragmentActivity implements StepOneFragmet.O
     }
 
     private void submitCheckin(final EntryCheckinContainer checkinContainer, final EntryCheckin.Builder builder,final SweetAlertDialog sweetAlertDialog) {
+
+
         if (!ApiClient.isNetworkAvailable(this)) {
             processFailedCheckin(builder, checkinContainer);
             progressBar.setVisibility(View.GONE);
@@ -240,7 +242,11 @@ public class AddCarActivity extends FragmentActivity implements StepOneFragmet.O
     @Override
     public void setBitMapSign(Bitmap bitMapSign) {
         fragmentReview.setSignBitmap(bitMapSign);
-        showConfirmDialog(fragmentReview);
+        //showConfirmDialog(fragmentReview);
+        fragmentRegFirst.setCheckIn();
+        progressBar.setVisibility(View.VISIBLE);
+        submitCheckin(fragmentReview.getEntryCheckinContainer(), fragmentReview.getBuilder(),null);
+
     }
 
     private void printCheckin(final EntryCheckinResponse response) {

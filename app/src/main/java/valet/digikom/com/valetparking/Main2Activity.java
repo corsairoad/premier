@@ -93,6 +93,7 @@ public class Main2Activity extends AppCompatActivity
         headerView = navView.inflateHeaderView(R.layout.nav_header_main2);
         txtUserName = (TextView) headerView.findViewById(R.id.text_user_name);
         setUserName();
+
         // set up pager parked car and called cars
         setupPagers();
 
