@@ -220,7 +220,7 @@ public class FinishCheckoutDao implements ProcessRequest {
         String[] args = new String[] {String.valueOf(id)};
         ContentValues cv = new ContentValues();
         cv.put(EntryCheckinResponse.Table.COL_IS_CHECKOUT, 1);
-        db.update(EntryCheckinResponse.Table.TABLE_NAME,cv, EntryCheckinResponse.Table.COL_RESPONSE_ID + " =?", args);
+        db.update(EntryCheckinResponse.Table.TABLE_NAME,cv, EntryCheckinResponse.Table.COL_REMOTE_VTHD_ID + " =?", args);
     }
 
     private class PrintCheckoutTask extends AsyncTask<Void, Void, String> {

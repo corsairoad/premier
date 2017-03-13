@@ -25,6 +25,10 @@ public class PatchMeResponse {
         private String type;
         @SerializedName("role_options")
         private int roleOption;
+        @SerializedName("iddt_counter")
+        private int lastCounterTicket;
+        @SerializedName("iems_key")
+        private String remoteDeviceId;
 
         public String getType() {
             return type;
@@ -32,6 +36,14 @@ public class PatchMeResponse {
 
         public int getRoleOption() {
             return roleOption;
+        }
+
+        public int getLastCounterTicket() {
+            return lastCounterTicket;
+        }
+
+        public String getRemoteDeviceId() {
+            return remoteDeviceId;
         }
     }
 }

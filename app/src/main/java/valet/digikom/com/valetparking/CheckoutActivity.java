@@ -84,6 +84,7 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
     int total = 0;
     int feeMembership = 0;
     int idValetHeader;
+    int remoteValetHeader;
 
     List<MembershipResponse.Data> listMemberShip = new ArrayList<>();
     List<PaymentMethod.Data> listPayment = new ArrayList<>();
@@ -105,7 +106,6 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
         setSupportActionBar(toolbar);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
 
         txtPlatNo = (TextView) findViewById(R.id.text_plat_no);
         txtLokasiParkir = (TextView) findViewById(R.id.text_lokasi_parkir);
@@ -135,6 +135,7 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
 
         if (getIntent() != null) {
             idValetHeader = getIntent().getIntExtra(EntryCheckoutCont.KEY_ENTRY_CHECKOUT,0);
+            setRemoteValetHeader(idValetHeader);
             new LoadEntryTask().execute(idValetHeader);
             new FetchCheckoutTask().execute(idValetHeader);
             new LoadFineTask().execute();
@@ -278,6 +279,11 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
     @Override
     public void onNothingSelected(AdapterView<?> adapterView) {
 
+    }
+
+    public void setRemoteValetHeader(int fakeId) {
+        EntryDao entryDao = EntryDao.getInstance(this);
+        remoteValetHeader = entryDao.getRemoteVthdIdByFakeId(fakeId);
     }
 
     private class FetchCheckoutTask extends AsyncTask<Integer, Void, EntryCheckoutCont.EntryChekout> {
@@ -426,6 +432,7 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
                 .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
                     @Override
                     public void onClick(SweetAlertDialog sweetAlertDialog) {
+                        sweetAlertDialog.dismissWithAnimation();
                         submitCheckout();
                     }
                 })
@@ -476,7 +483,7 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
 
         FinishCheckoutDao finishCheckoutDao = FinishCheckoutDao.getInstance(this);
         finishCheckoutDao.setFinishCheckOut(builder.build());
-        finishCheckoutDao.setId(idValetHeader);
+        finishCheckoutDao.setId(remoteValetHeader);
         finishCheckoutDao.setEntryCheckinResponse(entryCheckinResponse);
         finishCheckoutDao.setTotalBayar(txtTotalPay.getText().toString());
         finishCheckoutDao.setLostTicketFine(lostTicketFine);

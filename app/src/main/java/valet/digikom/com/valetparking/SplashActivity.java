@@ -3,13 +3,18 @@ package valet.digikom.com.valetparking;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.telephony.TelephonyManager;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
+
+import java.util.UUID;
+
 import valet.digikom.com.valetparking.dao.AuthResDao;
 import valet.digikom.com.valetparking.dao.CarDao;
 import valet.digikom.com.valetparking.dao.ColorDao;
@@ -40,12 +45,25 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
             return;
         }
 
+        saveDeviceAndAppId();
+
         linearLayout = (LinearLayout) findViewById(R.id.container_input);
         inputEmail = (EditText) findViewById(R.id.input_email);
         inputPassword = (EditText) findViewById(R.id.input_password);
         btnLogin = (Button) findViewById(R.id.btn_login);
         btnLogin.setOnClickListener(this);
         progressBar = (ProgressBar) findViewById(R.id.progressbar);
+    }
+
+    private void saveDeviceAndAppId() {
+        TelephonyManager telephonyManager = (android.telephony.TelephonyManager) getSystemService(TELEPHONY_SERVICE);
+        String deviceId = telephonyManager.getDeviceId();
+        String appId = UUID.randomUUID().toString();
+
+        if (!TextUtils.isEmpty(deviceId) && !TextUtils.isEmpty(appId)) {
+            PrefManager.getInstance(this).saveDeviceAndAppId(deviceId, appId);
+        }
+
     }
 
 
@@ -91,4 +109,5 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
         startActivity(intent);
         finish();
     }
+
 }

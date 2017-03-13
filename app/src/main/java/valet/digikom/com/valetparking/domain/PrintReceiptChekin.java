@@ -44,7 +44,7 @@ public class PrintReceiptChekin extends PrintReceipt {
 
     private void initFields() {
         noTransaksi = response.getData().getAttribute().getIdTransaksi();
-        date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+        date = response.getData().getAttribute().getCheckinTime();
         dropPoint = response.getData().getAttribute().getDropPoint();
         Disclaimer.Data disclaimerObj = DisclaimerDao.getInstance(getContext()).getDisclaimer(DisclaimerDao.FLAG_CHECKIN_DISCLAIMER);
         if (disclaimerObj != null) {

@@ -118,6 +118,8 @@ public class EntryCheckinResponse {
         private String valetType;
         @SerializedName("vthd_cbms_logo")
         private String logoMobil;
+        @SerializedName("vthd_iddt_counter")
+        private int lastTicketCounter;
 
         public Attribute() {
         }
@@ -185,6 +187,12 @@ public class EntryCheckinResponse {
         public void setDropPoint(String dropPoint) {
             this.dropPoint = dropPoint;
         }
+
+        public int getLastTicketCounter() {
+            return lastTicketCounter;
+        }
+
+
 
         public String getFloor() {
             return floor;
@@ -303,6 +311,8 @@ public class EntryCheckinResponse {
         public static final String COL_IS_READY_CHECKOUT = "is_ready";
         public static final String COL_PLAT_NO = "plat_no";
         public static final String COL_NO_TRANS = "no_transaction";
+        public static final String COL_REMOTE_VTHD_ID = "remote_vthd_id";
+        public static final String COL_TICKET_SEQUENCE = "ticket_sec";
 
         public static final String CREATE = "CREATE TABLE " + TABLE_NAME + "( " + COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 COL_RESPONSE_ID + " INTEGER, " +
@@ -312,7 +322,9 @@ public class EntryCheckinResponse {
                 COL_IS_UPLOADED + " INTEGER, " +
                 COL_IS_CHECKOUT + " INTEGER DEFAULT 0, " +
                 COL_IS_CALLED + " INTEGER DEFAULT 0, " +
-                COL_IS_READY_CHECKOUT + " INTEGER DEFAULT 0);";
+                COL_IS_READY_CHECKOUT + " INTEGER DEFAULT 0, " +
+                COL_REMOTE_VTHD_ID + " INTEGER DEFAULT 0, " +
+                COL_TICKET_SEQUENCE + " TEXT);";
     }
 
 }

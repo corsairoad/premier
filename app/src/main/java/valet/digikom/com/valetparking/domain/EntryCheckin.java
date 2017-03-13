@@ -1,5 +1,6 @@
 package valet.digikom.com.valetparking.domain;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 
 import com.google.gson.annotations.SerializedName;
@@ -11,6 +12,7 @@ import java.util.Date;
 import java.util.List;
 
 import valet.digikom.com.valetparking.util.BitmapToString;
+import valet.digikom.com.valetparking.util.PrefManager;
 
 /**
  * Created by DIGIKOM-EX4 on 1/11/2017.
@@ -20,8 +22,7 @@ public class EntryCheckin {
 
     @SerializedName("type")
     private String type = "ad_entry_checkin";
-    @SerializedName("id")
-    private String id;
+    private static String id;
     @SerializedName("attributes")
     private EntryCheckin.Attrib attrib;
     @SerializedName("relationships")
@@ -81,7 +82,18 @@ public class EntryCheckin {
         private String defect;
         @SerializedName("vthdVfsdId")
         private String valetType;
-
+        @SerializedName("vthdTixId")
+        private String ticketNo;
+        @SerializedName("vthdQRCode")
+        private String qrCode;
+        @SerializedName("vthdImeiCI")
+        private String deviceId;
+        @SerializedName("vthdAppsIdCI")
+        private String appId;
+        @SerializedName("vthdAppsTimeCI")
+        private String checkinTime;
+        @SerializedName("vthdIddtCounter")
+        private int lastTicketCounter;
 
         public Attrib() {
         }
@@ -145,8 +157,57 @@ public class EntryCheckin {
         public String getValetType() {
             return valetType;
         }
+
         public void setValetType(String valetType) {
             this.valetType = valetType;
+        }
+
+        public void setLastTicketCounter(int lastTicketCounter) {
+            this.lastTicketCounter = lastTicketCounter;
+        }
+
+        public int getLastTicketCounter() {
+            return lastTicketCounter;
+        }
+
+        public String getTicketNo() {
+            return ticketNo;
+        }
+
+        public void setTicketNo(String ticketNo) {
+            this.ticketNo = ticketNo;
+        }
+
+        public String getQrCode() {
+            return qrCode;
+        }
+
+        public void setQrCode(String qrCode) {
+            this.qrCode = qrCode;
+        }
+
+        public String getDeviceId() {
+            return deviceId;
+        }
+
+        public void setDeviceId(String deviceId) {
+            this.deviceId = deviceId;
+        }
+
+        public String getAppId() {
+            return appId;
+        }
+
+        public void setAppId(String appId) {
+            this.appId = appId;
+        }
+
+        public String getCheckinTime() {
+            return checkinTime;
+        }
+
+        public void setCheckinTime(String checkinTime) {
+            this.checkinTime = checkinTime;
         }
     }
 
@@ -453,13 +514,43 @@ public class EntryCheckin {
             //return Integer.parseInt(getCurrentDate(FORMAT_DATE_FOR_ID));
         }
 
-        public String generateTicketNo() {
-            String prefix = "R-";
+        public String generateTicketNo(Context context, int lastTicketCounter) {
+            String prefix = "R/";
             if ("exclusive".equals(valetType.getAttrib().getValetTypeName().toLowerCase())) {
-                prefix = "E-";
+                prefix = "E/";
             }
 
-            return prefix + getVthdId();
+            PrefManager prefManager = PrefManager.getInstance(context);
+
+            int idSite = prefManager.getIdSite();
+            String idLobby = prefManager.getIdDefaultDropPoint();
+            String remoteDevId = prefManager.getRemoteDeviceId();
+
+            StringBuilder sb = new StringBuilder()
+                    .append(prefix)
+                    .append(idSite)
+                    .append("/")
+                    .append(idLobby)
+                    .append("/")
+                    .append(remoteDevId)
+                    .append("/")
+                    .append(lastTicketCounter);
+
+            return sb.toString();
+        }
+
+        public int getLastTicketCounter(Context context) {
+            PrefManager prefManager = PrefManager.getInstance(context);
+            int lastTicketCounter = prefManager.getLastTicketCounter();
+            int lastPrintedTicketCounter = prefManager.getLastPrintedTicket();
+
+            if (lastTicketCounter <= lastPrintedTicketCounter) {
+                lastTicketCounter = lastPrintedTicketCounter + 1;
+            }
+
+            prefManager.saveLastPrintedTicketCounter(lastTicketCounter);
+
+            return lastTicketCounter;
         }
     }
 }

@@ -19,6 +19,11 @@ public class PrefManager {
     public static final String KEY_SITE_NAME = "site";
     public static final String KEY_PRINTER_ADDRESS = "mac_addres";
     public static final String KEY_ID_SITE = "csmsid";
+    public static final String KEY_DEVICE_ID = "device_id";
+    public static final String KEY_APP_ID = "app_id";
+    public static final String KEY_REMOTE_DEVICE_ID = "rem_dev_id";
+    public static final String KEY_LAST_COUNTER_TICKET = "last_counter_ticket";
+    public static final String KEY_LAST_PRINTED_TICKET_COUNTER = "last_printed_ticket_counter";
 
     private Context context;
     private static PrefManager prefManager;
@@ -57,6 +62,47 @@ public class PrefManager {
     public String getIdDefaultDropPoint() {
         String id = sharedPreferences.getString(KEY_DEFAULT_DROPPOINT, null);
         return id;
+    }
+
+    public void saveRemoteDeviceId(String remoteDevId) {
+        editor.putString(KEY_REMOTE_DEVICE_ID, remoteDevId);
+        editor.commit();
+    }
+
+    public String getRemoteDeviceId() {
+        return sharedPreferences.getString(KEY_REMOTE_DEVICE_ID, "");
+    }
+
+    public void saveLastTicketCounter(int lastCountTicket) {
+        editor.putInt(KEY_LAST_COUNTER_TICKET, lastCountTicket);
+        editor.commit();
+    }
+
+    public int getLastTicketCounter() {
+        return sharedPreferences.getInt(KEY_LAST_COUNTER_TICKET, 0);
+    }
+
+    public void saveLastPrintedTicketCounter(int lastPrinted) {
+        editor.putInt(KEY_LAST_PRINTED_TICKET_COUNTER, lastPrinted);
+        editor.commit();
+    }
+
+    public int getLastPrintedTicket() {
+        return sharedPreferences.getInt(KEY_LAST_PRINTED_TICKET_COUNTER, 0);
+    }
+
+    public void saveDeviceAndAppId(String deviceId, String appId) {
+        editor.putString(KEY_DEVICE_ID, deviceId);
+        editor.putString(KEY_APP_ID, appId);
+        editor.commit();
+    }
+
+    public String getDeviceId() {
+        return sharedPreferences.getString(KEY_DEVICE_ID, " ");
+    }
+
+    public String getAppId() {
+        return sharedPreferences.getString(KEY_APP_ID, " ");
     }
 
     public void setDefaultDropPointName(String name) {

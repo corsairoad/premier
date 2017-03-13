@@ -33,6 +33,8 @@ public class PatchMeBody {
             private int userRoleId;
             @SerializedName("drms_id")
             private int lobbyId = 0;
+            @SerializedName("iems_imei")
+            private String deviceId;
 
             public void setUserRoleId(int userRoleId) {
                 this.userRoleId = userRoleId;
@@ -40,6 +42,10 @@ public class PatchMeBody {
 
             public void setLobbyId(int lobbyId) {
                 this.lobbyId = lobbyId;
+            }
+
+            public void setDeviceId(String deviceId) {
+                this.deviceId = deviceId;
             }
         }
     }

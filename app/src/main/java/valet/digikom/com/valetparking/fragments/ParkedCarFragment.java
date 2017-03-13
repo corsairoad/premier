@@ -20,6 +20,7 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import valet.digikom.com.valetparking.CheckoutActivity;
 import valet.digikom.com.valetparking.ParkedCarDetailActivity;
 import valet.digikom.com.valetparking.R;
 import valet.digikom.com.valetparking.adapter.ListCheckinAdapter;
@@ -29,6 +30,7 @@ import valet.digikom.com.valetparking.dao.TokenDao;
 import valet.digikom.com.valetparking.domain.Checkin;
 import valet.digikom.com.valetparking.domain.CheckinList;
 import valet.digikom.com.valetparking.domain.EntryCheckinResponse;
+import valet.digikom.com.valetparking.domain.EntryCheckoutCont;
 import valet.digikom.com.valetparking.service.ApiClient;
 import valet.digikom.com.valetparking.service.ApiEndpoint;
 import valet.digikom.com.valetparking.service.ProcessRequest;
@@ -103,8 +105,8 @@ public class ParkedCarFragment extends Fragment implements ListCheckinAdapter.On
 
     @Override
     public void onItemCheckinClick(int id) {
-        Intent intent = new Intent(getContext(), ParkedCarDetailActivity.class);
-        intent.putExtra(EntryCheckinResponse.ID_ENTRY_CHECKIN, id);
+        Intent intent = new Intent(getContext(), CheckoutActivity.class);
+        intent.putExtra(EntryCheckoutCont.KEY_ENTRY_CHECKOUT, id);
         startActivity(intent);
     }
 
@@ -146,6 +148,7 @@ public class ParkedCarFragment extends Fragment implements ListCheckinAdapter.On
         TokenDao.getToken(new ProcessRequest() {
             @Override
             public void process(String token) {
+
                 if (getContext() != null) {
                     Toast.makeText(getContext(), "Downloading data..", Toast.LENGTH_SHORT).show();
                 }
@@ -153,6 +156,7 @@ public class ParkedCarFragment extends Fragment implements ListCheckinAdapter.On
                 ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class, token);
                 Call<CheckinList> call = apiEndpoint.getCheckinList(999);
                 call.enqueue(new Callback<CheckinList>() {
+
                     @Override
                     public void onResponse(Call<CheckinList> call, Response<CheckinList> response) {
                         if (response != null && response.body() != null) {

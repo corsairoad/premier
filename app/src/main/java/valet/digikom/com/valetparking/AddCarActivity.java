@@ -2,35 +2,30 @@ package valet.digikom.com.valetparking;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
-import java.util.ArrayList;
+
+import com.google.gson.Gson;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
 import java.util.List;
-import cn.pedant.SweetAlert.SweetAlertDialog;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+
 import valet.digikom.com.valetparking.dao.EntryCheckinContainerDao;
 import valet.digikom.com.valetparking.dao.EntryDao;
-import valet.digikom.com.valetparking.dao.TokenDao;
 import valet.digikom.com.valetparking.domain.AdditionalItems;
-import valet.digikom.com.valetparking.domain.Checkin;
 import valet.digikom.com.valetparking.domain.DefectMaster;
 import valet.digikom.com.valetparking.domain.EntryCheckin;
 import valet.digikom.com.valetparking.domain.EntryCheckinContainer;
 import valet.digikom.com.valetparking.domain.EntryCheckinResponse;
-import valet.digikom.com.valetparking.domain.PrintCheckin;
 import valet.digikom.com.valetparking.domain.PrintReceiptChekin;
 import valet.digikom.com.valetparking.domain.ValetTypeJson;
 import valet.digikom.com.valetparking.fragments.DefectFragment;
@@ -39,9 +34,6 @@ import valet.digikom.com.valetparking.fragments.SignDialogFragment;
 import valet.digikom.com.valetparking.fragments.StepOneFragmet;
 import valet.digikom.com.valetparking.fragments.StepThreeFragment;
 import valet.digikom.com.valetparking.fragments.StepTwoFragment;
-import valet.digikom.com.valetparking.service.ApiClient;
-import valet.digikom.com.valetparking.service.ApiEndpoint;
-import valet.digikom.com.valetparking.service.ProcessRequest;
 import valet.digikom.com.valetparking.util.CheckinCheckoutAlarm;
 import valet.digikom.com.valetparking.util.PrefManager;
 
@@ -81,9 +73,11 @@ public class AddCarActivity extends FragmentActivity implements StepOneFragmet.O
         entryCheckinContainerDao = EntryCheckinContainerDao.getInstance(this);
     }
 
-    private void submitCheckin(final EntryCheckinContainer checkinContainer, final EntryCheckin.Builder builder,final SweetAlertDialog sweetAlertDialog) {
+    private void submitCheckin(final EntryCheckinContainer checkinContainer, final EntryCheckin.Builder builder) {
+        processFailedCheckin(builder, checkinContainer);
+        goToMain();
 
-
+        /*
         if (!ApiClient.isNetworkAvailable(this)) {
             processFailedCheckin(builder, checkinContainer);
             progressBar.setVisibility(View.GONE);
@@ -106,21 +100,11 @@ public class AddCarActivity extends FragmentActivity implements StepOneFragmet.O
                             } else {
                                 Log.d("Post entry", "post entry checkin failed.");
                                 processFailedCheckin(builder, checkinContainer);
-                                //Toast.makeText(AddCarActivity.this,"Post Entry Checkin failed", Toast.LENGTH_SHORT).show();
-                                /*
-                                sweetAlertDialog.setTitleText("Failed!")
-                                        .setContentText("Registration Failed. Please contact your support.")
-                                        .setConfirmText("OK")
-                                        .setConfirmClickListener(null)
-                                        .changeAlertType(SweetAlertDialog.ERROR_TYPE);
-                                        */
                             }
-
                             goToMain();
                         }
                         @Override
                         public void onFailure(Call<EntryCheckinResponse> call, Throwable t) {
-                            //Toast.makeText(AddCarActivity.this,"Post Entry Checkin failed", Toast.LENGTH_SHORT).show();
                             progressBar.setVisibility(View.GONE);
                             processFailedCheckin(builder, checkinContainer);
 
@@ -130,18 +114,7 @@ public class AddCarActivity extends FragmentActivity implements StepOneFragmet.O
                 }
             }, this);
         }
-
-
-        /*
-      new Thread(new Runnable() {
-          @Override
-          public void run() {
-              ValetDbHelper valetDbHelper = new ValetDbHelper(AddCarActivity.this);
-              CheckinDao checkinDao = CheckinDao.newInstance(valetDbHelper, AddCarActivity.this);
-              checkinDao.addCheckIn(checkin,bmp);
-          }
-      }).run();
-      */
+        */
     }
 
     @Override
@@ -190,33 +163,6 @@ public class AddCarActivity extends FragmentActivity implements StepOneFragmet.O
         fragmentReview.setImageDefect(bitmap);
     }
 
-    private void showConfirmDialog(final ReviewFragment reviewFragment) {
-        new SweetAlertDialog(this, SweetAlertDialog.NORMAL_TYPE)
-                .setTitleText("Registration")
-                .setContentText("Submit Registration?")
-                .setConfirmText("Yes")
-                .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
-                    @Override
-                    public void onClick(SweetAlertDialog sweetAlertDialog) {
-                        fragmentRegFirst.setCheckIn();
-                        sweetAlertDialog.dismissWithAnimation();
-                        progressBar.setVisibility(View.VISIBLE);
-                        submitCheckin(fragmentReview.getEntryCheckinContainer(), fragmentReview.getBuilder(),sweetAlertDialog);
-                        //submitCheckin(signBmp, fragmentReview.getCheckin(), fragmentReview.getEntryCheckinContainer());
-
-                    }
-                })
-                .setCancelText("Cancel")
-                .setCancelClickListener(new SweetAlertDialog.OnSweetClickListener() {
-                    @Override
-                    public void onClick(SweetAlertDialog sweetAlertDialog) {
-                        sweetAlertDialog.cancel();
-                    }
-                })
-                .showCancelButton(true)
-                .show();
-    }
-
     @Override
     public void onClick(View view) {
         if (view == btnSubmit) {
@@ -245,15 +191,10 @@ public class AddCarActivity extends FragmentActivity implements StepOneFragmet.O
         //showConfirmDialog(fragmentReview);
         fragmentRegFirst.setCheckIn();
         progressBar.setVisibility(View.VISIBLE);
-        submitCheckin(fragmentReview.getEntryCheckinContainer(), fragmentReview.getBuilder(),null);
-
-    }
-
-    private void printCheckin(final EntryCheckinResponse response) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                print(response);
+                submitCheckin(fragmentReview.getEntryCheckinContainer(), fragmentReview.getBuilder());
             }
         });
     }
@@ -265,18 +206,11 @@ public class AddCarActivity extends FragmentActivity implements StepOneFragmet.O
         printReceiptChekin.buildPrintData();
     }
 
-    private void disableActivity() {
-        // disable activity from user input until submit process done
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-        layoutGrey.setVisibility(View.VISIBLE);
-    }
-
-    private void enableActivity() {
-        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-        layoutGrey.setVisibility(View.GONE);
-    }
-
     private void processFailedCheckin(EntryCheckin.Builder builder, EntryCheckinContainer checkinContainer) {
+        PrefManager prefManager = PrefManager.getInstance(this);
+        int lastTicketCounter = builder.getLastTicketCounter(this);
+
+        // ------------ create checkin data and save to local db ------------------
         EntryCheckinResponse entryCheckinResponse = new EntryCheckinResponse();
         EntryCheckinResponse.Data data = new EntryCheckinResponse.Data();
         EntryCheckinResponse.Attribute attr = new EntryCheckinResponse.Attribute();
@@ -290,11 +224,11 @@ public class AddCarActivity extends FragmentActivity implements StepOneFragmet.O
         attr.setLogoMobil(builder.getCarMaster().getAttrib().getLogo());
         attr.setCheckinTime(builder.getCheckInTime());
         attr.setDropPoint(builder.getDropPointMaster().getAttrib().getDropName());
-        attr.setId(builder.getVthdId());
+        attr.setId(lastTicketCounter);
         attr.setFee(builder.getValetType().getAttrib().getPrice());
         attr.setPlatNo(builder.getPlatNo());
-        attr.setIdTransaksi(builder.generateTicketNo());
-        attr.setSiteName(PrefManager.getInstance(this).getSiteName());
+        attr.setIdTransaksi(builder.generateTicketNo(this, lastTicketCounter)); // no ticket
+        attr.setSiteName(prefManager.getSiteName());
 
         data.setAttribute(attr);
         data.setId(String.valueOf(attr.getId())); // vthdid
@@ -302,24 +236,58 @@ public class AddCarActivity extends FragmentActivity implements StepOneFragmet.O
         data.setType("ad_entry_checkin");
         entryCheckinResponse.setData(data);
 
-        checkinContainer.getEntryCheckin().setId(data.getId());
+        // -------------- create checkin json body for save to local db and upload to server --------------
+        EntryCheckin entryCheckin = checkinContainer.getEntryCheckin();
+        entryCheckin.setId(String.valueOf(lastTicketCounter));
+        entryCheckin.getAttrib().setCheckinTime(attr.getCheckinTime());
+        entryCheckin.getAttrib().setTicketNo(attr.getIdTransaksi());
+        entryCheckin.getAttrib().setQrCode("------------------------");
+        entryCheckin.getAttrib().setDeviceId(prefManager.getDeviceId());
+        entryCheckin.getAttrib().setAppId(prefManager.getAppId());
+        entryCheckin.getAttrib().setLastTicketCounter(lastTicketCounter);
+
         entryDao.insertEntryResponse(entryCheckinResponse, EntryCheckinResponse.FLAG_UPLOAD_PENDING);
-        long a = entryCheckinContainerDao.insert(checkinContainer);
+        entryCheckinContainerDao.insert(checkinContainer);
 
-        if (a>=0) {
-            Toast.makeText(this, "insert container sukes", Toast.LENGTH_SHORT).show();
-        }
+        //debugJsonCheckin(checkinContainer);
 
+        startAlarmForUploadCheckin();
         print(entryCheckinResponse);
+    }
 
+    private void startAlarmForUploadCheckin() {
         CheckinCheckoutAlarm checkinCheckoutAlarm = CheckinCheckoutAlarm.getInstance(this);
         checkinCheckoutAlarm.startAlarm();
     }
 
     private void goToMain() {
         Intent intent = new Intent(this, Main2Activity.class);
+        //intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.setAction(Main2Activity.ACTION_DOWNLOAD_CHECKIN);
         startActivity(intent);
         finish();
+    }
+
+    private void debugJsonCheckin(EntryCheckinContainer entryCheckinContainer) {
+        Gson gson = new Gson();
+        String jsonEntryCheckin = gson.toJson(entryCheckinContainer);
+        exportToFile(jsonEntryCheckin);
+        Log.d("JSON CHECKIN", jsonEntryCheckin);
+
+    }
+
+    private void exportToFile(String json) {
+        try {
+            File myFile = new File("/sdcard/mysdfile.txt");
+            myFile.createNewFile();
+            FileOutputStream fOut = new FileOutputStream(myFile);
+            OutputStreamWriter myOutWriter =new OutputStreamWriter(fOut);
+            myOutWriter.append(json);
+            myOutWriter.close();
+            fOut.close();
+            Toast.makeText(this,"Done writing SD 'mysdfile.txt'", Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            Toast.makeText(this, e.getMessage(),Toast.LENGTH_SHORT).show();
+        }
     }
 }

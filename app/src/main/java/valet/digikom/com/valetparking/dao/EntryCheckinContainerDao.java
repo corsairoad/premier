@@ -64,9 +64,10 @@ public class EntryCheckinContainerDao {
         return containers;
     }
 
-    public void deleteById(String id) {
+    public int deleteById(String id) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         String[] args = new String[] {id};
-        db.delete(EntryCheckinContainer.Table.TABLE_NAME,EntryCheckinContainer.Table.COL_FAKE_VTHD_ID + "=?", args);
+
+        return db.delete(EntryCheckinContainer.Table.TABLE_NAME,EntryCheckinContainer.Table.COL_FAKE_VTHD_ID + " = ?", args);
     }
 }

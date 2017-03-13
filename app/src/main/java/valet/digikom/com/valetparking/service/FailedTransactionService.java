@@ -16,10 +16,12 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import valet.digikom.com.valetparking.dao.EntryCheckinContainerDao;
+import valet.digikom.com.valetparking.dao.EntryDao;
 import valet.digikom.com.valetparking.dao.TokenDao;
 import valet.digikom.com.valetparking.domain.EntryCheckinContainer;
 import valet.digikom.com.valetparking.domain.EntryCheckinResponse;
 import valet.digikom.com.valetparking.util.CheckinCheckoutAlarm;
+import valet.digikom.com.valetparking.util.PrefManager;
 
 /**
  * Created by DIGIKOM-EX4 on 2/28/2017.
@@ -47,14 +49,14 @@ public class FailedTransactionService extends IntentService {
             for (EntryCheckinContainer container : containers) {
                 postCheckin(container);
             }
+            Log.d(TAG, "STARTED");
         }
-
-        Log.d(TAG, "START");
     }
 
     private void cancelAlarm() {
         CheckinCheckoutAlarm checkinCheckoutAlarm = CheckinCheckoutAlarm.getInstance(this);
         checkinCheckoutAlarm.cancelAlarm();
+        Log.d(TAG, "CANCELED");
     }
 
     private void postCheckin(final EntryCheckinContainer entryCheckinContainer) {
@@ -67,12 +69,26 @@ public class FailedTransactionService extends IntentService {
                     @Override
                     public void onResponse(Call<EntryCheckinResponse> call, Response<EntryCheckinResponse> response) {
                         if (response != null && response.body() != null) {
-                            EntryCheckinContainerDao containerDao = EntryCheckinContainerDao.getInstance(FailedTransactionService.this);
-                            containerDao.deleteById(entryCheckinContainer.getEntryCheckin().getId());
-                            Log.d(TAG,"post failed transaction success");
+                            int fakeVthdId = entryCheckinContainer.getEntryCheckin().getAttrib().getLastTicketCounter();
+                            int remoteVthdId = response.body().getData().getAttribute().getId();
+                            String tiketSeq = response.body().getData().getAttribute().getIdTransaksi();
+                            int lastTicketCounter = response.body().getData().getAttribute().getLastTicketCounter();
+                            Log.d(TAG, "TICKET C0UNTER "+lastTicketCounter);
+
+                            PrefManager.getInstance(FailedTransactionService.this).saveLastTicketCounter(lastTicketCounter);
+
+                            int updateSuccess = EntryDao.getInstance(FailedTransactionService.this)
+                                    .updateRemoteAndTicketSequenceId(String.valueOf(fakeVthdId), remoteVthdId, tiketSeq);
+
+                            if (updateSuccess > 0) {
+                                EntryCheckinContainerDao containerDao = EntryCheckinContainerDao.getInstance(FailedTransactionService.this);
+                                int deleteSuccess = containerDao.deleteById(String.valueOf(fakeVthdId));
+                                Log.d(TAG,"remove failed-checkin " + deleteSuccess);
+                                Log.d(TAG, "No. TICKET: " +  response.body().getData().getAttribute().getIdTransaksi());
+                            }
                         }else {
                             //debugJsonCheckin(entryCheckinContainer);
-                            Log.d(TAG,"post failed transaction fail");
+                            Log.d(TAG,"post failed-checkin failed");
                         }
                     }
 
@@ -83,30 +99,5 @@ public class FailedTransactionService extends IntentService {
                 });
             }
         }, this);
-    }
-
-    private void debugJsonCheckin(EntryCheckinContainer entryCheckinContainer) {
-        Gson gson = new Gson();
-        String jsonEntryCheckin = gson.toJson(entryCheckinContainer);
-        exportToFile(jsonEntryCheckin);
-        Log.d("JSON CHECKIN", jsonEntryCheckin);
-
-    }
-
-    private void exportToFile(String json) {
-        try {
-            File myFile = new File("/sdcard/checkincontainer.txt");
-            myFile.createNewFile();
-            FileOutputStream fOut = new FileOutputStream(myFile);
-            OutputStreamWriter myOutWriter =new OutputStreamWriter(fOut);
-            myOutWriter.append(json);
-            myOutWriter.close();
-            fOut.close();
-            Toast.makeText(this,"Done writing SD 'mysdfile.txt'", Toast.LENGTH_SHORT).show();
-
-        } catch (Exception e)
-        {
-            Toast.makeText(this, e.getMessage(),Toast.LENGTH_SHORT).show();
-        }
     }
 }

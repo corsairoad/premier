@@ -76,6 +76,17 @@ public class EntryDao {
         db.update(EntryCheckinResponse.Table.TABLE_NAME, cv, EntryCheckinResponse.Table.COL_RESPONSE_ID + "=?", args);
     }
 
+    public int updateRemoteAndTicketSequenceId(String fakeVthdId, int remoteVthdId, String ticketSeq) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        String[] args = new String[] {fakeVthdId};
+        ContentValues cv = new ContentValues();
+        cv.put(EntryCheckinResponse.Table.COL_REMOTE_VTHD_ID, remoteVthdId);
+        cv.put(EntryCheckinResponse.Table.COL_TICKET_SEQUENCE, ticketSeq);
+        cv.put(EntryCheckinResponse.Table.COL_IS_UPLOADED, EntryCheckinResponse.FLAG_UPLOAD_SUCCESS);
+
+        return db.update(EntryCheckinResponse.Table.TABLE_NAME,cv, EntryCheckinResponse.Table.COL_RESPONSE_ID + "=?", args);
+    }
+
     public void insertListCheckin(List<EntryCheckinResponse.Data> checkinList) {
         if (!checkinList.isEmpty()) {
             for (EntryCheckinResponse.Data e : checkinList) {
@@ -88,6 +99,20 @@ public class EntryDao {
                 }
             }
         }
+    }
+
+    public int getRemoteVthdIdByFakeId(int id) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        String[] args = new String[] {String.valueOf(id)};
+        int remoteId = 0;
+        Cursor c = db.rawQuery("SELECT " + EntryCheckinResponse.Table.COL_REMOTE_VTHD_ID + " FROM " + EntryCheckinResponse.Table.TABLE_NAME
+        + " WHERE " + EntryCheckinResponse.Table.COL_RESPONSE_ID + " = ?", args);
+
+        if (c.moveToFirst()) {
+            remoteId = c.getInt(0);
+        }
+
+        return remoteId;
     }
 
     public List<EntryCheckinResponse> fetchAllCheckinResponse() {
@@ -104,9 +129,7 @@ public class EntryDao {
             }while (c.moveToNext());
         }
 
-
         c.close();
-
 
         return responseList;
     }

@@ -1,7 +1,5 @@
 package valet.digikom.com.valetparking;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
@@ -19,6 +17,8 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.telephony.TelephonyManager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -28,11 +28,13 @@ import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.UUID;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 import valet.digikom.com.valetparking.adapter.ParkedCarPagerAdapter;
 import valet.digikom.com.valetparking.dao.DropDao;
 import valet.digikom.com.valetparking.domain.EntryCheckinResponse;
+import valet.digikom.com.valetparking.domain.EntryCheckoutCont;
 import valet.digikom.com.valetparking.fragments.CalledCarFragment;
 import valet.digikom.com.valetparking.fragments.ParkedCarFragment;
 import valet.digikom.com.valetparking.util.CheckoutReadyAlarm;
@@ -65,8 +67,6 @@ public class Main2Activity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-
 
         prefManager = PrefManager.getInstance(this);
         if(prefManager.getIdSite() == 0 && prefManager.getAuthResponse() != null) {
@@ -101,7 +101,8 @@ public class Main2Activity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(Main2Activity.this, AddCarActivity.class));
+                Intent intent = new Intent(Main2Activity.this, AddCarActivity.class);
+                startActivity(intent);
             }
         });
 
@@ -328,15 +329,18 @@ public class Main2Activity extends AppCompatActivity
             Uri uri = intent.getData();
             String queryId = uri.getLastPathSegment();
             startParkDetailActivity(queryId);
-        }else if (ACTION_DOWNLOAD_CHECKIN.equals(intent.getAction())) {
+        }
+        /*
+        else if (ACTION_DOWNLOAD_CHECKIN.equals(intent.getAction())) {
             ParkedCarFragment parkedCarFragment = (ParkedCarFragment) pagerAdapter.getItem(0);
             parkedCarFragment.downloadCheckinList();
         }
+        */
     }
 
     private void startParkDetailActivity(String idResponse) {
-        Intent intent = new Intent(this, ParkedCarDetailActivity.class);
-        intent.putExtra(EntryCheckinResponse.ID_ENTRY_CHECKIN, Integer.valueOf(idResponse));
+        Intent intent = new Intent(this, CheckoutActivity.class);
+        intent.putExtra(EntryCheckoutCont.KEY_ENTRY_CHECKOUT, Integer.valueOf(idResponse));
         startActivity(intent);
     }
 
@@ -345,7 +349,7 @@ public class Main2Activity extends AppCompatActivity
         String printer = prefManager.getPrinterMacAddress();
         if (printer == null) {
             new MaterialDialog.Builder(this)
-                    .title("Connect to Printer?")
+                    .title("Connect to Printer")
                     .content("You are not connected to printer. Connect now?")
                     .positiveText("Oke")
                     .positiveColor(Color.parseColor("#00695c"))

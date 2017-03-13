@@ -1,17 +1,16 @@
 package valet.digikom.com.valetparking;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.Toast;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -82,7 +81,6 @@ public class WelcomeActivity extends AppCompatActivity {
                 if (roleOption != null) {
                     mRoleOption = roleOption;
                     patch(mRoleOption.getIdLobby());
-                }else {
                 }
             }
 
@@ -128,6 +126,7 @@ public class WelcomeActivity extends AppCompatActivity {
                 PatchMeBody.Data.RoleOpt role = new PatchMeBody.Data.RoleOpt();
                 role.setUserRoleId(mRoleOption.getUserRoleId());
                 role.setLobbyId(idLobby);
+                role.setDeviceId(prefManager.getDeviceId());
                 data.setRoleOpt(role);
                 patchMeBody.setData(data);
 
@@ -137,6 +136,13 @@ public class WelcomeActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(Call<PatchMeResponse> call, Response<PatchMeResponse> response) {
                         if (response != null && response.body() != null) {
+                            String remoteDeviceId = response.body().getData().getRemoteDeviceId();
+                            int lastTicketCounter = response.body().getData().getLastCounterTicket();
+                            prefManager.saveRemoteDeviceId(remoteDeviceId);
+                            prefManager.saveLastTicketCounter(lastTicketCounter);
+
+                            Log.d("Last_ticket", ""+lastTicketCounter);
+
                             //download lobby
                             TokenDao.getToken(new ProcessRequest() {
                                 @Override
@@ -161,8 +167,6 @@ public class WelcomeActivity extends AppCompatActivity {
                                     });
                                 }
                             }, WelcomeActivity.this);
-                        }else {
-
                         }
                     }
 

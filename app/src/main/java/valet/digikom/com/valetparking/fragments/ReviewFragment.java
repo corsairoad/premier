@@ -253,17 +253,7 @@ public class ReviewFragment extends Fragment {
         EntryCheckinContainer entryCheckinContainer = new EntryCheckinContainer();
         entryCheckinContainer.setEntryCheckin(entryCheckin);
 
-        //debugJsonCheckin(entryCheckinContainer);
-
         return entryCheckinContainer;
-    }
-
-    private void debugJsonCheckin(EntryCheckinContainer entryCheckinContainer) {
-        Gson gson = new Gson();
-        String jsonEntryCheckin = gson.toJson(entryCheckinContainer);
-        exportToFile(jsonEntryCheckin);
-        Log.d("JSON CHECKIN", jsonEntryCheckin);
-
     }
 
     private void getDefualtDropPoint() {
@@ -280,24 +270,6 @@ public class ReviewFragment extends Fragment {
                 }
             }
         }).run();
-    }
-
-    private void exportToFile(String json) {
-        try {
-            File myFile = new File("/sdcard/mysdfile.txt");
-            myFile.createNewFile();
-            FileOutputStream fOut = new FileOutputStream(myFile);
-            OutputStreamWriter myOutWriter =new OutputStreamWriter(fOut);
-            myOutWriter.append(json);
-            myOutWriter.close();
-            fOut.close();
-            Toast.makeText(getContext(),"Done writing SD 'mysdfile.txt'", Toast.LENGTH_SHORT).show();
-
-        }
-        catch (Exception e)
-        {
-            Toast.makeText(getContext(), e.getMessage(),Toast.LENGTH_SHORT).show();
-        }
     }
 
 
