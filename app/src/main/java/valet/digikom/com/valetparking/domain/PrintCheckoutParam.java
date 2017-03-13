@@ -22,6 +22,7 @@ public class PrintCheckoutParam {
     MembershipResponse.Data dataMembership;
     String idMembersip;
     String checkoutTime;
+    String totalCheckin;
     PaymentMethod.Data paymentData;
     Bank.Data bankData;
 
@@ -32,11 +33,20 @@ public class PrintCheckoutParam {
         setOverNightFine(builder.overNightFine);
         setLostTicketFine(builder.lostTicketFine);
         setNoVoucher(builder.noVoucher);
+        setTotalCheckin(builder.totalCheckin);
         setDataMembership(builder.dataMembership);
         setIdMembersip(builder.idMembersip);
         setCheckoutTime(builder.checkoutTime);
         setPaymentData(builder.paymentData);
         setBankData(builder.bankData);
+    }
+
+    public String getTotalCheckin() {
+        return totalCheckin;
+    }
+
+    public void setTotalCheckin(String totalCheckin) {
+        this.totalCheckin = totalCheckin;
     }
 
     public String getTotalBayar() {
@@ -137,6 +147,7 @@ public class PrintCheckoutParam {
         MembershipResponse.Data dataMembership;
         String idMembersip;
         String checkoutTime;
+        String totalCheckin;
         PaymentMethod.Data paymentData;
         Bank.Data bankData;
 
@@ -150,6 +161,11 @@ public class PrintCheckoutParam {
 
         public Builder setEntryCheckinResponse(EntryCheckinResponse response) {
             this.entryCheckinResponse = response;
+            return this;
+        }
+
+        public Builder setTotalCheckin(String totalCheckin) {
+            this.totalCheckin = totalCheckin;
             return this;
         }
 

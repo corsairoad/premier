@@ -16,6 +16,8 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
 import java.util.ArrayList;
@@ -433,7 +435,13 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
                     @Override
                     public void onClick(SweetAlertDialog sweetAlertDialog) {
                         sweetAlertDialog.dismissWithAnimation();
-                        submitCheckout();
+
+                        if (ApiClient.isNetworkAvailable(CheckoutActivity.this)) {
+                            Toast.makeText(CheckoutActivity.this, "Closing... please wait", Toast.LENGTH_SHORT).show();
+                            submitCheckout();
+                        }else {
+                            Toast.makeText(CheckoutActivity.this, "No Internet connection.", Toast.LENGTH_SHORT).show();
+                        }
                     }
                 })
                 .setCancelText("Cancel")
@@ -446,6 +454,8 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
                 .showCancelButton(true)
                 .show();
     }
+
+
 
     private void submitCheckout() {
         FinishCheckOut.Builder builder = new FinishCheckOut.Builder();

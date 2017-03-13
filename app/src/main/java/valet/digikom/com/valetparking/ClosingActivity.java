@@ -2,8 +2,8 @@ package valet.digikom.com.valetparking;
 
 import android.content.Intent;
 import android.os.AsyncTask;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
@@ -14,12 +14,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-
 import cn.pedant.SweetAlert.SweetAlertDialog;
 import me.zhanghai.android.materialprogressbar.MaterialProgressBar;
 import retrofit2.Call;
@@ -30,7 +28,6 @@ import valet.digikom.com.valetparking.dao.ClosingDao;
 import valet.digikom.com.valetparking.dao.TokenDao;
 import valet.digikom.com.valetparking.domain.ClosingData;
 import valet.digikom.com.valetparking.domain.EntryCheckinResponse;
-import valet.digikom.com.valetparking.domain.PrintClosing;
 import valet.digikom.com.valetparking.domain.PrintClosingParam;
 import valet.digikom.com.valetparking.domain.PrintReceiptClosing;
 import valet.digikom.com.valetparking.service.ApiClient;
@@ -109,7 +106,6 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
         PrefManager prefManager = PrefManager.getInstance(this);
         String lobbyName = prefManager.getDefaultDropPointName();
         String siteName = prefManager.getSiteName();
-        String lokasi = siteName + ": " + lobbyName;
         ClosingDao closingDao = ClosingDao.getInstance(this);
         String readInfo = inputRemark.getText().toString();
         String startDate = inputDateFrom.getText().toString();

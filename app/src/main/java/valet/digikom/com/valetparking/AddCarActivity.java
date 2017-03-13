@@ -12,6 +12,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.google.gson.Gson;
 
 import java.io.File;
@@ -41,16 +42,17 @@ public class AddCarActivity extends FragmentActivity implements StepOneFragmet.O
                 StepThreeFragment.OnStuffSelectedListener, DefectFragment.OnDefectDrawingListener, View.OnClickListener, StepOneFragmet.OnValetTypeSelectedListener, SignDialogFragment.OnDialogSignListener {
 
     public static final String KEY_DIALOG_SIGN = "sign";
-    Button btnSubmit;
-    Button btnCancel;
-    StepOneFragmet fragmentRegFirst;
-    DefectFragment fragmentDefect;
-    StepThreeFragment fragmentStuff;
-    ReviewFragment fragmentReview;
-    LinearLayout layoutGrey;
-    ProgressBar progressBar;
-    EntryDao entryDao;
-    EntryCheckinContainerDao entryCheckinContainerDao;
+    private Button btnSubmit;
+    private Button btnCancel;
+    private StepOneFragmet fragmentRegFirst;
+    private DefectFragment fragmentDefect;
+    private StepThreeFragment fragmentStuff;
+    private ReviewFragment fragmentReview;
+    private LinearLayout layoutGrey;
+    private ProgressBar progressBar;
+    private EntryDao entryDao;
+    private EntryCheckinContainerDao entryCheckinContainerDao;
+    private SignDialogFragment sdf;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,7 +78,6 @@ public class AddCarActivity extends FragmentActivity implements StepOneFragmet.O
     private void submitCheckin(final EntryCheckinContainer checkinContainer, final EntryCheckin.Builder builder) {
         processFailedCheckin(builder, checkinContainer);
         goToMain();
-
         /*
         if (!ApiClient.isNetworkAvailable(this)) {
             processFailedCheckin(builder, checkinContainer);
@@ -181,22 +182,34 @@ public class AddCarActivity extends FragmentActivity implements StepOneFragmet.O
     }
 
     private void showSignDialog() {
-        SignDialogFragment sdf = new SignDialogFragment();
+        sdf = new SignDialogFragment();
         sdf.show(getSupportFragmentManager(), KEY_DIALOG_SIGN);
     }
 
     @Override
     public void setBitMapSign(Bitmap bitMapSign) {
+
+        if (sdf != null) {
+            sdf.dismiss();
+        }
+
+        new MaterialDialog.Builder(this)
+                .title("Registration success")
+                .customView(R.layout.layout_scrolling_image, false)
+                .show();
+
         fragmentReview.setSignBitmap(bitMapSign);
         //showConfirmDialog(fragmentReview);
         fragmentRegFirst.setCheckIn();
         progressBar.setVisibility(View.VISIBLE);
-        runOnUiThread(new Runnable() {
+
+        new Thread(new Runnable() {
             @Override
             public void run() {
                 submitCheckin(fragmentReview.getEntryCheckinContainer(), fragmentReview.getBuilder());
+                //goToMain();
             }
-        });
+        }).start();
     }
 
     private void print(EntryCheckinResponse response) {

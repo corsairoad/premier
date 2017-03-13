@@ -164,9 +164,9 @@ public class FinishCheckoutDao implements ProcessRequest {
                     setCheckoutCar(id);
                     Toast.makeText(context,"Checkout success", Toast.LENGTH_SHORT).show();
                     //new PrintCheckoutTask().execute();
-                    print();
+                    print(id);
                 }else {
-                    Toast.makeText(context,"Checkout failed. Voucher number or member id invalid.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context,"Checkout failed.", Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -177,12 +177,14 @@ public class FinishCheckoutDao implements ProcessRequest {
         });
     }
 
-    private void print() {
+    private void print(int remoteId) {
 
         // create print checkout param
+        String ticketSeq = EntryDao.getInstance(context).getTicketSequence(remoteId);
         PrintCheckoutParam.Builder paramBuilder = new PrintCheckoutParam.Builder()
                 .setTotalBayar(getTotalBayar())
                 .setEntryCheckinResponse(getEntryCheckinResponse())
+                .setTotalCheckin(ticketSeq)
                 .setFinishCheckout(getFinishCheckOut())
                 .setOvernigthFine(getOverNightFine())
                 .setLostTicketFine(getLostTicketFine())
@@ -220,20 +222,6 @@ public class FinishCheckoutDao implements ProcessRequest {
         String[] args = new String[] {String.valueOf(id)};
         ContentValues cv = new ContentValues();
         cv.put(EntryCheckinResponse.Table.COL_IS_CHECKOUT, 1);
-        db.update(EntryCheckinResponse.Table.TABLE_NAME,cv, EntryCheckinResponse.Table.COL_REMOTE_VTHD_ID + " =?", args);
-    }
-
-    private class PrintCheckoutTask extends AsyncTask<Void, Void, String> {
-        @Override
-        protected String doInBackground(Void... voids) {
-            print();
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(String s) {
-            super.onPostExecute(s);
-            goToMain();
-        }
+        db.update(EntryCheckinResponse.Table.TABLE_NAME,cv, EntryCheckinResponse.Table.COL_REMOTE_VTHD_ID + " = ?", args);
     }
 }

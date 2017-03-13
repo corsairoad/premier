@@ -115,6 +115,20 @@ public class EntryDao {
         return remoteId;
     }
 
+    public String getTicketSequence(int id) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        String[] args = new String[] {String.valueOf(id)};
+        String ticketSeq = " ";
+        Cursor c = db.rawQuery("SELECT " + EntryCheckinResponse.Table.COL_TICKET_SEQUENCE + " FROM " + EntryCheckinResponse.Table.TABLE_NAME
+                + " WHERE " + EntryCheckinResponse.Table.COL_RESPONSE_ID + " = ?", args);
+
+        if (c.moveToFirst()) {
+            ticketSeq = c.getString(0);
+        }
+
+        return ticketSeq;
+    }
+
     public List<EntryCheckinResponse> fetchAllCheckinResponse() {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         // Cursor c = db.query(EntryCheckinResponse.Table.TABLE_NAME,null, EntryCheckinResponse.Table.COL_IS_CHECKOUT + "=? AND " + EntryCheckinResponse.Table.COL_IS_CALLED + "=0",new String[]{"0"},null,null,EntryCheckinResponse.Table.COL_RESPONSE_ID + " DESC");
@@ -153,6 +167,25 @@ public class EntryDao {
         String[] args = new String[] {String.valueOf(id)};
         // Cursor c = db.query(EntryCheckinResponse.Table.TABLE_NAME,null, EntryCheckinResponse.Table.COL_RESPONSE_ID + "=? AND " + EntryCheckinResponse.Table.COL_IS_CHECKOUT + " = 0",args,null,null,null);
         Cursor c = db.query(EntryCheckinResponse.Table.TABLE_NAME,null, EntryCheckinResponse.Table.COL_RESPONSE_ID + "=?",args,null,null,null);
+
+
+        if (c.moveToFirst()) {
+            do {
+                String jsonResponse = c.getString(c.getColumnIndex(EntryCheckinResponse.Table.COL_JSON_RESPONSE));
+                checkinResponse = gson.fromJson(jsonResponse, EntryCheckinResponse.class);
+
+            }while (c.moveToNext());
+        }
+
+        return checkinResponse;
+    }
+
+    public EntryCheckinResponse getEntryByRemoteId(int id) {
+        EntryCheckinResponse checkinResponse = null;
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        String[] args = new String[] {String.valueOf(id)};
+        // Cursor c = db.query(EntryCheckinResponse.Table.TABLE_NAME,null, EntryCheckinResponse.Table.COL_RESPONSE_ID + "=? AND " + EntryCheckinResponse.Table.COL_IS_CHECKOUT + " = 0",args,null,null,null);
+        Cursor c = db.query(EntryCheckinResponse.Table.TABLE_NAME,null, EntryCheckinResponse.Table.COL_REMOTE_VTHD_ID + "=?",args,null,null,null);
 
 
         if (c.moveToFirst()) {

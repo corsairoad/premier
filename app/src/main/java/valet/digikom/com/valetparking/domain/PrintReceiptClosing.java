@@ -61,7 +61,7 @@ public class PrintReceiptClosing extends PrintReceipt {
             String status = "";
 
             for (ClosingData.Data data : closingParam.getClosingData()) {
-                String transactNo = data.getAttributes().getTransactionId();
+                String transactNo = data.getAttributes().getNoTiket();
                 String noPol = data.getAttributes().getPlatNo();
                 //String valetType = data.getAttributes().getValetTypeName();
 

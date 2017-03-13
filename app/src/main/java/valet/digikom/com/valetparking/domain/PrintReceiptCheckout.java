@@ -37,6 +37,7 @@ public class PrintReceiptCheckout extends PrintReceipt {
             String checkinTime = printCheckoutParam.getEntryCheckinResponse().getData().getAttribute().getCheckinTime();
             String checkoutTime = printCheckoutParam.getCheckoutTime();
             String paymentName = printCheckoutParam.getPaymentData().getAttr().getPaymentName();
+            String ticketSeq = printCheckoutParam.getTotalCheckin();
             String feex = MakeCurrencyString.fromInt(printCheckoutParam.getEntryCheckinResponse().getData().getAttribute().getFee());
             int lostTicket = printCheckoutParam.getLostTicketFine();
             int overNight = printCheckoutParam.getOverNightFine();
@@ -68,6 +69,9 @@ public class PrintReceiptCheckout extends PrintReceipt {
             builder.addTextSize(1,1);
 
             sb.append(" No. Tiket     : " + noTrans + "\n");
+            if (!TextUtils.isEmpty(ticketSeq)) {
+                sb.append(" Id. Transaksi : " + ticketSeq + "\n");
+            }
             sb.append(" No. Plat      : " + noPol + "\n");
             sb.append(" Valet         : " + valetType + "\n");
             sb.append(" Jenis Mobil   : " + jenis + "\n");

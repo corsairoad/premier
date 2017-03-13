@@ -62,7 +62,7 @@ public class SignDialogFragment extends DialogFragment implements View.OnClickLi
             }
 
             listener.setBitMapSign(signPad.getSignatureBitmap());
-            dismiss();
+
         }
     }
 

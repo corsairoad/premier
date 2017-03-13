@@ -68,6 +68,8 @@ public class ClosingData {
             private String checkIn;
             @SerializedName("vthd_man_cotime")
             private String checkout;
+            @SerializedName("vthd_tix_id")
+            private String noTiket;
 
             public String getCreatedAt() {
                 return createdAt;
@@ -83,6 +85,10 @@ public class ClosingData {
 
             public String getLogoMobil() {
                 return logoMobil;
+            }
+
+            public String getNoTiket() {
+                return noTiket;
             }
 
             public String getValetHeaderId() {

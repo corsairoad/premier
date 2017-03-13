@@ -238,7 +238,7 @@ public class ParkedCarDetailActivity extends AppCompatActivity implements View.O
 
         @Override
         protected EntryCheckinResponse doInBackground(Integer... integers) {
-            return entryDao.getEntryByIdResponse(integers[0]);
+            return entryDao.getEntryByRemoteId(integers[0]);
         }
 
         @Override

@@ -20,11 +20,14 @@
                 android:paddingRight="@dimen/activity_horizontal_margin"
                 android:paddingTop="@dimen/activity_vertical_margin">
 
+                <!-- Visibility Gone -->
+
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="5"
                     android:gravity="center_vertical"
+                    android:visibility="gone"
                     android:orientation="vertical">
 
                     <TextView
