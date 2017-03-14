@@ -39,4 +39,6 @@ public class CheckinCheckoutAlarm {
     public void cancelAlarm() {
         alarmManager.cancel(pendingIntent);
     }
+
+
 }

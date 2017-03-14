@@ -69,11 +69,11 @@ public class FailedTransactionService extends IntentService {
                     @Override
                     public void onResponse(Call<EntryCheckinResponse> call, Response<EntryCheckinResponse> response) {
                         if (response != null && response.body() != null) {
-                            int fakeVthdId = entryCheckinContainer.getEntryCheckin().getAttrib().getLastTicketCounter();
+                            int fakeVthdId = entryCheckinContainer.getEntryCheckin().getAttrib().getLastTicketCounter(); // fake vthd id diambil dari last ticket counter
                             int remoteVthdId = response.body().getData().getAttribute().getId();
                             String tiketSeq = response.body().getData().getAttribute().getIdTransaksi();
                             int lastTicketCounter = response.body().getData().getAttribute().getLastTicketCounter();
-                            Log.d(TAG, "TICKET C0UNTER "+lastTicketCounter);
+                            Log.d(TAG, "TICKET C0UNTER "+ lastTicketCounter);
 
                             PrefManager.getInstance(FailedTransactionService.this).saveLastTicketCounter(lastTicketCounter);
 

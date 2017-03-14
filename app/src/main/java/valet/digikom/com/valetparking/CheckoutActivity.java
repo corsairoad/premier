@@ -20,7 +20,10 @@ import android.widget.Toast;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import cn.pedant.SweetAlert.SweetAlertDialog;
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -48,6 +51,7 @@ import valet.digikom.com.valetparking.service.ApiClient;
 import valet.digikom.com.valetparking.service.ApiEndpoint;
 import valet.digikom.com.valetparking.service.ProcessRequest;
 import valet.digikom.com.valetparking.util.MakeCurrencyString;
+import valet.digikom.com.valetparking.util.PrefManager;
 
 public class CheckoutActivity extends AppCompatActivity implements CompoundButton.OnCheckedChangeListener, View.OnClickListener, AdapterView.OnItemSelectedListener {
 
@@ -455,10 +459,16 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
                 .show();
     }
 
-
+    private String getCurrentDate() {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        return sdf.format(new Date());
+    }
 
     private void submitCheckout() {
         FinishCheckOut.Builder builder = new FinishCheckOut.Builder();
+        builder.setCheckoutTime(getCurrentDate());
+        builder.setAppId(PrefManager.getInstance(this).getAppId());
+        builder.setDeviceId(PrefManager.getInstance(this).getDeviceId());
 
         if (cbOvernight.isChecked()) {
             builder.setOvernightFee(mOvernightFine);
@@ -503,6 +513,7 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
         if (dataMembership != null) {
             dataMembership.getAttr().setToken(inputMembershipId.getText().toString());
         }
+
         finishCheckoutDao.setDataMembership(dataMembership);
         finishCheckoutDao.setIdMembership(inputMembershipId.getText().toString());
         finishCheckoutDao.setPaymentData(paymentData);
@@ -510,9 +521,9 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
 
         TokenDao.getToken(finishCheckoutDao, this);
 
-        //Gson gson = new Gson();
-        //String finishCheckOut = gson.toJson(builder.build());
-        //Log.d("json checkout", finishCheckOut);
+        Gson gson = new Gson();
+        String finishCheckOut = gson.toJson(builder.build());
+        Log.d("json checkout", finishCheckOut);
 
         //goToMain();
     }

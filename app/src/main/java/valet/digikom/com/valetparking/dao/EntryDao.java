@@ -118,9 +118,9 @@ public class EntryDao {
     public String getTicketSequence(int id) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         String[] args = new String[] {String.valueOf(id)};
-        String ticketSeq = " ";
+        String ticketSeq = null;
         Cursor c = db.rawQuery("SELECT " + EntryCheckinResponse.Table.COL_TICKET_SEQUENCE + " FROM " + EntryCheckinResponse.Table.TABLE_NAME
-                + " WHERE " + EntryCheckinResponse.Table.COL_RESPONSE_ID + " = ?", args);
+                + " WHERE " + EntryCheckinResponse.Table.COL_REMOTE_VTHD_ID + " = ?", args);
 
         if (c.moveToFirst()) {
             ticketSeq = c.getString(0);

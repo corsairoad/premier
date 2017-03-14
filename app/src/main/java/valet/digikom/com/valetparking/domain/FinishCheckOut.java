@@ -60,6 +60,24 @@ public class FinishCheckOut {
         public static class Attribute {
             @SerializedName("vthdPytoId")
             private String paymentId;
+            @SerializedName("vthdAppsTimeCO")
+            private String checkoutTime;
+            @SerializedName("vthdAppsIdCO")
+            private String appId;
+            @SerializedName("vthdImeiCO")
+            private String deviceId;
+
+            public void setCheckoutTime(String checkoutTime) {
+                this.checkoutTime = checkoutTime;
+            }
+
+            public void setAppId(String appId) {
+                this.appId = appId;
+            }
+
+            public void setDeviceId(String deviceId) {
+                this.deviceId = deviceId;
+            }
 
             public void setPaymentId(String paymentId) {
                 this.paymentId = paymentId;
@@ -246,10 +264,37 @@ public class FinishCheckOut {
         private Bank.Data bankData;
         private String voucher;
         private String cardNo;
+        private String checkoutTime;
+        private String appId;
+        private String deviceId;
 
         private Data data;
 
         public Builder() {
+        }
+
+        public String getCheckoutTime() {
+            return checkoutTime;
+        }
+
+        public void setCheckoutTime(String checkoutTime) {
+            this.checkoutTime = checkoutTime;
+        }
+
+        public String getAppId() {
+            return appId;
+        }
+
+        public void setAppId(String appId) {
+            this.appId = appId;
+        }
+
+        public String getDeviceId() {
+            return deviceId;
+        }
+
+        public void setDeviceId(String deviceId) {
+            this.deviceId = deviceId;
         }
 
         public String getVoucher() {
@@ -309,6 +354,10 @@ public class FinishCheckOut {
             Data.Attribute attribute = new Data.Attribute();
             Data.RelationShip relationShip = new Data.RelationShip();
 
+
+            attribute.setDeviceId(getDeviceId());
+            attribute.setAppId(getAppId());
+            attribute.setCheckoutTime(getCheckoutTime());
             // setup fine fee json object (lost ticket)
             Data.FineFeeDetail fineFeeDetail = new Data.FineFeeDetail();
             List<Data.DataRelationship> relationshipDataList = new ArrayList<>();
