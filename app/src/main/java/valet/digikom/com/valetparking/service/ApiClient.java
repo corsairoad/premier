@@ -1,23 +1,14 @@
 package valet.digikom.com.valetparking.service;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
 import android.net.ConnectivityManager;
-import android.os.SystemClock;
-import android.util.Log;
-
 import java.io.IOException;
 import java.net.SocketTimeoutException;
-import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
-
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import okhttp3.ResponseBody;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import valet.digikom.com.valetparking.dao.BankDao;
@@ -33,15 +24,13 @@ import valet.digikom.com.valetparking.dao.TokenDao;
 import valet.digikom.com.valetparking.dao.ValetTypeDao;
 import valet.digikom.com.valetparking.util.ValetDbHelper;
 
-import static com.bumptech.glide.gifdecoder.GifHeaderParser.TAG;
-
 /**
  * Created by dev on 1/7/17.
  */
 
 public class ApiClient {
-    public static final String BASE_URL = "http://premier.intelligence.id/v1/";
-    //public static final String BASE_URL = "http://dev.premier.intelligence.id/v1/";
+    // public static final String BASE_URL = "http://premier.intelligence.id/v1/";
+    private static final String BASE_URL = "http://dev.premier.intelligence.id/v1/";
     private static OkHttpClient.Builder httpClient = new OkHttpClient.Builder()
             .readTimeout(30, TimeUnit.SECONDS)
             .connectTimeout(30, TimeUnit.SECONDS);

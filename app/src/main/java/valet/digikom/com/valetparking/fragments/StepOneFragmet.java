@@ -5,7 +5,6 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
 import android.text.InputFilter;
@@ -159,6 +158,7 @@ public class StepOneFragmet extends Fragment implements View.OnClickListener {
 
             }
         });
+
         valetTypeAdapter = new ListValetTypeAdapter(getContext(),valetTypeJsonList);
         spValetType.setAdapter(valetTypeAdapter);
 
@@ -526,7 +526,7 @@ public class StepOneFragmet extends Fragment implements View.OnClickListener {
             RadioButton rb = new RadioButton(getContext());
             rb.setId(data.getAttrib().getId());
             rb.setText(valetTypeName);
-            rb.setTextSize(20);
+            rb.setTextSize(25);
             if ("regular".equals(valetTypeName.toLowerCase())) {
                 rb.setChecked(true);
             }

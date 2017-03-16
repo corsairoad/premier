@@ -123,7 +123,6 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
                 .setClosingData(closingData)
                 .setSiteName(siteName)
                 .setLobbyName(lobbyName)
-                .setSiteName(siteName)
                 .setDateFrom(startDate)
                 .setDateTo(endDate)
                 .setAdminName("Admin")

@@ -33,69 +33,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_marginBottom="16dp">
-
-                <!-- Visibility GONE -->
-                <Spinner
-                    android:id="@+id/spinner_valet_type_x"
-                    android:visibility="gone"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"/>
-
-                <RadioGroup
-                    android:id="@+id/rgroup_valet_type"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-                </RadioGroup>
-
-            </LinearLayout>
-
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginBottom="20dp">
-
-                <ImageView
-                    android:visibility="gone"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:src="@drawable/ic_pin_drop_black_24dp" />
-
-                <android.support.design.widget.TextInputLayout
-                    android:id="@+id/til_drop_point"
-                    app:hintAnimationEnabled="false"
-                    android:layout_width="0dp"
-                    android:layout_weight="5"
-                    android:layout_height="wrap_content">
-
-                    <EditText
-                        android:id="@+id/input_drop_point"
-                        android:layout_width="match_parent"
-                        android:editable="false"
-                        android:textSize="25sp"
-                        android:background="@android:color/transparent"
-                        android:layout_height="wrap_content"
-                        android:hint="@string/drop_point"/>
-
-                </android.support.design.widget.TextInputLayout>
-
-                <ImageButton
-                    android:id="@+id/btn_drop"
-                    android:layout_width="0dp"
-                    android:layout_weight="2"
-                    android:layout_height="match_parent"
-                    android:background="@drawable/drop_down_button"
-                    android:src="@drawable/ic_arrow_drop_down_black_24dp"/>
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
                 android:layout_marginBottom="20dp">
 
                 <ImageView
@@ -131,6 +68,70 @@
 
 
             </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="16dp">
+
+                <!-- Visibility GONE -->
+                <Spinner
+                    android:id="@+id/spinner_valet_type_x"
+                    android:visibility="gone"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"/>
+
+                <RadioGroup
+                    android:id="@+id/rgroup_valet_type"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                </RadioGroup>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="20dp">
+
+                <ImageView
+                    android:visibility="gone"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/ic_pin_drop_black_24dp" />
+
+                <android.support.design.widget.TextInputLayout
+                    android:id="@+id/til_drop_point"
+                    app:hintAnimationEnabled="false"
+                    android:layout_width="0dp"
+                    android:layout_weight="5"
+                    android:layout_height="wrap_content">
+
+                    <EditText
+                        android:id="@+id/input_drop_point"
+                        android:layout_width="match_parent"
+                        android:editable="false"
+                        android:textSize="20sp"
+                        android:background="@android:color/transparent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/drop_point"/>
+
+                </android.support.design.widget.TextInputLayout>
+
+                <ImageButton
+                    android:id="@+id/btn_drop"
+                    android:layout_width="0dp"
+                    android:layout_weight="2"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/drop_down_button"
+                    android:src="@drawable/ic_arrow_drop_down_black_24dp"/>
+
+            </LinearLayout>
+
 
             <RelativeLayout
                 android:layout_width="match_parent"

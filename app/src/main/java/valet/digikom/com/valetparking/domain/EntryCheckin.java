@@ -528,10 +528,10 @@ public class EntryCheckin {
 
             StringBuilder sb = new StringBuilder()
                     .append(prefix)
-                    .append(idSite)
-                    .append("/")
-                    .append(idLobby)
-                    .append("/")
+                    //.append(idSite)
+                    //.append("/")
+                    //.append(idLobby)
+                    //.append("/")
                     .append(remoteDevId)
                     .append("/")
                     .append(lastTicketCounter);

@@ -33,6 +33,7 @@ import java.util.UUID;
 import cn.pedant.SweetAlert.SweetAlertDialog;
 import valet.digikom.com.valetparking.adapter.ParkedCarPagerAdapter;
 import valet.digikom.com.valetparking.dao.DropDao;
+import valet.digikom.com.valetparking.domain.DropPointMaster;
 import valet.digikom.com.valetparking.domain.EntryCheckinResponse;
 import valet.digikom.com.valetparking.domain.EntryCheckoutCont;
 import valet.digikom.com.valetparking.fragments.CalledCarFragment;
@@ -130,9 +131,12 @@ public class Main2Activity extends AppCompatActivity
                     @Override
                     public void run() {
                         if (idDropPoint != null) {
-                            String dropName = dropDao.getDropPointById(Integer.parseInt(idDropPoint)).getAttrib().getDropName();
-                            String title = dropName + " " + getCurrentDate();
-                            getSupportActionBar().setTitle(title);
+                            DropPointMaster dropPointMaster = dropDao.getDropPointById(Integer.parseInt(idDropPoint));
+                            if (dropPointMaster != null) {
+                                String dropName = dropPointMaster.getAttrib().getDropName();
+                                String title = dropName + " " + getCurrentDate();
+                                getSupportActionBar().setTitle(title);
+                            }
                         }
                     }
                 });

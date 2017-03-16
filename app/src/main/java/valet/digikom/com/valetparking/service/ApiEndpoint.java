@@ -103,6 +103,18 @@ public interface ApiEndpoint {
     @GET("ad_checkout_finish_fine")
     Call<ClosingData> getClosingData(@Query("page[size]")int pageSize);
 
+    //GET CLOSING DATA PER LOBBY
+    @GET("ad_print_lobby")
+    Call<ClosingData> getClosingDataLobby(@Query("page[size]")int pageSize);
+
+    //GET CLOSING DATA PER SHIFT
+    @GET("ad_print_shift")
+    Call<ClosingData> getClosingDataShift(@Query("page[size]")int pageSize);
+
+    //GET CLOSING DATA PER SITE
+    @GET("ad_print_site")
+    Call<ClosingData> getClosingDataSite(@Query("page[size]")int pageSize);
+
     // CLOSING EOD
     @POST("report_administrative")
     Call<ClosingResponse> close(@Body ClosingBody closingBody);
