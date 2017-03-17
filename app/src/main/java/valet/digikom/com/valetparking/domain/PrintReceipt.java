@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.RectF;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.epson.eposdevice.printer.Printer;
 import com.epson.eposprint.Builder;

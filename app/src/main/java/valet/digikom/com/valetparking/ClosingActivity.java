@@ -6,10 +6,15 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
@@ -35,11 +40,19 @@ import valet.digikom.com.valetparking.service.ApiEndpoint;
 import valet.digikom.com.valetparking.service.ProcessRequest;
 import valet.digikom.com.valetparking.util.PrefManager;
 
-public class ClosingActivity extends AppCompatActivity implements View.OnClickListener, ListClosingAdapter.OnClosingItemClickListener{
+public class ClosingActivity extends AppCompatActivity implements View.OnClickListener, ListClosingAdapter.OnClosingItemClickListener, AdapterView.OnItemSelectedListener {
 
     private static final String TAG = ClosingActivity.class.getSimpleName();
     private static final int OPEN = 1;
     private static final int CLOSING = 2;
+
+    private static final String DOWNLOAD_PER_LOBBY = "lobby";
+    private static final String DOWNLOAD_PER_SHIFT = "shift";
+    private static final String DOWNLOAD_PER_SITE = "site";
+
+    public static final int PRINT_CLOSING = 0;
+    public static final int PRINT_SUMMARY = 1;
+    public static final int PRINT_DETAILS = 2;
 
     EditText inputDateFrom;
     EditText inputDateUntil;
@@ -54,6 +67,11 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
     TextView textTotal;
     MaterialProgressBar progressBar;
     Button btnClosing;
+    Button btnPrintDetails;
+    Button btnPrintSummary;
+    LinearLayout layoutPrintSummary;
+    Spinner spReport;
+    Toolbar toolbar;
 
     int mYear;
     int mMonth;
@@ -65,11 +83,16 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
     int exc;
     int total;
 
+    String startDate = "";
+    String endDate = "";
+    String selectedReport;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_closing);
 
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         progressBar = (MaterialProgressBar) findViewById(R.id.progressbar);
         progressBar.setVisibility(View.VISIBLE);
         textRegular = (TextView) findViewById(R.id.text_regular);
@@ -81,20 +104,58 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
         inputDateUntil = (EditText) findViewById(R.id.input_date_until);
         inputRemark = (EditText) findViewById(R.id.input_remark);
         btnClosing = (Button) findViewById(R.id.btn_closing);
-        btnClosing.setOnClickListener(this);
+        btnPrintSummary = (Button) findViewById(R.id.btn_print_summary);
+        btnPrintDetails = (Button) findViewById(R.id.btn_print_detail);
+        layoutPrintSummary = (LinearLayout) findViewById(R.id.layout_print_summary);
+        spReport = (Spinner) findViewById(R.id.spinner_report);
         listClosingView = (RecyclerView) findViewById(R.id.list_closing_view);
+
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         listClosingView.setLayoutManager(layoutManager);
         closingAdapter = new ListClosingAdapter(closingData, this);
         listClosingView.setAdapter(closingAdapter);
 
+        ArrayAdapter<CharSequence> spReportAdapter = ArrayAdapter.createFromResource(this, R.array.array_report_type,  R.layout.text_item_spinner_report);
+        spReportAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spReport.setAdapter(spReportAdapter);
+        spReport.setOnItemSelectedListener(this);
+
         btnSetFrom.setOnClickListener(this);
         btnSetUntil.setOnClickListener(this);
+        btnClosing.setOnClickListener(this);
+        btnPrintSummary.setOnClickListener(this);
+        btnPrintDetails.setOnClickListener(this);
 
         inputDateFrom.setText(getCurrentDate(OPEN));
         inputDateUntil.setText(getCurrentDate(CLOSING));
 
-        new DownloadClosingDataTask().execute();
+        handleIntent();
+
+        downloadData(DOWNLOAD_PER_LOBBY);
+
+        startDate = inputDateFrom.getText().toString();
+        endDate = inputDateUntil.getText().toString();
+    }
+
+    private void handleIntent() {
+        if (getIntent() != null) {
+            if (Main2Activity.ACTION_REPORT.equals(getIntent().getAction())) {
+                getSupportActionBar().setTitle(getString(R.string.report)); // set title
+                showPrintButtonOnly();
+            }
+        }
+    }
+
+    private void showPrintButtonOnly() {
+        btnClosing.setVisibility(View.GONE);
+        layoutPrintSummary.setVisibility(View.VISIBLE);
+        toolbar.setVisibility(View.VISIBLE);
+    }
+
+    private void downloadData(String flagDownload) {
+        closingData.clear();
+        closingAdapter.notifyDataSetChanged();
+        new DownloadClosingDataTask().execute(flagDownload);
     }
 
     @Override
@@ -102,14 +163,9 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
         return super.onOptionsItemSelected(item);
     }
 
-    private synchronized void close() {
-        PrefManager prefManager = PrefManager.getInstance(this);
-        String lobbyName = prefManager.getDefaultDropPointName();
-        String siteName = prefManager.getSiteName();
+    private synchronized void close(String flagHeader, int flagPrint) {
         ClosingDao closingDao = ClosingDao.getInstance(this);
         String readInfo = inputRemark.getText().toString();
-        String startDate = inputDateFrom.getText().toString();
-        String endDate = inputDateUntil.getText().toString();
         closingDao.close(readInfo,startDate,endDate);
 
         /*
@@ -117,6 +173,14 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
         PrintClosing printClosing = new PrintClosing(this, closingData, lokasi, siteName, startDate,endDate,"Admin", reg,exc,total);
         printClosing.print();
         */
+
+        print(flagHeader, flagPrint);
+    }
+
+    private void print(String flagHeader, int flagPrint) {
+        PrefManager prefManager = PrefManager.getInstance(this);
+        String lobbyName = prefManager.getDefaultDropPointName();
+        String siteName = prefManager.getSiteName();
 
         // CREATE CLOSING PARAMETER
         PrintClosingParam closingParam = new PrintClosingParam.Builder()
@@ -132,70 +196,79 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
                 .build();
 
         // BUILD AND PRINT CLOSING DATA
-        PrintReceiptClosing printReceiptClosing = new PrintReceiptClosing(this, closingParam);
+        PrintReceiptClosing printReceiptClosing = new PrintReceiptClosing(this, closingParam,flagHeader, flagPrint);
         printReceiptClosing.buildPrintData();
     }
 
     @Override
     public void onClick(final View viewx) {
-        if (viewx == btnClosing) {
-            if (closingData.isEmpty()) {
-                Toast.makeText(this, "Closing data empty. Closing aborted.", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            new SweetAlertDialog(this)
-                    .setTitleText("Closing")
-                    .setContentText("Closing transaction now?")
-                    .setConfirmText("Yes")
-                    .setCancelText("No")
-                    .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
-                        @Override
-                        public void onClick(SweetAlertDialog sweetAlertDialog) {
-                            close();
-                            new DownloadClosingDataTask().execute();
-                            sweetAlertDialog.dismissWithAnimation();
+        if (closingData.isEmpty()) {
+            Toast.makeText(this, "Data empty", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        int id = viewx.getId();
+        switch (id) {
+            case R.id.btn_closing:
+                new SweetAlertDialog(this)
+                        .setTitleText("Closing")
+                        .setContentText("Closing transaction now?")
+                        .setConfirmText("Yes")
+                        .setCancelText("No")
+                        .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                            @Override
+                            public void onClick(SweetAlertDialog sweetAlertDialog) {
+                                sweetAlertDialog.dismissWithAnimation();
+                                close(null, PRINT_CLOSING);
+                                new DownloadClosingDataTask().execute(DOWNLOAD_PER_LOBBY);
+                            }
+                        })
+                        .setCancelClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                            @Override
+                            public void onClick(SweetAlertDialog sweetAlertDialog) {
+                                sweetAlertDialog.dismissWithAnimation();
+                            }
+                        })
+                        .showCancelButton(true)
+                        .show();
+                break;
+            case R.id.btn_print_summary:
+                print(selectedReport,PRINT_SUMMARY);
+                break;
+            case R.id.btn_print_detail:
+                print(selectedReport, PRINT_DETAILS);
+                break;
+            default:
+                Calendar calendar = Calendar.getInstance();
+                TimePickerDialog tp = TimePickerDialog.newInstance(new TimePickerDialog.OnTimeSetListener() {
+                    @Override
+                    public void onTimeSet(TimePickerDialog view, int hourOfDay, int minute, int second) {
+                        mHour = hourOfDay;
+                        mMinute = minute;
+                        mSecond = second;
+                        if (viewx == btnSetFrom) {
+                            inputDateFrom.setText(getDateString(mYear, mMonth, mDay, mHour, mMinute, mSecond));
+                        }else {
+                            inputDateUntil.setText(getDateString(mYear, mMonth, mDay, mHour, mMinute, mSecond));
                         }
-                    })
-                    .setCancelClickListener(new SweetAlertDialog.OnSweetClickListener() {
-                        @Override
-                        public void onClick(SweetAlertDialog sweetAlertDialog) {
-                            sweetAlertDialog.dismissWithAnimation();
-                        }
-                    })
-                    .showCancelButton(true)
-                    .show();
-        }else {
-            Calendar calendar = Calendar.getInstance();
-            TimePickerDialog tp = TimePickerDialog.newInstance(new TimePickerDialog.OnTimeSetListener() {
-                @Override
-                public void onTimeSet(TimePickerDialog view, int hourOfDay, int minute, int second) {
-                    mHour = hourOfDay;
-                    mMinute = minute;
-                    mSecond = second;
-                    if (viewx == btnSetFrom) {
-                        inputDateFrom.setText(getDateString(mYear, mMonth, mDay, mHour, mMinute, mSecond));
-                    }else {
-                        inputDateUntil.setText(getDateString(mYear, mMonth, mDay, mHour, mMinute, mSecond));
                     }
-                }
-            }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true);
-            tp.show(getFragmentManager(), TAG);
+                }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true);
+                tp.show(getFragmentManager(), TAG);
 
-            DatePickerDialog dp = DatePickerDialog.newInstance(new DatePickerDialog.OnDateSetListener() {
-                                                                   @Override
-                                                                   public void onDateSet(DatePickerDialog view, int year, int monthOfYear, int dayOfMonth) {
-                                                                       mYear = year;
-                                                                       mMonth = monthOfYear;
-                                                                       mDay = dayOfMonth;
-                                                                   }
-                                                               },
-                    calendar.get(Calendar.YEAR),
-                    calendar.get(Calendar.MONTH),
-                    calendar.get(Calendar.DAY_OF_MONTH));
-            dp.show(getFragmentManager(), TAG);
+                DatePickerDialog dp = DatePickerDialog.newInstance(new DatePickerDialog.OnDateSetListener() {
+                                                                       @Override
+                                                                       public void onDateSet(DatePickerDialog view, int year, int monthOfYear, int dayOfMonth) {
+                                                                           mYear = year;
+                                                                           mMonth = monthOfYear;
+                                                                           mDay = dayOfMonth;
+                                                                       }
+                                                                   },
+                        calendar.get(Calendar.YEAR),
+                        calendar.get(Calendar.MONTH),
+                        calendar.get(Calendar.DAY_OF_MONTH));
+                dp.show(getFragmentManager(), TAG);
+                break;
 
         }
-
     }
 
     private String getDateString(int year, int month, int day, int hour, int minute, int second) {
@@ -238,15 +311,51 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
         startActivity(intent);
     }
 
-    private class DownloadClosingDataTask extends AsyncTask<Void, Void, List<ClosingData.Data>> {
+    @Override
+    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+        selectedReport = (String) adapterView.getSelectedItem();
+        switch (i) {
+            case 0:
+                downloadData(DOWNLOAD_PER_LOBBY);
+                break;
+            case 1:
+                downloadData(DOWNLOAD_PER_SITE);
+                break;
+            case 2:
+                downloadData(DOWNLOAD_PER_SHIFT);
+                break;
+            default:break;
+        }
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> adapterView) {
+
+    }
+
+    private class DownloadClosingDataTask extends AsyncTask<String, Void, List<ClosingData.Data>> {
 
         @Override
-        protected List<ClosingData.Data> doInBackground(Void... voids) {
+        protected List<ClosingData.Data> doInBackground(final String... strings) {
             TokenDao.getToken(new ProcessRequest() {
                 @Override
                 public void process(String token) {
+                    String flag = strings[0];
                     ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class, token);
                     Call<ClosingData> call = apiEndpoint.getClosingData(900);
+                    if (flag != null) {
+                        switch (flag) {
+                            case DOWNLOAD_PER_SHIFT:
+                                call = apiEndpoint.getClosingDataShift(900);
+                                break;
+                            case DOWNLOAD_PER_SITE:
+                                call = apiEndpoint.getClosingDataSite(900);
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+
                     call.enqueue(new Callback<ClosingData>() {
                         @Override
                         public void onResponse(Call<ClosingData> call, Response<ClosingData> response) {

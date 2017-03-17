@@ -22,7 +22,7 @@
             android:id="@+id/img_car"
             android:layout_width="45dp"
             app:civ_border_width="0dp"
-            android:layout_height="45dp" />
+            android:layout_height="60dp" />
 
         <LinearLayout
             android:layout_width="0dp"
@@ -43,6 +43,14 @@
                 android:layout_height="0dp"
                 android:textSize="16dp"
                 android:textColor="@color/color_text_plat_no_checkin"
+                android:layout_weight="1"/>
+
+            <TextView
+                android:id="@+id/text_remote_tiket_no"
+                android:layout_width="match_parent"
+                android:textSize="16dp"
+                android:textColor="@color/color_text_plat_no_checkin"
+                android:layout_height="0dp"
                 android:layout_weight="1"/>
 
             <TextView

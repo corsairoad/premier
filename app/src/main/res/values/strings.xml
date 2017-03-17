@@ -282,4 +282,15 @@
     <string name="new_password">New Password</string>
     <string name="retype_new_password">Retype New Password</string>
     <string name="payment_method">PAYMENT METHOD</string>
+    <string name="report">Report</string>
+    <string name="print_summary">Print Summary</string>
+    <string name="print_details">Print Details</string>
+
+    <string-array name="array_report_type">
+        <item>PER LOBBY</item>
+        <item>PER SITE</item>
+        <item>PER SHIFT</item>
+    </string-array>
+
+
 </resources>

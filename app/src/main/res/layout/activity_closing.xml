@@ -1,16 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout  xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="valet.digikom.com.valetparking.ClosingActivity">
 
-        <LinearLayout
+    <android.support.design.widget.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/AppTheme.AppBarOverlay">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@id/toolbar"
+            android:visibility="gone"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:popupTheme="@style/AppTheme.PopupOverlay">
+
+            <Spinner
+                android:id="@+id/spinner_report"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+            </android.support.v7.widget.Toolbar>
+
+
+    </android.support.design.widget.AppBarLayout>
+
+    <LinearLayout
             android:id="@+id/activity_closing"
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            tools:context="valet.digikom.com.valetparking.ClosingActivity">
+            tools:context="valet.digikom.com.valetparking.ClosingActivity"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -228,8 +252,11 @@
                     android:layout_height="match_parent"
                     android:layout_above="@+id/input_remark"/>
 
+
+                <!-- visibility gone -->
                 <EditText
                     android:id="@+id/input_remark"
+                    android:visibility="gone"
                     android:layout_width="match_parent"
                     android:hint="@string/remark"
                     android:layout_height="wrap_content"
@@ -239,9 +266,86 @@
                     android:id="@+id/btn_closing"
                     android:layout_alignParentBottom="true"
                     android:text="@string/closing"
+                    android:textColor="@android:color/white"
+                    android:textSize="20sp"
                     android:background="@drawable/buttonshape"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
+
+                <LinearLayout
+                    android:id="@+id/layout_print_summary"
+                    android:visibility="gone"
+                    android:layout_width="match_parent"
+                    android:layout_height="?android:attr/actionBarSize"
+                    android:orientation="horizontal"
+                    android:background="@drawable/buttonshape"
+                    android:layout_alignParentBottom="true">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:paddingTop="@dimen/activity_horizontal_margin"
+                        android:paddingBottom="@dimen/activity_horizontal_margin"
+                        android:paddingRight="@dimen/activity_horizontal_margin"
+                        android:layout_weight="1"
+                        android:background="?attr/selectableItemBackground"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:layout_height="match_parent"
+                            android:src="@drawable/ic_view_agenda_black_24dp"/>
+
+                        <Button
+                            android:id="@+id/btn_print_summary"
+                            android:layout_width="0dp"
+                            android:layout_weight="2"
+                            android:layout_height="match_parent"
+                            android:gravity="center_vertical"
+                            android:textSize="20sp"
+                            android:background="@null"
+                            android:textColor="@android:color/white"
+                            android:text="@string/print_summary"/>
+
+
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="1dp"
+                        android:layout_height="match_parent"
+                        android:background="@color/cardview_light_background"/>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:paddingTop="@dimen/activity_horizontal_margin"
+                        android:paddingBottom="@dimen/activity_horizontal_margin"
+                        android:paddingRight="@dimen/activity_horizontal_margin"
+                        android:orientation="horizontal"
+                        android:background="?attr/selectableItemBackground">
+
+                        <ImageView
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:src="@drawable/ic_view_day_black_24dp"/>
+
+                        <Button
+                            android:id="@+id/btn_print_detail"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="2"
+                            android:gravity="center_vertical"
+                            android:background="@null"
+                            android:text="@string/print_details"
+                            android:textColor="@android:color/white"
+                            android:textSize="20sp" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
 
             </RelativeLayout>
 

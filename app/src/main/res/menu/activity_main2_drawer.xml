@@ -39,6 +39,11 @@
             android:id="@+id/closing"
             android:icon="@drawable/ic_cloud_upload_black_24dp"
             android:title="@string/closing" />
+
+        <item
+            android:id="@+id/report"
+            android:icon="@drawable/ic_description_black_24dp"
+            android:title="@string/report" />
     </group>
 
     <item android:title="Communicate" android:visible="false">

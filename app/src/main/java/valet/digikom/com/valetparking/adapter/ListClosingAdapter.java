@@ -44,7 +44,10 @@ public class ListClosingAdapter extends RecyclerView.Adapter<ListClosingAdapter.
     public void onBindViewHolder(MyViewHolder holder, int position) {
         ClosingData.Data.Attr attr = closingData.get(position).getAttributes();
         String platNo = attr.getPlatNo();
-        String header = attr.getTransactionId() + " - " + platNo;
+        String noTiket = attr.getNoTiket();
+        String remoteTiketNo = attr.getTransactionId();
+
+        String header = noTiket + " - " + platNo;
         String createdAt = attr.getCreatedAt();
         String id = closingData.get(position).getId();
         String valetTypeName = attr.getValetTypeName();
@@ -76,6 +79,7 @@ public class ListClosingAdapter extends RecyclerView.Adapter<ListClosingAdapter.
                 .into(holder.imgCar);
 
         holder.textPlatNo.setText(header);
+        holder.textRemoteTicketNo.setText(remoteTiketNo);
         holder.textRunnerName.setText(createdAt);
         holder.textIdCheckin.setText(id);
         holder.textValetTypeName.setText(valetTypeName);
@@ -97,6 +101,7 @@ public class ListClosingAdapter extends RecyclerView.Adapter<ListClosingAdapter.
         TextView textRunnerName;
         TextView textIdCheckin;
         TextView textValetTypeName;
+        TextView textRemoteTicketNo;
         CircleImageView imgCar;
         LinearLayout container;
 
@@ -106,6 +111,7 @@ public class ListClosingAdapter extends RecyclerView.Adapter<ListClosingAdapter.
             textRunnerName = (TextView) view.findViewById(R.id.text_runner);
             textIdCheckin = (TextView) view.findViewById(R.id.id_checkin);
             layoutContainer = (LinearLayout) view.findViewById(R.id.container_checkin);
+            textRemoteTicketNo = (TextView) view.findViewById(R.id.text_remote_tiket_no);
             imgCar = (CircleImageView) view.findViewById(R.id.img_car);
             textValetTypeName = (TextView) view.findViewById(R.id.text_ready);
             textValetTypeName.setVisibility(View.VISIBLE);

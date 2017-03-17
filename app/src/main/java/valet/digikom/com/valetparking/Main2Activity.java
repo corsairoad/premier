@@ -47,6 +47,7 @@ public class Main2Activity extends AppCompatActivity
         CalledCarFragment.CountCalledCarListener{
 
     public static final String ACTION_DOWNLOAD_CHECKIN = "com.valet.download.data.checkin";
+    public static final String ACTION_REPORT = "com.valet.report";
 
     ViewPager viewPager;
     ParkedCarPagerAdapter pagerAdapter;
@@ -242,19 +243,24 @@ public class Main2Activity extends AppCompatActivity
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
-
-        if (id == R.id.setting) {
-            startActivity(new Intent(this, PreferenceActivity.class));
-        } else if (id == R.id.nav_manage) {
-            Intent intent = new Intent(this, PrinterActivity.class);
-            startActivity(intent);
-        } else if (id == R.id.closing) {
-            Intent intent = new Intent(this, ClosingActivity.class);
-            startActivity(intent);
+        Intent intent = new Intent(this, ClosingActivity.class); // set default to closing
+        switch (id) {
+            case R.id.setting:
+                intent = new Intent(this, PreferenceActivity.class);
+                startActivity(new Intent(this, PreferenceActivity.class));
+                break;
+            case R.id.report:
+                intent.setAction(ACTION_REPORT);
+                break;
+            default:
+                break;
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
+        
+        startActivity(intent);
+        
         return true;
     }
 
