@@ -62,7 +62,7 @@ public class ListCheckinAdapter extends RecyclerView.Adapter<ListCheckinAdapter.
                 .crossFade()
                 .into(holder.imgCar);
 
-        String platNo = response.getData().getAttribute().getIdTransaksi() + " - " + response.getData().getAttribute().getPlatNo();
+        String platNo = response.getData().getAttribute().getNoTiket() + " - " + response.getData().getAttribute().getPlatNo();
         String checkinTime = response.getData().getAttribute().getCheckinTime();
 
         holder.textPlatNo.setText(platNo);

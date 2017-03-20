@@ -41,7 +41,7 @@ public class ListClosingAdapter extends RecyclerView.Adapter<ListClosingAdapter.
     }
 
     @Override
-    public void onBindViewHolder(MyViewHolder holder, int position) {
+    public void onBindViewHolder(MyViewHolder holder, final int position) {
         ClosingData.Data.Attr attr = closingData.get(position).getAttributes();
         String platNo = attr.getPlatNo();
         String noTiket = attr.getNoTiket();
@@ -57,7 +57,8 @@ public class ListClosingAdapter extends RecyclerView.Adapter<ListClosingAdapter.
         holder.container.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                onClosingItemClickListener.OnClosingItemClick(Integer.parseInt(vthdId));
+                //onClosingItemClickListener.OnClosingItemClick(Integer.parseInt(vthdId));
+                onClosingItemClickListener.OnClosingItemClick(position);
             }
         });
 

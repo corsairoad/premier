@@ -14,9 +14,12 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 import java.text.SimpleDateFormat;
@@ -116,7 +119,7 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
         listClosingView.setAdapter(closingAdapter);
 
         ArrayAdapter<CharSequence> spReportAdapter = ArrayAdapter.createFromResource(this, R.array.array_report_type,  R.layout.text_item_spinner_report);
-        spReportAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spReportAdapter.setDropDownViewResource(R.layout.text_dropdown_item_spinner_report);
         spReport.setAdapter(spReportAdapter);
         spReport.setOnItemSelectedListener(this);
 
@@ -207,6 +210,7 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
             return;
         }
         int id = viewx.getId();
+        Toast.makeText(this, "Printing.. please wait", Toast.LENGTH_SHORT).show();
         switch (id) {
             case R.id.btn_closing:
                 new SweetAlertDialog(this)
@@ -304,11 +308,80 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     @Override
-    public void OnClosingItemClick(int vthdId) {
+    public void OnClosingItemClick(int vthdId) { // vthdid changed to position on adapter
+        //openDetailClosing(vthdId);
+        progressBar.setVisibility(View.VISIBLE);
+        showDialogDetail(vthdId);
+    }
+
+    private void openDetailClosing(int vthdId) { // vthdid changed to position on adapter
         Intent intent = new Intent(this, ParkedCarDetailActivity.class);
         intent.putExtra(EntryCheckinResponse.ID_ENTRY_CHECKIN, vthdId);
         intent.setAction("DETAIL_FOR_CLOSING_ITEM");
         startActivity(intent);
+    }
+
+    private void showDialogDetail(int vthdId) { // vthdid changed to position on adapter
+        final View view = getLayoutInflater().inflate(R.layout.layout_closing_detail_dialog, null);
+        final ClosingData.Data data = closingData.get(vthdId);
+        if (data != null) {
+            TokenDao.getToken(new ProcessRequest() {
+                @Override
+                public void process(String token) {
+                    ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class, token);
+                    Call<EntryCheckinResponse> call = apiEndpoint.getVthdTransactionItem(data.getLinks().getSelf().getHref());
+                    call.enqueue(new Callback<EntryCheckinResponse>() {
+                        @Override
+                        public void onResponse(Call<EntryCheckinResponse> call, Response<EntryCheckinResponse> response) {
+                            if (response != null && response.body()!=null) {
+                                initClosingData(view, data, response.body().getData());
+                                MaterialDialog materialDialog = new MaterialDialog.Builder(ClosingActivity.this)
+                                        .customView(view, true)
+                                        .title("Car Detail")
+                                        .positiveText("Oke")
+                                        .build();
+                                materialDialog.show();
+                            }else {
+                                Toast.makeText(ClosingActivity.this, "Cannot retrieve data. Please check your internet connection", Toast.LENGTH_SHORT).show();
+                            }
+
+                            progressBar.setVisibility(View.GONE);
+                        }
+
+                        @Override
+                        public void onFailure(Call<EntryCheckinResponse> call, Throwable t) {
+                            progressBar.setVisibility(View.GONE);
+                            Toast.makeText(ClosingActivity.this, "Cannot retrieve data. Please check your internet connection", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+            }, this);
+
+
+        }
+
+    }
+
+    private void initClosingData(View view, ClosingData.Data data, EntryCheckinResponse.Data vthdData) {
+        TextView txtLicensePlate = (TextView) view.findViewById(R.id.text_plat_no);
+        TextView txtCarType = (TextView) view.findViewById(R.id.text_car_type);
+        TextView txtColor = (TextView) view.findViewById(R.id.text_color);
+        TextView txtValetType = (TextView) view.findViewById(R.id.text_valet_type);
+        TextView txtDropPoint = (TextView) view.findViewById(R.id.text_drop_point);
+        TextView txtCheckin = (TextView) view.findViewById(R.id.text_checkin_time);
+        TextView txtCheckout = (TextView) view.findViewById(R.id.text_checkout_time);
+        TextView txtTicketNo = (TextView) view.findViewById(R.id.text_ticket_no);
+        TextView txtIdTransaksi = (TextView) view.findViewById(R.id.text_id_transaksi);
+
+        txtLicensePlate.setText(data.getAttributes().getPlatNo());
+        txtCarType.setText(vthdData.getAttribute().getCar());
+        txtColor.setText(vthdData.getAttribute().getColor());
+        txtDropPoint.setText(vthdData.getAttribute().getDropPoint());
+        txtValetType.setText(data.getAttributes().getValetTypeName());
+        txtCheckin.setText(data.getAttributes().getCheckIn());
+        txtCheckout.setText(data.getAttributes().getCheckout());
+        txtTicketNo.setText(data.getAttributes().getNoTiket());
+        txtIdTransaksi.setText(data.getAttributes().getTransactionId());
     }
 
     @Override

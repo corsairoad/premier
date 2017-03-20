@@ -50,17 +50,23 @@ public class EntryDao {
     }
 
     public void insertEntryResponse(EntryCheckinResponse response, int flagUpload) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
         Gson gson = new Gson();
         String jsonResponse = gson.toJson(response);
         String platNo = response.getData().getAttribute().getPlatNo();
         String noTrans = response.getData().getAttribute().getIdTransaksi();
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        int id = response.getData().getAttribute().getId();
+        int fakeVthdId = response.getData().getAttribute().getLastTicketCounter(); // fakeVthdid is lastticketcounter
 
         ContentValues cv = new ContentValues();
-        cv.put(EntryCheckinResponse.Table.COL_RESPONSE_ID, response.getData().getAttribute().getId());
+        cv.put(EntryCheckinResponse.Table.COL_RESPONSE_ID, fakeVthdId);
         cv.put(EntryCheckinResponse.Table.COL_JSON_RESPONSE, jsonResponse);
         cv.put(EntryCheckinResponse.Table.COL_PLAT_NO, platNo);
         cv.put(EntryCheckinResponse.Table.COL_NO_TRANS, noTrans);
+
+        cv.put(EntryCheckinResponse.Table.COL_REMOTE_VTHD_ID, id);
+        cv.put(EntryCheckinResponse.Table.COL_TICKET_SEQUENCE, noTrans);
+
         cv.put(EntryCheckinResponse.Table.COL_IS_UPLOADED, flagUpload);
 
         db.insert(EntryCheckinResponse.Table.TABLE_NAME,null,cv);
@@ -89,9 +95,10 @@ public class EntryDao {
 
     public void insertListCheckin(List<EntryCheckinResponse.Data> checkinList) {
         if (!checkinList.isEmpty()) {
+            int rows = removeUploadSuccess();
             for (EntryCheckinResponse.Data e : checkinList) {
                 if (e != null) {
-                    removeEntryById(e.getAttribute().getId());
+                    //removeEntryById(e.getAttribute().getId());
 
                     EntryCheckinResponse entryCheckinResponse = new EntryCheckinResponse();
                     entryCheckinResponse.setData(e);
@@ -101,12 +108,18 @@ public class EntryDao {
         }
     }
 
+    private int removeUploadSuccess() {
+        String sql = EntryCheckinResponse.Table.COL_IS_UPLOADED + " = " + EntryCheckinResponse.FLAG_UPLOAD_SUCCESS;
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        return db.delete(EntryCheckinResponse.Table.TABLE_NAME, sql, new String[] {});
+    }
+
     public int getRemoteVthdIdByFakeId(int id) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         String[] args = new String[] {String.valueOf(id)};
         int remoteId = 0;
         Cursor c = db.rawQuery("SELECT " + EntryCheckinResponse.Table.COL_REMOTE_VTHD_ID + " FROM " + EntryCheckinResponse.Table.TABLE_NAME
-        + " WHERE " + EntryCheckinResponse.Table.COL_RESPONSE_ID + " = ?", args);
+        + " WHERE " + EntryCheckinResponse.Table.COL_RESPONSE_ID + " = ? AND " + EntryCheckinResponse.Table.COL_IS_UPLOADED + " = " + EntryCheckinResponse.FLAG_UPLOAD_SUCCESS, args);
 
         if (c.moveToFirst()) {
             remoteId = c.getInt(0);

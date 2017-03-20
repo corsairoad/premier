@@ -6,21 +6,19 @@
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-    <TextView
-        android:id="@+id/text_total_checkin"
+
+    <Spinner
+        android:id="@+id/spinner_lobby_checkin"
+        android:paddingTop="@dimen/activity_horizontal_margin"
+        android:paddingBottom="@dimen/activity_horizontal_margin"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingLeft="16dp"
-        android:paddingTop="16dp"
-        android:visibility="gone"
-        android:paddingBottom="16dp"
-        android:paddingRight="16dp"
-        android:textSize="16sp"
-        android:textColor="@color/color_total_checkin"/>
+        android:layout_height="wrap_content"></Spinner>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/list_checkin"
-        android:layout_below="@id/text_total_checkin"
+        android:layout_below="@id/spinner_lobby_checkin"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 

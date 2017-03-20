@@ -385,7 +385,7 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
             txtPlatNo.setText(platNo);
             txtLokasiParkir.setText(lokasiParkir);
             txtDropPoint.setText(attrib.getDropPoint());
-            txtNoTransaksi.setText(attrib.getIdTransaksi());
+            txtNoTransaksi.setText(attrib.getNoTiket());
             txtFee.setText(MakeCurrencyString.fromInt(fee));
             txtCheckinTime.setText(attrib.getCheckinTime());
             txtOvernight.setText(MakeCurrencyString.fromInt(overNightFine));

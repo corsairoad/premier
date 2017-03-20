@@ -41,7 +41,7 @@ public class ItemsDao implements ProcessRequest{
 
     private void downloadItems(String token) {
         ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class, token);
-        Call<AdditionalItemsResponse> call = apiEndpoint.getItems();
+        Call<AdditionalItemsResponse> call = apiEndpoint.getItems(100);
         call.enqueue(new Callback<AdditionalItemsResponse>() {
             @Override
             public void onResponse(Call<AdditionalItemsResponse> call, Response<AdditionalItemsResponse> response) {
@@ -65,8 +65,8 @@ public class ItemsDao implements ProcessRequest{
         db.execSQL("DELETE FROM " + AdditionalItems.Table.TABLE_NAME);
         for (AdditionalItems items : itemsList) {
             ContentValues cv = new ContentValues();
-            cv.put(AdditionalItems.Table.COL_ID, items.getAttributes().getAdditionalItemMaster().getId());
-            cv.put(AdditionalItems.Table.COL_ITEM_NAME, items.getAttributes().getAdditionalItemMaster().getName());
+            cv.put(AdditionalItems.Table.COL_ID, items.getAttributes().getId());
+            cv.put(AdditionalItems.Table.COL_ITEM_NAME, items.getAttributes().getName());
 
             db.insert(AdditionalItems.Table.TABLE_NAME,null, cv);
         }
@@ -92,9 +92,9 @@ public class ItemsDao implements ProcessRequest{
                 aim.setId(cursor.getInt(cursor.getColumnIndex(AdditionalItems.Table.COL_ID)));
                 aim.setName(cursor.getString(cursor.getColumnIndex(AdditionalItems.Table.COL_ITEM_NAME)));
 
-                attr.setAdditionalItemMaster(aim);
+                //attr.setAdditionalItemMaster(aim);
 
-                ai.setAttributes(attr);
+                ai.setAttributes(aim);
 
                 itemsList.add(ai);
             } while (cursor.moveToNext());

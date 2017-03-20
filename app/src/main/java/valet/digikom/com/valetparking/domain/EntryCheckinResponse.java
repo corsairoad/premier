@@ -120,6 +120,8 @@ public class EntryCheckinResponse {
         private String logoMobil;
         @SerializedName("vthd_iddt_counter")
         private int lastTicketCounter;
+        @SerializedName("vthd_tix_id")
+        private String noTiket;
 
         public Attribute() {
         }
@@ -134,6 +136,14 @@ public class EntryCheckinResponse {
 
         public void setLogoMobil(String logoMobil) {
             this.logoMobil = logoMobil;
+        }
+
+        public String getNoTiket() {
+            return noTiket;
+        }
+
+        public void setNoTiket(String noTiket) {
+            this.noTiket = noTiket;
         }
 
         public String getValetType() {
@@ -158,6 +168,10 @@ public class EntryCheckinResponse {
 
         public String getCompanyName() {
             return companyName;
+        }
+
+        public void setLastTicketCounter(int lastTicketCounter) {
+            this.lastTicketCounter = lastTicketCounter;
         }
 
         public void setCompanyName(String companyName) {

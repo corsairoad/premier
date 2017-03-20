@@ -65,15 +65,15 @@ public class ListStuffAdapter extends ArrayAdapter<AdditionalItems> {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 if (b) {
-                    listener.onStuffSelected(item.getAttributes().getAdditionalItemMaster().getName(), item);
+                    listener.onStuffSelected(item.getAttributes().getName(), item);
                 }else {
-                    listener.onStuffUnselected(item.getAttributes().getAdditionalItemMaster().getName(), item);
+                    listener.onStuffUnselected(item.getAttributes().getName(), item);
                 }
             }
         });
 
-        int id = getItem(position).getAttributes().getAdditionalItemMaster().getId();
-        String name = getItem(position).getAttributes().getAdditionalItemMaster().getName();
+        int id = getItem(position).getAttributes().getId();
+        String name = getItem(position).getAttributes().getName();
         textId.setText(String.valueOf(id));
         textDefects.setText(name);
         return convertView;

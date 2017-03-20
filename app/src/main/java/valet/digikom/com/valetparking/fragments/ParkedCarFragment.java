@@ -11,6 +11,9 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,14 +38,15 @@ import valet.digikom.com.valetparking.service.ApiClient;
 import valet.digikom.com.valetparking.service.ApiEndpoint;
 import valet.digikom.com.valetparking.service.ProcessRequest;
 
-public class ParkedCarFragment extends Fragment implements ListCheckinAdapter.OnItemCheckinListener, CheckoutDao.OnCarReadyListener {
+public class ParkedCarFragment extends Fragment implements ListCheckinAdapter.OnItemCheckinListener, CheckoutDao.OnCarReadyListener, AdapterView.OnItemSelectedListener {
 
     RecyclerView listCheckin;
     ListCheckinAdapter adapter;
     ArrayList<Checkin> checkins = new ArrayList<>();
     List<EntryCheckinResponse> responseList = new ArrayList<>();
     TextView textEmpty;
-    TextView textTotalCheckin;
+    Spinner spLobbyCheckin;
+
     CountParkedCarListener listener;
     public static ParkedCarFragment parkedCarFragment;
     EntryDao entryDao;
@@ -67,7 +71,7 @@ public class ParkedCarFragment extends Fragment implements ListCheckinAdapter.On
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.content_main2, container, false);
 
-        textTotalCheckin = (TextView) view.findViewById(R.id.text_total_checkin);
+        spLobbyCheckin = (Spinner) view.findViewById(R.id.spinner_lobby_checkin);
         listCheckin = (RecyclerView) view.findViewById(R.id.list_checkin);
         textEmpty = (TextView) view.findViewById(R.id.text_empty);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
@@ -75,6 +79,11 @@ public class ParkedCarFragment extends Fragment implements ListCheckinAdapter.On
         listCheckin.setLayoutManager(layoutManager);
         adapter = new ListCheckinAdapter(checkins, responseList,getContext(), this);
         listCheckin.setAdapter(adapter);
+
+        ArrayAdapter<CharSequence> spLobbyAdapter = ArrayAdapter.createFromResource(getContext(),R.array.array_lobby_checkin,  R.layout.text_item_spinner_report);
+        spLobbyAdapter.setDropDownViewResource(R.layout.text_dropdown_item_spinner_report);
+        spLobbyCheckin.setAdapter(spLobbyAdapter);
+        spLobbyCheckin.setOnItemSelectedListener(this);
 
          new LoadCheckinTask().execute();
 
@@ -115,6 +124,27 @@ public class ParkedCarFragment extends Fragment implements ListCheckinAdapter.On
         new LoadCheckinTask().execute();
     }
 
+    @Override
+    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+        //clearData();
+        if (ApiClient.isNetworkAvailable(getContext())) {
+            downloadCheckinList(i);
+        }else {
+            Toast.makeText(getContext(), "Download failed, please check your internet connection", Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
+    private void clearData() {
+        responseList.clear();
+        adapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> adapterView) {
+
+    }
+
     private class LoadCheckinTask extends AsyncTask<Void, Void, List<EntryCheckinResponse>> {
 
         @Override
@@ -130,10 +160,10 @@ public class ParkedCarFragment extends Fragment implements ListCheckinAdapter.On
                 responseList.addAll(entryCheckinResponses);
                 adapter.notifyDataSetChanged();
                 textEmpty.setVisibility(View.GONE);
-                textTotalCheckin.setText(getResources().getString(R.string.total_checkin) + " " + entryCheckinResponses.size());
+                //textTotalCheckin.setText(getResources().getString(R.string.total_checkin) + " " + entryCheckinResponses.size());
                 listener.setCountParkedCar(entryCheckinResponses.size());
             }else {
-                textTotalCheckin.setVisibility(View.INVISIBLE);
+                //textTotalCheckin.setVisibility(View.INVISIBLE);
                 textEmpty.setVisibility(View.VISIBLE);
                 listener.setCountParkedCar(0);
             }
@@ -144,7 +174,7 @@ public class ParkedCarFragment extends Fragment implements ListCheckinAdapter.On
         void setCountParkedCar (int count);
     }
 
-    public void downloadCheckinList() {
+    public void downloadCheckinList(final int index) {
         TokenDao.getToken(new ProcessRequest() {
             @Override
             public void process(String token) {
@@ -154,12 +184,18 @@ public class ParkedCarFragment extends Fragment implements ListCheckinAdapter.On
                 }
 
                 ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class, token);
-                Call<CheckinList> call = apiEndpoint.getCheckinList(999);
+                Call<CheckinList> call = apiEndpoint.getCurrentCheckinList(100);
+
+                if (index == 1) {
+                    call = apiEndpoint.getCheckinList(999);
+                }
+
                 call.enqueue(new Callback<CheckinList>() {
 
                     @Override
                     public void onResponse(Call<CheckinList> call, Response<CheckinList> response) {
                         if (response != null && response.body() != null) {
+                            clearData();
                             entryDao.insertListCheckin(response.body().getCheckinResponseList());
                         }
                         new LoadCheckinTask().execute();

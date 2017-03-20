@@ -222,6 +222,7 @@ public class AddCarActivity extends FragmentActivity implements StepOneFragmet.O
     private void processFailedCheckin(EntryCheckin.Builder builder, EntryCheckinContainer checkinContainer) {
         PrefManager prefManager = PrefManager.getInstance(this);
         int lastTicketCounter = builder.getLastTicketCounter(this);
+        String noTiket = builder.generateTicketNo(this, lastTicketCounter);
 
         // ------------ create checkin data and save to local db ------------------
         EntryCheckinResponse entryCheckinResponse = new EntryCheckinResponse();
@@ -240,12 +241,13 @@ public class AddCarActivity extends FragmentActivity implements StepOneFragmet.O
         attr.setId(lastTicketCounter);
         attr.setFee(builder.getValetType().getAttrib().getPrice());
         attr.setPlatNo(builder.getPlatNo());
-        attr.setIdTransaksi(builder.generateTicketNo(this, lastTicketCounter)); // no ticket
+        attr.setIdTransaksi(noTiket); // transaction id set for no tiket for temporary
+        attr.setNoTiket(noTiket);
         attr.setSiteName(prefManager.getSiteName());
+        attr.setLastTicketCounter(lastTicketCounter);
 
         data.setAttribute(attr);
         data.setId(String.valueOf(attr.getId())); // vthdid
-
         data.setType("ad_entry_checkin");
         entryCheckinResponse.setData(data);
 
@@ -260,6 +262,7 @@ public class AddCarActivity extends FragmentActivity implements StepOneFragmet.O
         entryCheckin.getAttrib().setLastTicketCounter(lastTicketCounter);
 
         entryDao.insertEntryResponse(entryCheckinResponse, EntryCheckinResponse.FLAG_UPLOAD_PENDING);
+
         entryCheckinContainerDao.insert(checkinContainer);
 
         //debugJsonCheckin(checkinContainer);

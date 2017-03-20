@@ -405,7 +405,7 @@ public class PrintCheckin implements ReceiveListener {
                 mPrinter.addFeedLine(1);
                 int loop = 1;
                 for (AdditionalItems i : itemsList) {
-                    sb.append(i.getAttributes().getAdditionalItemMaster().getName());
+                    sb.append(i.getAttributes().getName());
                     if (loop < itemsList.size()){
                         sb.append(", ");
                     }

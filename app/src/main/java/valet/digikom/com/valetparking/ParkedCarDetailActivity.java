@@ -188,7 +188,7 @@ public class ParkedCarDetailActivity extends AppCompatActivity implements View.O
             txtValetType.setText(attr.getValetType());
             txtPlatNo.setText(platNo);
             txtLokasiParkir.setText(lokasiParkir);
-            txtNoTrans.setText(attr.getIdTransaksi());
+            txtNoTrans.setText(attr.getNoTiket());
             txtDropPoint.setText(attr.getDropPoint());
             txtCheckin.setText(attr.getCheckinTime());
             txtFee.setText(MakeCurrencyString.fromInt(attr.getFee()));

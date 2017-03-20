@@ -24,6 +24,12 @@ public class ClosingData {
         private String id;
         @SerializedName("attributes")
         private Attr attributes;
+        @SerializedName("links")
+        private Links links;
+
+        public Links getLinks() {
+            return links;
+        }
 
         public String getType() {
             return type;
@@ -133,6 +139,24 @@ public class ClosingData {
 
             public String getValetTpyeKey() {
                 return valetTpyeKey;
+            }
+        }
+
+        public static class Links {
+            @SerializedName("self")
+            private Self self;
+
+            public Self getSelf() {
+                return self;
+            }
+
+            public static class Self {
+                @SerializedName("href")
+                private String href;
+
+                public String getHref() {
+                    return href;
+                }
             }
         }
     }

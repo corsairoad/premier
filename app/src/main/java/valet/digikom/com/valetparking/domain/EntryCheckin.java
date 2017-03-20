@@ -443,7 +443,7 @@ public class EntryCheckin {
                     for (AdditionalItems i : itemsList) {
                         RelationShip.ItemDetail.Item item = new RelationShip.ItemDetail.Item();
                         RelationShip.ItemDetail.Item.AttribItem attribItem = new RelationShip.ItemDetail.Item.AttribItem();
-                        attribItem.setItemId(String.valueOf(i.getAttributes().getAdditionalItemMaster().getId()));
+                        attribItem.setItemId(String.valueOf(i.getAttributes().getId()));
                         item.setAttribItem(attribItem);
 
                         items.add(item);

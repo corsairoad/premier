@@ -285,11 +285,17 @@
     <string name="report">Report</string>
     <string name="print_summary">Print Summary</string>
     <string name="print_details">Print Details</string>
+    <string name="id_transaksi">ID TRANSAKSI</string>
 
     <string-array name="array_report_type">
         <item>PER LOBBY</item>
         <item>PER SITE</item>
         <item>PER SHIFT</item>
+    </string-array>
+
+    <string-array name="array_lobby_checkin">
+        <item>CURRENT LOBBY</item>
+        <item>ALL LOBBIES</item>
     </string-array>
 
 

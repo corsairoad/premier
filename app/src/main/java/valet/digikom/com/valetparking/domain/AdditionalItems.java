@@ -20,19 +20,31 @@ public class AdditionalItems {
     }
 
     @SerializedName("attributes")
-    Attributes attributes;
+    AdditionalItemMaster attributes;
+    //Attributes attributes;
 
     public AdditionalItems() {
     }
 
-    public Attributes getAttributes() {
+
+    public AdditionalItemMaster getAttributes() {
         return attributes;
     }
 
-    public void setAttributes(Attributes attributes) {
+    public void setAttributes(AdditionalItemMaster attributes) {
         this.attributes = attributes;
     }
 
+    /*
+        public Attributes getAttributes() {
+            return attributes;
+        }
+        */
+    /*
+    public void setAttributes(Attributes attributes) {
+        this.attributes = attributes;
+    }
+    */
     public static class Attributes {
         @SerializedName("additional_item_master")
         AdditionalItemMaster additionalItemMaster;
@@ -50,7 +62,8 @@ public class AdditionalItems {
     }
 
     public static class AdditionalItemMaster {
-        @SerializedName("aims_id")
+        //@SerializedName("aims_id")
+        @SerializedName("aidt_id")
         private int id;
         @SerializedName("aims_name")
         private String name;
@@ -80,7 +93,7 @@ public class AdditionalItems {
         Attributes attributes = new Attributes();
         AdditionalItemMaster additionalItemMaster = new AdditionalItemMaster();
         attributes.setAdditionalItemMaster(additionalItemMaster);
-        additionalItems.setAttributes(attributes);
+        //additionalItems.setAttributes(attributes);
         return additionalItems;
     }
 }

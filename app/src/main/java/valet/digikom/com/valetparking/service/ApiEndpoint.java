@@ -12,6 +12,7 @@ import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
+import retrofit2.http.Url;
 import valet.digikom.com.valetparking.domain.AddCarCallBody;
 import valet.digikom.com.valetparking.domain.AddCarCallResponse;
 import valet.digikom.com.valetparking.domain.AdditionalItemsResponse;
@@ -61,7 +62,7 @@ public interface ApiEndpoint {
     Call<AuthResponse> login(@Field("email") String email, @Field("password") String password);
 
     @GET("additional_item_site_detail")
-    Call<AdditionalItemsResponse> getItems();
+    Call<AdditionalItemsResponse> getItems(@Query("page[size]") int pageSize);
 
     @GET("car_brand_master")
     Call<CarMasterResponse> getCars(@Query("page[size]") int pageSize);
@@ -77,6 +78,9 @@ public interface ApiEndpoint {
 
     @GET("ad_entry_checkin")
     Call<CheckinList> getCheckinList(@Query("page[size]") int pageSize);
+
+    @GET("ad_entry_checkin_lobby")
+    Call<CheckinList> getCurrentCheckinList(@Query("page[size]") int pageSize);
 
     @PUT("ad_car_call/{id}")
     Call<AddCarCallResponse> postCallCar(@Path("id") int id, @Body AddCarCallBody addCarCallBody);
@@ -138,4 +142,7 @@ public interface ApiEndpoint {
     // GET BANKS FOR PAYMENT METHOD REF
     @GET("bank_master")
     Call<Bank> getBanks();
+
+    @GET
+    Call<EntryCheckinResponse> getVthdTransactionItem(@Url String url);
 }
