@@ -56,10 +56,10 @@ public class EntryDao {
         String platNo = response.getData().getAttribute().getPlatNo();
         String noTrans = response.getData().getAttribute().getIdTransaksi();
         int id = response.getData().getAttribute().getId();
-        int fakeVthdId = response.getData().getAttribute().getLastTicketCounter(); // fakeVthdid is lastticketcounter
+        //int fakeVthdId = response.getData().getAttribute().getLastTicketCounter(); // fakeVthdid is lastticketcounter
 
         ContentValues cv = new ContentValues();
-        cv.put(EntryCheckinResponse.Table.COL_RESPONSE_ID, fakeVthdId);
+        cv.put(EntryCheckinResponse.Table.COL_RESPONSE_ID, id);
         cv.put(EntryCheckinResponse.Table.COL_JSON_RESPONSE, jsonResponse);
         cv.put(EntryCheckinResponse.Table.COL_PLAT_NO, platNo);
         cv.put(EntryCheckinResponse.Table.COL_NO_TRANS, noTrans);
@@ -94,8 +94,8 @@ public class EntryDao {
     }
 
     public void insertListCheckin(List<EntryCheckinResponse.Data> checkinList) {
+        int rows = removeUploadSuccess();
         if (!checkinList.isEmpty()) {
-            int rows = removeUploadSuccess();
             for (EntryCheckinResponse.Data e : checkinList) {
                 if (e != null) {
                     //removeEntryById(e.getAttribute().getId());
@@ -180,7 +180,6 @@ public class EntryDao {
         String[] args = new String[] {String.valueOf(id)};
         // Cursor c = db.query(EntryCheckinResponse.Table.TABLE_NAME,null, EntryCheckinResponse.Table.COL_RESPONSE_ID + "=? AND " + EntryCheckinResponse.Table.COL_IS_CHECKOUT + " = 0",args,null,null,null);
         Cursor c = db.query(EntryCheckinResponse.Table.TABLE_NAME,null, EntryCheckinResponse.Table.COL_RESPONSE_ID + "=?",args,null,null,null);
-
 
         if (c.moveToFirst()) {
             do {

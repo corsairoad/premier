@@ -2,6 +2,7 @@ package valet.digikom.com.valetparking.fragments;
 
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -14,6 +15,7 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +23,7 @@ import valet.digikom.com.valetparking.R;
 import valet.digikom.com.valetparking.adapter.ListStuffAdapter;
 import valet.digikom.com.valetparking.dao.ItemsDao;
 import valet.digikom.com.valetparking.domain.AdditionalItems;
+import valet.digikom.com.valetparking.util.ChangeBgColorListener;
 import valet.digikom.com.valetparking.util.ValetDbHelper;
 
 /**
@@ -28,7 +31,7 @@ import valet.digikom.com.valetparking.util.ValetDbHelper;
  * Use the {@link StepThreeFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class StepThreeFragment extends Fragment implements View.OnClickListener {
+public class StepThreeFragment extends Fragment implements View.OnClickListener, ChangeBgColorListener {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -42,6 +45,7 @@ public class StepThreeFragment extends Fragment implements View.OnClickListener 
     ListStuffAdapter adapter;
     private OnStuffSelectedListener onStuffListener;
     ArrayList<Integer> selectedPositions = new ArrayList<>();
+    private RelativeLayout bgStuffs;
 
     public StepThreeFragment() {
         // Required empty public constructor
@@ -80,6 +84,8 @@ public class StepThreeFragment extends Fragment implements View.OnClickListener 
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_step_three, container, false);
+
+        bgStuffs = (RelativeLayout) view.findViewById(R.id.bg_stuffs);
         mListviewStuff = (ListView) view.findViewById(R.id.listview_stuff);
         inputStuff = (EditText) view.findViewById(R.id.input_stuff);
         btnAddStuff = (ImageButton) view.findViewById(R.id.btn_add_stuff);
@@ -128,6 +134,15 @@ public class StepThreeFragment extends Fragment implements View.OnClickListener 
         adapter.setPost(post);
         adapter.notifyDataSetChanged();
         inputStuff.setText("");
+    }
+
+    @Override
+    public void onValetTypeChange(String index) {
+        int color = Color.parseColor("#ffffff");
+        if ("exclusive".equals(index.toLowerCase())) {
+            color = Color.parseColor("#ffea00");
+        }
+        bgStuffs.setBackgroundColor(color);
     }
 
     public interface OnStuffSelectedListener{

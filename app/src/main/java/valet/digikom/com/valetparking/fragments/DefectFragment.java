@@ -21,6 +21,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import java.util.ArrayList;
@@ -32,6 +33,7 @@ import at.lukle.clickableareasimage.PixelPosition;
 import valet.digikom.com.valetparking.R;
 import valet.digikom.com.valetparking.dao.DefectDao;
 import valet.digikom.com.valetparking.domain.DefectMaster;
+import valet.digikom.com.valetparking.util.ChangeBgColorListener;
 import valet.digikom.com.valetparking.util.ValetDbHelper;
 
 /**
@@ -39,7 +41,7 @@ import valet.digikom.com.valetparking.util.ValetDbHelper;
  * Use the {@link DefectFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class DefectFragment extends Fragment implements View.OnTouchListener, View.OnClickListener {
+public class DefectFragment extends Fragment implements View.OnTouchListener, View.OnClickListener, ChangeBgColorListener {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -61,7 +63,7 @@ public class DefectFragment extends Fragment implements View.OnTouchListener, Vi
     float upy = 0;
     OnDefectDrawingListener onDefectDrawingListener;
     private int[] viewCoords;
-
+    private LinearLayout bgDefect;
     private int imageWidthInPx;
     private int imageHeightInPx;
     private List<DefectMaster> defectMasterList;
@@ -94,6 +96,8 @@ public class DefectFragment extends Fragment implements View.OnTouchListener, Vi
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_defect, container, false);
+
+        bgDefect = (LinearLayout) view.findViewById(R.id.bg_defect);
         choosenImageView = (ImageView) view.findViewById(R.id.ChoosenImageView);
         btnClear = (Button) view.findViewById(R.id.btn_clear);
         btnClear.setOnClickListener(this);
@@ -202,6 +206,15 @@ public class DefectFragment extends Fragment implements View.OnTouchListener, Vi
     @Override
     public void onClick(View view) {
         clear();
+    }
+
+    @Override
+    public void onValetTypeChange(String index) {
+        int color = Color.parseColor("#ffffff");
+        if ("exclusive".equals(index.toLowerCase())) {
+            color = Color.parseColor("#ffea00");
+        }
+        bgDefect.setBackgroundColor(color);
     }
 
     public interface OnDefectDrawingListener {

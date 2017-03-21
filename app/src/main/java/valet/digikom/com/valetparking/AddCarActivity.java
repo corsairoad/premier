@@ -178,7 +178,13 @@ public class AddCarActivity extends FragmentActivity implements StepOneFragmet.O
 
     @Override
     public void onValetTypeSelected(ValetTypeJson.Data data) {
+        int valetId = data.getAttrib().getId();
+        String valetTypeName = data.getAttrib().getValetTypeName();
         fragmentReview.setValetType(data);
+
+        fragmentRegFirst.onValetTypeChange(valetTypeName);
+        fragmentStuff.onValetTypeChange(valetTypeName);
+        fragmentDefect.onValetTypeChange(valetTypeName);
     }
 
     private void showSignDialog() {
@@ -223,7 +229,7 @@ public class AddCarActivity extends FragmentActivity implements StepOneFragmet.O
         PrefManager prefManager = PrefManager.getInstance(this);
         int lastTicketCounter = builder.getLastTicketCounter(this);
         String noTiket = builder.generateTicketNo(this, lastTicketCounter);
-
+        int fakeVthdId = builder.generateId();
         // ------------ create checkin data and save to local db ------------------
         EntryCheckinResponse entryCheckinResponse = new EntryCheckinResponse();
         EntryCheckinResponse.Data data = new EntryCheckinResponse.Data();
@@ -238,13 +244,15 @@ public class AddCarActivity extends FragmentActivity implements StepOneFragmet.O
         attr.setLogoMobil(builder.getCarMaster().getAttrib().getLogo());
         attr.setCheckinTime(builder.getCheckInTime());
         attr.setDropPoint(builder.getDropPointMaster().getAttrib().getDropName());
-        attr.setId(lastTicketCounter);
+        //attr.setId(lastTicketCounter);
+        attr.setId(fakeVthdId);
         attr.setFee(builder.getValetType().getAttrib().getPrice());
         attr.setPlatNo(builder.getPlatNo());
         attr.setIdTransaksi(noTiket); // transaction id set for no tiket for temporary
         attr.setNoTiket(noTiket);
         attr.setSiteName(prefManager.getSiteName());
         attr.setLastTicketCounter(lastTicketCounter);
+        attr.setColor(builder.getColorMaster().getAttrib().getColorName());
 
         data.setAttribute(attr);
         data.setId(String.valueOf(attr.getId())); // vthdid
@@ -253,7 +261,8 @@ public class AddCarActivity extends FragmentActivity implements StepOneFragmet.O
 
         // -------------- create checkin json body for save to local db and upload to server --------------
         EntryCheckin entryCheckin = checkinContainer.getEntryCheckin();
-        entryCheckin.setId(String.valueOf(lastTicketCounter));
+        //entryCheckin.setId(String.valueOf(lastTicketCounter));
+        entryCheckin.setId(String.valueOf(fakeVthdId));
         entryCheckin.getAttrib().setCheckinTime(attr.getCheckinTime());
         entryCheckin.getAttrib().setTicketNo(attr.getIdTransaksi());
         entryCheckin.getAttrib().setQrCode("------------------------");

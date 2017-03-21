@@ -1,13 +1,17 @@
 package valet.digikom.com.valetparking.fragments;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,6 +41,7 @@ import valet.digikom.com.valetparking.domain.EntryCheckoutCont;
 import valet.digikom.com.valetparking.service.ApiClient;
 import valet.digikom.com.valetparking.service.ApiEndpoint;
 import valet.digikom.com.valetparking.service.ProcessRequest;
+import valet.digikom.com.valetparking.util.PrefManager;
 
 public class ParkedCarFragment extends Fragment implements ListCheckinAdapter.OnItemCheckinListener, CheckoutDao.OnCarReadyListener, AdapterView.OnItemSelectedListener {
 
@@ -51,6 +56,27 @@ public class ParkedCarFragment extends Fragment implements ListCheckinAdapter.On
     public static ParkedCarFragment parkedCarFragment;
     EntryDao entryDao;
 
+    LocalBroadcastManager bManager;
+    public static final String RECEIVE_CURRENT_LOBBY_DATA = "valet.digikom.com.valetparking.current.lobby";
+
+    private BroadcastReceiver bReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if(intent.getAction().equals(RECEIVE_CURRENT_LOBBY_DATA)) {
+                Log.d("Download", "Broadcast receiver data current lobby called");
+                new LoadCheckinTask().execute();
+            }
+        }
+    };
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if(bManager != null) {
+            bManager.unregisterReceiver(bReceiver);
+        }
+    }
+
     public ParkedCarFragment() {
     }
 
@@ -59,6 +85,11 @@ public class ParkedCarFragment extends Fragment implements ListCheckinAdapter.On
         super.onCreate(savedInstanceState);
         parkedCarFragment = this;
         entryDao = EntryDao.getInstance(getContext());
+
+        bManager = LocalBroadcastManager.getInstance(getContext());
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(RECEIVE_CURRENT_LOBBY_DATA);
+        bManager.registerReceiver(bReceiver, intentFilter);
     }
 
     public static ParkedCarFragment getInstance() {
@@ -127,6 +158,7 @@ public class ParkedCarFragment extends Fragment implements ListCheckinAdapter.On
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
         //clearData();
+        PrefManager.getInstance(getContext()).saveLobbyType(i);
         if (ApiClient.isNetworkAvailable(getContext())) {
             downloadCheckinList(i);
         }else {
@@ -160,6 +192,8 @@ public class ParkedCarFragment extends Fragment implements ListCheckinAdapter.On
                 responseList.addAll(entryCheckinResponses);
                 adapter.notifyDataSetChanged();
                 textEmpty.setVisibility(View.GONE);
+
+                Log.d("Download", "Checkin List updated");
                 //textTotalCheckin.setText(getResources().getString(R.string.total_checkin) + " " + entryCheckinResponses.size());
                 listener.setCountParkedCar(entryCheckinResponses.size());
             }else {
@@ -174,7 +208,7 @@ public class ParkedCarFragment extends Fragment implements ListCheckinAdapter.On
         void setCountParkedCar (int count);
     }
 
-    public void downloadCheckinList(final int index) {
+    public  void downloadCheckinList(final int index) {
         TokenDao.getToken(new ProcessRequest() {
             @Override
             public void process(String token) {
@@ -184,7 +218,7 @@ public class ParkedCarFragment extends Fragment implements ListCheckinAdapter.On
                 }
 
                 ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class, token);
-                Call<CheckinList> call = apiEndpoint.getCurrentCheckinList(100);
+                Call<CheckinList> call = apiEndpoint.getCurrentCheckinList(500);
 
                 if (index == 1) {
                     call = apiEndpoint.getCheckinList(999);

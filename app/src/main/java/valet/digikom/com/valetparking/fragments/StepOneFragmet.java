@@ -2,6 +2,7 @@ package valet.digikom.com.valetparking.fragments;
 
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -20,6 +21,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
@@ -49,11 +51,12 @@ import valet.digikom.com.valetparking.domain.ValetTypeJson;
 import valet.digikom.com.valetparking.service.ApiClient;
 import valet.digikom.com.valetparking.service.ApiEndpoint;
 import valet.digikom.com.valetparking.service.ProcessRequest;
+import valet.digikom.com.valetparking.util.ChangeBgColorListener;
 import valet.digikom.com.valetparking.util.PrefManager;
 import valet.digikom.com.valetparking.util.ValetDbHelper;
 
 
-public class StepOneFragmet extends Fragment implements View.OnClickListener {
+public class StepOneFragmet extends Fragment implements View.OnClickListener, ChangeBgColorListener {
 
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
@@ -85,6 +88,7 @@ public class StepOneFragmet extends Fragment implements View.OnClickListener {
     private OnValetTypeSelectedListener valetTypeSelectedListener;
     private InputMethodManager imm;
     private RadioGroup rGroupValetType;
+    private LinearLayout bgRegistration;
 
     public StepOneFragmet() {
         // Required empty public constructor
@@ -113,6 +117,8 @@ public class StepOneFragmet extends Fragment implements View.OnClickListener {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_step_one, container, false);
+
+        bgRegistration = (LinearLayout) view.findViewById(R.id.bg_registration);
 
         tilDropPoint = (TextInputLayout) view.findViewById(R.id.til_drop_point);
         tilCarType = (TextInputLayout) view.findViewById(R.id.til_car_type);
@@ -151,6 +157,7 @@ public class StepOneFragmet extends Fragment implements View.OnClickListener {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 valetTypeSelectedListener.onValetTypeSelected(valetTypeJsonList.get(i));
+
             }
 
             @Override
@@ -220,6 +227,14 @@ public class StepOneFragmet extends Fragment implements View.OnClickListener {
         return view;
     }
 
+    public void changeBgColor(String index) {
+        int color = Color.parseColor("#ffffff");
+        if ("exclusive".equals(index.toLowerCase())) {
+            color = Color.parseColor("#ffea00");
+        }
+        bgRegistration.setBackgroundColor(color);
+    }
+
     private ValetTypeJson.Data findValetTypeById(int checkedId) {
         for (ValetTypeJson.Data data : valetTypeJsonList) {
             if (data.getAttrib().getId() == checkedId) {
@@ -283,6 +298,11 @@ public class StepOneFragmet extends Fragment implements View.OnClickListener {
         }else if (view == tilColorType) {
             new FetchColorsTask().execute();
         }
+    }
+
+    @Override
+    public void onValetTypeChange(String index) {
+        changeBgColor(index);
     }
 
 
@@ -529,7 +549,10 @@ public class StepOneFragmet extends Fragment implements View.OnClickListener {
             rb.setTextSize(25);
             if ("regular".equals(valetTypeName.toLowerCase())) {
                 rb.setChecked(true);
+            }else {
+                rb.setTextColor(Color.parseColor("#dd2c00"));
             }
+
             rGroupValetType.addView(rb);
         }
     }

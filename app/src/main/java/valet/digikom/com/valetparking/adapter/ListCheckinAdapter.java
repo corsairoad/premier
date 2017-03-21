@@ -68,6 +68,7 @@ public class ListCheckinAdapter extends RecyclerView.Adapter<ListCheckinAdapter.
         holder.textPlatNo.setText(platNo);
         holder.textRunnerName.setText(checkinTime);
 
+        int id = (int) getItemId(position);
         holder.layoutContainer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

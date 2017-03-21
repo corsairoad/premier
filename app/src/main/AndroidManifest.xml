@@ -154,6 +154,13 @@
                 <action android:name="android.view.InputMethod" />
             </intent-filter>
         </service>
+
+        <service android:name=".service.DownloadCurrentLobbyService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="premier.valet.download.current.lobby"/>
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>

@@ -41,8 +41,13 @@ public class FailedTransactionService extends IntentService {
             EntryCheckinContainerDao containerDao = EntryCheckinContainerDao.getInstance(this);
             List<EntryCheckinContainer> containers = containerDao.fetchAll();
 
+            // different process service
+            if (PrefManager.getInstance(this).getLobbyType() == 0) {
+                downloadCurrentLobbyDataService();
+            }
+
             if (containers.isEmpty()) {
-                cancelAlarm();
+                //cancelAlarm();
                 return;
             }
 
@@ -50,7 +55,15 @@ public class FailedTransactionService extends IntentService {
                 postCheckin(container);
             }
             Log.d(TAG, "STARTED");
+
+
         }
+    }
+
+    private void downloadCurrentLobbyDataService() {
+        Intent intent = new Intent(this, DownloadCurrentLobbyService.class);
+        intent.setAction(DownloadCurrentLobbyService.ACTION_DOWNLOAD);
+        startService(intent);
     }
 
     private void cancelAlarm() {
@@ -69,7 +82,8 @@ public class FailedTransactionService extends IntentService {
                     @Override
                     public void onResponse(Call<EntryCheckinResponse> call, Response<EntryCheckinResponse> response) {
                         if (response != null && response.body() != null) {
-                            int fakeVthdId = entryCheckinContainer.getEntryCheckin().getAttrib().getLastTicketCounter(); // fake vthd id diambil dari last ticket counter
+                            //int fakeVthdId = entryCheckinContainer.getEntryCheckin().getAttrib().getLastTicketCounter(); // fake vthd id diambil dari last ticket counter
+                            int fakeVthdId = Integer.parseInt(entryCheckinContainer.getEntryCheckin().getId()); // fake vthd id diambil dari last ticket counter
                             int remoteVthdId = response.body().getData().getAttribute().getId();
                             String tiketSeq = response.body().getData().getAttribute().getIdTransaksi();
                             int lastTicketCounter = response.body().getData().getAttribute().getLastTicketCounter();

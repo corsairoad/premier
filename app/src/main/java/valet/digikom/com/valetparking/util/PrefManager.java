@@ -24,6 +24,7 @@ public class PrefManager {
     public static final String KEY_REMOTE_DEVICE_ID = "rem_dev_id";
     public static final String KEY_LAST_COUNTER_TICKET = "last_counter_ticket";
     public static final String KEY_LAST_PRINTED_TICKET_COUNTER = "last_printed_ticket_counter";
+    public static final String KEY_LOBBY_TYPE = "key_lobby_type";
 
     private Context context;
     private static PrefManager prefManager;
@@ -48,6 +49,15 @@ public class PrefManager {
     public void setSiteName(String name) {
         editor.putString(KEY_SITE_NAME, name);
         editor.commit();
+    }
+
+    public void saveLobbyType(int lobbyType) {
+        editor.putInt(KEY_LOBBY_TYPE, lobbyType);
+        editor.commit();
+    }
+
+    public int getLobbyType() {
+        return sharedPreferences.getInt(KEY_LOBBY_TYPE, 0);
     }
 
     public String getSiteName() {
