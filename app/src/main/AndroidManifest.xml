@@ -161,6 +161,13 @@
                 <action android:name="premier.valet.download.current.lobby"/>
             </intent-filter>
         </service>
+
+        <service android:name=".service.PostCheckoutService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="premier.valet.post.checkout.data"/>
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>

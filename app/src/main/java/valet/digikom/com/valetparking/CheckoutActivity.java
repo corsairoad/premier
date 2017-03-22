@@ -91,6 +91,7 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
     int feeMembership = 0;
     int idValetHeader;
     int remoteValetHeader;
+    String noTiket;
 
     List<MembershipResponse.Data> listMemberShip = new ArrayList<>();
     List<PaymentMethod.Data> listPayment = new ArrayList<>();
@@ -103,6 +104,7 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
     SpinnerBankAdapter spinnerBankAdapter;
     MembershipResponse.Data dataMembership;
     EntryCheckinResponse entryCheckinResponse;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -369,6 +371,8 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
         if (response != null) {
             this.entryCheckinResponse = response;
             EntryCheckinResponse.Attribute attrib = response.getData().getAttribute();
+
+            this.noTiket = attrib.getNoTiket();
             fee = attrib.getFee();
             String platNo = attrib.getPlatNo();
             String lokasiParkir = attrib.getAreaParkir() + " " + attrib.getBlokParkir() + " " + attrib.getSektorParkir();
@@ -385,7 +389,7 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
             txtPlatNo.setText(platNo);
             txtLokasiParkir.setText(lokasiParkir);
             txtDropPoint.setText(attrib.getDropPoint());
-            txtNoTransaksi.setText(attrib.getNoTiket());
+            txtNoTransaksi.setText(this.noTiket);
             txtFee.setText(MakeCurrencyString.fromInt(fee));
             txtCheckinTime.setText(attrib.getCheckinTime());
             txtOvernight.setText(MakeCurrencyString.fromInt(overNightFine));
@@ -466,7 +470,9 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
 
     private void submitCheckout() {
         FinishCheckOut.Builder builder = new FinishCheckOut.Builder();
-        builder.setCheckoutTime(getCurrentDate());
+        String checkoutTime = getCurrentDate();
+
+        builder.setCheckoutTime(checkoutTime);
         builder.setAppId(PrefManager.getInstance(this).getAppId());
         builder.setDeviceId(PrefManager.getInstance(this).getDeviceId());
 
@@ -518,14 +524,33 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
         finishCheckoutDao.setIdMembership(inputMembershipId.getText().toString());
         finishCheckoutDao.setPaymentData(paymentData);
         finishCheckoutDao.setBankData(bankData);
+        finishCheckoutDao.setCheckedOutTime(checkoutTime);
 
-        TokenDao.getToken(finishCheckoutDao, this);
+        //finishCheckoutDao.saveDataCheckout(remoteValetHeader, finishCheckoutDao.getFinishCheckOut(), noTiket.trim());
+        //finishCheckoutDao.print(remoteValetHeader);
 
-        Gson gson = new Gson();
-        String finishCheckOut = gson.toJson(builder.build());
-        Log.d("json checkout", finishCheckOut);
+        //TokenDao.getToken(finishCheckoutDao, this);
+        new FinishCheckoutProcess(finishCheckoutDao).execute();
 
-        //goToMain();
+        goToMain();
+    }
+
+    private class FinishCheckoutProcess extends AsyncTask<String,String,String> {
+        FinishCheckoutDao finishCheckoutDao;
+
+        public FinishCheckoutProcess(FinishCheckoutDao finishCheckoutDao) {
+            this.finishCheckoutDao = finishCheckoutDao;
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+
+            finishCheckoutDao.saveDataCheckout(remoteValetHeader, finishCheckoutDao.getFinishCheckOut(), noTiket.trim());
+            finishCheckoutDao.setCheckoutCar(idValetHeader);
+            finishCheckoutDao.print(remoteValetHeader);
+
+            return null;
+        }
     }
 
     private void goToMain() {

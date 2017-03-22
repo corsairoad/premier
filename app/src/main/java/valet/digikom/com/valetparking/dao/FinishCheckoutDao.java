@@ -3,9 +3,16 @@ package valet.digikom.com.valetparking.dao;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
+import android.util.Log;
 import android.widget.Toast;
+
+import com.google.gson.Gson;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 import retrofit2.Call;
@@ -14,6 +21,7 @@ import retrofit2.Response;
 import valet.digikom.com.valetparking.CheckoutActivity;
 import valet.digikom.com.valetparking.Main2Activity;
 import valet.digikom.com.valetparking.domain.Bank;
+import valet.digikom.com.valetparking.domain.CheckoutData;
 import valet.digikom.com.valetparking.domain.EntryCheckinResponse;
 import valet.digikom.com.valetparking.domain.FinishCheckOut;
 import valet.digikom.com.valetparking.domain.FinishCheckoutResponse;
@@ -46,14 +54,13 @@ public class FinishCheckoutDao implements ProcessRequest {
     private String idMembership;
     private MembershipResponse.Data dataMembership;
     private String checkedOutTime;
-    private CheckoutActivity checkoutActivity;
     private PaymentMethod.Data paymentData;
     private Bank.Data bankData;
 
     private FinishCheckoutDao(Context context) {
         this.context = context;
         dbHelper = ValetDbHelper.getInstance(context);
-        checkoutActivity = (CheckoutActivity) context;
+
     }
 
     public static FinishCheckoutDao getInstance(Context c) {
@@ -73,6 +80,10 @@ public class FinishCheckoutDao implements ProcessRequest {
 
     public Bank.Data getBankData() {
         return bankData;
+    }
+
+    public String getCheckedOutTime() {
+        return checkedOutTime;
     }
 
     public void setBankData(Bank.Data bankData) {
@@ -117,6 +128,10 @@ public class FinishCheckoutDao implements ProcessRequest {
 
     public void setTotalBayar(String totalBayar) {
         this.totalBayar = totalBayar;
+    }
+
+    public void setCheckedOutTime(String checkedOutTime) {
+        this.checkedOutTime = checkedOutTime;
     }
 
     public EntryCheckinResponse getEntryCheckinResponse() {
@@ -177,7 +192,7 @@ public class FinishCheckoutDao implements ProcessRequest {
         });
     }
 
-    private void print(int remoteId) {
+    public void print(int remoteId) {
 
         // create print checkout param
         String ticketSeq = EntryDao.getInstance(context).getTicketSequence(remoteId);
@@ -191,7 +206,7 @@ public class FinishCheckoutDao implements ProcessRequest {
                 .setNovoucher(getNomorVoucher())
                 .setDataMembership(getDataMembership())
                 .setIdMembership(getIdMembership())
-                .setCheckoutTime(checkedOutTime)
+                .setCheckoutTime(getCheckedOutTime())
                 .setPaymentData(getPaymentData())
                 .setBankData(getBankData());
 
@@ -199,7 +214,7 @@ public class FinishCheckoutDao implements ProcessRequest {
         PrintReceiptCheckout printReceiptCheckout = new PrintReceiptCheckout(context,paramBuilder.build());
         printReceiptCheckout.buildPrintData();
 
-        goToMain();
+        //goToMain();
 
         /*
         ---------- cara print lama -------------------
@@ -214,14 +229,86 @@ public class FinishCheckoutDao implements ProcessRequest {
     private void goToMain() {
         Intent intent = new Intent(context, Main2Activity.class);
         context.startActivity(intent);
-        checkoutActivity.finish();
+        //checkoutActivity.finish();
     }
 
-    private void setCheckoutCar(int id) {
+    public void setCheckoutCar(int id) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         String[] args = new String[] {String.valueOf(id)};
         ContentValues cv = new ContentValues();
         cv.put(EntryCheckinResponse.Table.COL_IS_CHECKOUT, 1);
-        db.update(EntryCheckinResponse.Table.TABLE_NAME,cv, EntryCheckinResponse.Table.COL_REMOTE_VTHD_ID + " = ?", args);
+        int updateSuccess = db.update(EntryCheckinResponse.Table.TABLE_NAME,cv, EntryCheckinResponse.Table.COL_REMOTE_VTHD_ID + " = ?", args);
+
     }
+
+    public boolean isAlreadyCheckout(int id) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        String[] args = new String[] {String.valueOf(id)};
+        Cursor c = db.query(FinishCheckOut.Table.TABLE_NAME, null, FinishCheckOut.Table.COL_DATA_ID + "=?",args,null,null,null);
+
+        if (c.moveToFirst()) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public long saveDataCheckout(int remoteVthdId, FinishCheckOut finishCheckOut, String noTiket) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        String json = toJson(finishCheckOut);
+        ContentValues cv = new ContentValues();
+
+        cv.put(FinishCheckOut.Table.COL_JSON_DATA, json);
+        cv.put(FinishCheckOut.Table.COL_DATA_ID, remoteVthdId);
+        cv.put(FinishCheckOut.Table.COL_NO_TIKET, noTiket);
+
+        return db.insert(FinishCheckOut.Table.TABLE_NAME, null, cv);
+    }
+
+    public List<CheckoutData> getCheckoutData() {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        List<CheckoutData> checkoutDataList = new ArrayList<>();
+
+        Cursor c = db.rawQuery("SELECT * FROM " + FinishCheckOut.Table.TABLE_NAME, new String[] {});
+
+        if (c.moveToFirst()) {
+            do{
+                CheckoutData checkoutData = new CheckoutData();
+                checkoutData.setRemoteVthdId(c.getInt(c.getColumnIndex(FinishCheckOut.Table.COL_DATA_ID)));
+                checkoutData.setJsonData(c.getString(c.getColumnIndex(FinishCheckOut.Table.COL_JSON_DATA)));
+
+                checkoutDataList.add(checkoutData);
+            } while (c.moveToNext());
+        }
+        c.close();
+        return checkoutDataList;
+    }
+
+
+    public int updateCheckoutVthdId(String noTiket, int id) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        String whereClause = FinishCheckOut.Table.COL_NO_TIKET + " = ?";
+        String[] args = new String[] {noTiket};
+
+        ContentValues cv = new ContentValues();
+        cv.put(FinishCheckOut.Table.COL_DATA_ID, id);
+
+        return db.update(FinishCheckOut.Table.TABLE_NAME,cv,whereClause,args);
+    }
+
+    public int deleteDatabyRemoteId(int remoteVthdId) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        String whereClaue = FinishCheckOut.Table.COL_DATA_ID + " = ?";
+        String[] args = new String[] {String.valueOf(remoteVthdId)};
+
+        return db.delete(FinishCheckOut.Table.TABLE_NAME, whereClaue,args);
+    }
+
+    private String toJson(FinishCheckOut dataCheckout) {
+        Gson gson = new Gson();
+        String finishCheckOut = gson.toJson(dataCheckout);
+        Log.d("json checkout", finishCheckOut);
+        return finishCheckOut;
+    }
+
 }

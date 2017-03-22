@@ -276,7 +276,7 @@ public class AddCarActivity extends FragmentActivity implements StepOneFragmet.O
 
         //debugJsonCheckin(checkinContainer);
 
-        startAlarmForUploadCheckin();
+        //startAlarmForUploadCheckin();
         print(entryCheckinResponse);
     }
 

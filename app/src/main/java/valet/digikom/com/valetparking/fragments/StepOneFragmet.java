@@ -263,7 +263,7 @@ public class StepOneFragmet extends Fragment implements View.OnClickListener, Ch
 
     public boolean isFormValid() {
         boolean allValid = true;
-        EditText[] editTexts = {inputDropPoint, inputPlatNo, inputCartype};
+        EditText[] editTexts = {inputDropPoint, inputPlatNo, inputCartype, inputColor};
 
         for (EditText editText : editTexts) {
             if (editText != null){

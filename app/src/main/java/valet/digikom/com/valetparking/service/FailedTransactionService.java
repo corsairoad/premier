@@ -17,6 +17,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import valet.digikom.com.valetparking.dao.EntryCheckinContainerDao;
 import valet.digikom.com.valetparking.dao.EntryDao;
+import valet.digikom.com.valetparking.dao.FinishCheckoutDao;
 import valet.digikom.com.valetparking.dao.TokenDao;
 import valet.digikom.com.valetparking.domain.EntryCheckinContainer;
 import valet.digikom.com.valetparking.domain.EntryCheckinResponse;
@@ -41,23 +42,34 @@ public class FailedTransactionService extends IntentService {
             EntryCheckinContainerDao containerDao = EntryCheckinContainerDao.getInstance(this);
             List<EntryCheckinContainer> containers = containerDao.fetchAll();
 
-            // different process service
-            if (PrefManager.getInstance(this).getLobbyType() == 0) {
-                downloadCurrentLobbyDataService();
+            if (!containers.isEmpty()) {
+                for (EntryCheckinContainer container : containers) {
+                    postCheckin(container);
+                }
             }
 
-            if (containers.isEmpty()) {
-                //cancelAlarm();
-                return;
-            }
+            startDownloadCurrentLobbyService();
+            startPostCheckoutService();
 
-            for (EntryCheckinContainer container : containers) {
-                postCheckin(container);
-            }
             Log.d(TAG, "STARTED");
 
 
         }
+    }
+
+    private void startDownloadCurrentLobbyService() {
+        // different process service
+        if (PrefManager.getInstance(this).getLobbyType() == 0) {
+            Intent intent = new Intent(this, DownloadCurrentLobbyService.class);
+            intent.setAction(DownloadCurrentLobbyService.ACTION_DOWNLOAD);
+            startService(intent);
+            //downloadCurrentLobbyDataService();
+        }
+    }
+
+    private void startPostCheckoutService() {
+        Intent intent = new Intent(PostCheckoutService.ACTION);
+        startService(intent);
     }
 
     private void downloadCurrentLobbyDataService() {
@@ -83,9 +95,10 @@ public class FailedTransactionService extends IntentService {
                     public void onResponse(Call<EntryCheckinResponse> call, Response<EntryCheckinResponse> response) {
                         if (response != null && response.body() != null) {
                             //int fakeVthdId = entryCheckinContainer.getEntryCheckin().getAttrib().getLastTicketCounter(); // fake vthd id diambil dari last ticket counter
-                            int fakeVthdId = Integer.parseInt(entryCheckinContainer.getEntryCheckin().getId()); // fake vthd id diambil dari last ticket counter
+                            int fakeVthdId = Integer.parseInt(entryCheckinContainer.getEntryCheckin().getId());
                             int remoteVthdId = response.body().getData().getAttribute().getId();
                             String tiketSeq = response.body().getData().getAttribute().getIdTransaksi();
+                            String noTiket = response.body().getData().getAttribute().getNoTiket().trim();
                             int lastTicketCounter = response.body().getData().getAttribute().getLastTicketCounter();
                             Log.d(TAG, "TICKET C0UNTER "+ lastTicketCounter);
 
@@ -94,12 +107,16 @@ public class FailedTransactionService extends IntentService {
                             int updateSuccess = EntryDao.getInstance(FailedTransactionService.this)
                                     .updateRemoteAndTicketSequenceId(String.valueOf(fakeVthdId), remoteVthdId, tiketSeq);
 
+                            int updateIdDataCheckout = FinishCheckoutDao.getInstance(FailedTransactionService.this)
+                                    .updateCheckoutVthdId(noTiket, remoteVthdId);
+
                             if (updateSuccess > 0) {
                                 EntryCheckinContainerDao containerDao = EntryCheckinContainerDao.getInstance(FailedTransactionService.this);
                                 int deleteSuccess = containerDao.deleteById(String.valueOf(fakeVthdId));
                                 Log.d(TAG,"remove failed-checkin " + deleteSuccess);
                                 Log.d(TAG, "No. TICKET: " +  response.body().getData().getAttribute().getIdTransaksi());
                             }
+
                         }else {
                             //debugJsonCheckin(entryCheckinContainer);
                             Log.d(TAG,"post failed-checkin failed");

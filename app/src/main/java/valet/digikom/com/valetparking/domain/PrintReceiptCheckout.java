@@ -30,7 +30,7 @@ public class PrintReceiptCheckout extends PrintReceipt {
 
             String valetType = printCheckoutParam.getEntryCheckinResponse().getData().getAttribute().getValetType();
             String site = printCheckoutParam.getEntryCheckinResponse().getData().getAttribute().getSiteName();
-            String noTrans = printCheckoutParam.getEntryCheckinResponse().getData().getAttribute().getIdTransaksi();
+            String noTrans = printCheckoutParam.getEntryCheckinResponse().getData().getAttribute().getNoTiket();
             String noPol = printCheckoutParam.getEntryCheckinResponse().getData().getAttribute().getPlatNo();
             String jenis = printCheckoutParam.getEntryCheckinResponse().getData().getAttribute().getCar();
             String warna = printCheckoutParam.getEntryCheckinResponse().getData().getAttribute().getColor();

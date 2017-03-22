@@ -90,8 +90,9 @@ public abstract class PrintReceipt implements StatusChangeEventListener {
 
     public Builder getBuilder() throws EposException {
         if (mBuilder == null) {
-            mBuilder = new Builder(PRINTER_NAME, PRINTER_LANGUAGE, context);
+            mBuilder = new Builder(PRINTER_NAME, PRINTER_LANGUAGE, context.getApplicationContext());
         }
+        mBuilder.addTextFont(Builder.FONT_B);
         return mBuilder;
     }
 

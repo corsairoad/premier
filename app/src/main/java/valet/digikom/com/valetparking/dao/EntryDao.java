@@ -66,7 +66,7 @@ public class EntryDao {
 
         cv.put(EntryCheckinResponse.Table.COL_REMOTE_VTHD_ID, id);
         cv.put(EntryCheckinResponse.Table.COL_TICKET_SEQUENCE, noTrans);
-
+        cv.put(EntryCheckinResponse.Table.COL_IS_CHECKOUT, 0);
         cv.put(EntryCheckinResponse.Table.COL_IS_UPLOADED, flagUpload);
 
         db.insert(EntryCheckinResponse.Table.TABLE_NAME,null,cv);
@@ -95,6 +95,7 @@ public class EntryDao {
 
     public void insertListCheckin(List<EntryCheckinResponse.Data> checkinList) {
         int rows = removeUploadSuccess();
+        //FinishCheckoutDao finishCheckoutDao = FinishCheckoutDao.getInstance(dbHelper.getContext());
         if (!checkinList.isEmpty()) {
             for (EntryCheckinResponse.Data e : checkinList) {
                 if (e != null) {
@@ -102,7 +103,11 @@ public class EntryDao {
 
                     EntryCheckinResponse entryCheckinResponse = new EntryCheckinResponse();
                     entryCheckinResponse.setData(e);
+
+                    //int remoteVthdId = entryCheckinResponse.getData().getAttribute().getId();
+
                     insertEntryResponse(entryCheckinResponse,EntryCheckinResponse.FLAG_UPLOAD_SUCCESS);
+
                 }
             }
         }

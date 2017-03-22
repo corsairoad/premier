@@ -1,6 +1,13 @@
 package valet.digikom.com.valetparking.domain;
 
 import android.content.Context;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Rect;
 import android.text.TextUtils;
 import android.widget.Toast;
 
@@ -9,11 +16,13 @@ import com.epson.eposprint.Builder;
 import com.epson.eposprint.EposException;
 
 import java.math.BigDecimal;
+import java.nio.charset.Charset;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import valet.digikom.com.valetparking.ClosingActivity;
+import valet.digikom.com.valetparking.R;
 import valet.digikom.com.valetparking.util.MakeCurrencyString;
 
 /**
@@ -55,8 +64,11 @@ public class PrintReceiptClosing extends PrintReceipt {
     public void buildPrintData() {
         try {
             Toast.makeText(getContext(), "Printing", Toast.LENGTH_SHORT).show();
+
             Builder builder = getBuilder();
+
             StringBuilder sb = new StringBuilder();
+            StringBuilder sbSample = new StringBuilder();
 
             builder.addTextAlign(Printer.ALIGN_CENTER);
             builder.addTextSize(2,2);
@@ -74,14 +86,19 @@ public class PrintReceiptClosing extends PrintReceipt {
                 sb.append("LOBBY       : " + closingParam.getLobbyName() + "\n");
             }
             sb.append("WAKTU REPORT: " + getCurrentDate() + "\n");
-            sb.append("------------------------------------------\n");
+            sb.append("--------------------------------------------------------\n");
 
+            sbSample.append(sb.toString());
             builder.addText(sb.toString());
+
             sb.delete(0, sb.length());
 
+
             if (flagPrint == ClosingActivity.PRINT_DETAILS || flagPrint == ClosingActivity.PRINT_CLOSING) {
-                sb.append("Tiket  No. Pol   In     Out     Status\n");
-                sb.append("------------------------------------------\n");
+                sb.append("Tiket        ID.Trans. No.Plat    In    Out    Status\n");
+                sb.append("--------------------------------------------------------\n");
+
+                sbSample.append(sb.toString());
                 builder.addText(sb.toString());
                 sb.delete(0, sb.length());
             }
@@ -99,6 +116,7 @@ public class PrintReceiptClosing extends PrintReceipt {
             for (ClosingData.Data data : closingParam.getClosingData()) {
                 String transactNo = data.getAttributes().getNoTiket();
                 String noPol = data.getAttributes().getPlatNo();
+                String remoteId = data.getAttributes().getTransactionId();
                 //String valetType = data.getAttributes().getValetTypeName();
 
                 int valetTotal = data.getAttributes().getValetTotalFee();
@@ -135,13 +153,14 @@ public class PrintReceiptClosing extends PrintReceipt {
                     checkoutTime = "";
                 }
 
-                sb.append(transactNo + " " + noPol + "\t"  + checkinTime + "\t" + checkoutTime + "\t" + status + "\n");
+                sb.append(transactNo + "\t   " + remoteId + "\t" + noPol + "\t"  + checkinTime + " " + checkoutTime + "  " + status + "\n");
                 i++;
             }
 
-            sb.append("------------------------------------------\n");
+            sb.append("--------------------------------------------------------\n");
 
             if (flagPrint == ClosingActivity.PRINT_DETAILS || flagPrint == ClosingActivity.PRINT_CLOSING) {
+                sbSample.append(sb.toString());
                 builder.addText(sb.toString());
             }
 
@@ -154,15 +173,59 @@ public class PrintReceiptClosing extends PrintReceipt {
             sb.append("Total Tiket Hilang : " + lostTicket + "\n");
             sb.append("Cash               : " + MakeCurrencyString.fromInt(sumCash.intValue()) + "\n");
             sb.append("Income             : " + MakeCurrencyString.fromInt(sumIncome.intValue()) + "\n");
+
+            sbSample.append(sb.toString());
             builder.addText(sb.toString());
             builder.addFeedLine(1);
             builder.addCut(Printer.CUT_FEED);
+
+            builder.addTextFont(Builder.FONT_A);
 
             print();
         } catch (EposException e) {
             Toast.makeText(getContext(), "Print failed", Toast.LENGTH_SHORT).show();
             e.printStackTrace();
         }
+    }
+
+
+    public Bitmap drawTextToBitmap(Context gContext,
+                                   int gResId,
+                                   String gText) {
+        Resources resources = gContext.getResources();
+        float scale = resources.getDisplayMetrics().density;
+        Bitmap bitmap =
+                BitmapFactory.decodeResource(resources, gResId);
+
+        android.graphics.Bitmap.Config bitmapConfig =
+                bitmap.getConfig();
+        // set default bitmap config if none
+        if(bitmapConfig == null) {
+            bitmapConfig = android.graphics.Bitmap.Config.ARGB_8888;
+        }
+        // resource bitmaps are imutable,
+        // so we need to convert it to mutable one
+        bitmap = bitmap.copy(bitmapConfig, true);
+
+        Canvas canvas = new Canvas(bitmap);
+        // new antialised Paint
+        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        // text color - #3D3D3D
+        paint.setColor(Color.rgb(61, 61, 61));
+        // text size in pixels
+        paint.setTextSize((int) (14 * scale));
+        // text shadow
+        paint.setShadowLayer(1f, 0f, 1f, Color.WHITE);
+
+        // draw text to the Canvas center
+        Rect bounds = new Rect();
+        paint.getTextBounds(gText, 0, gText.length(), bounds);
+        int x = (bitmap.getWidth() - bounds.width())/2;
+        int y = (bitmap.getHeight() + bounds.height())/2;
+
+        canvas.drawText(gText, x, y, paint);
+
+        return bitmap;
     }
 
     private String getCurrentDate() {

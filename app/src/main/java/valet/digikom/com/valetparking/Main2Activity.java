@@ -33,6 +33,7 @@ import valet.digikom.com.valetparking.domain.DropPointMaster;
 import valet.digikom.com.valetparking.domain.EntryCheckoutCont;
 import valet.digikom.com.valetparking.fragments.CalledCarFragment;
 import valet.digikom.com.valetparking.fragments.ParkedCarFragment;
+import valet.digikom.com.valetparking.util.CheckinCheckoutAlarm;
 import valet.digikom.com.valetparking.util.CheckoutReadyAlarm;
 import valet.digikom.com.valetparking.util.PrefManager;
 import valet.digikom.com.valetparking.util.ValetDbHelper;
@@ -115,6 +116,7 @@ public class Main2Activity extends AppCompatActivity
         handleIntent(getIntent());
 
         startCheckoutEntryAlarm();
+        startAllServices();
     }
 
     private void setTitle() {
@@ -227,6 +229,12 @@ public class Main2Activity extends AppCompatActivity
 
         // checking ready checkout car
         if (id == R.id.action_refresh) {
+            int indexLobbyType = prefManager.getLobbyType();
+            ParkedCarFragment parkedCarFragment = (ParkedCarFragment) pagerAdapter.getItem(0);
+            if(parkedCarFragment != null) {
+                parkedCarFragment.downloadCheckinList(indexLobbyType);
+            }
+
             return true;
         }
 
@@ -371,5 +379,11 @@ public class Main2Activity extends AppCompatActivity
     private String getCurrentDate() {
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MMMM/yyyy");
         return sdf.format(new Date());
+    }
+
+    // checkin, checkout, download current lobby data
+    private void startAllServices() {
+        CheckinCheckoutAlarm checkinCheckoutAlarm = CheckinCheckoutAlarm.getInstance(this);
+        checkinCheckoutAlarm.startAlarm();
     }
 }

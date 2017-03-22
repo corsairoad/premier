@@ -59,6 +59,28 @@ public class ParkedCarFragment extends Fragment implements ListCheckinAdapter.On
     LocalBroadcastManager bManager;
     public static final String RECEIVE_CURRENT_LOBBY_DATA = "valet.digikom.com.valetparking.current.lobby";
 
+    int countSpinner;
+    public ParkedCarFragment() {
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        parkedCarFragment = this;
+        entryDao = EntryDao.getInstance(getContext());
+
+        bManager = LocalBroadcastManager.getInstance(getContext());
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(RECEIVE_CURRENT_LOBBY_DATA);
+        bManager.registerReceiver(bReceiver, intentFilter);
+        countSpinner = 0;
+    }
+
+    public static ParkedCarFragment getInstance() {
+        return parkedCarFragment;
+    }
+
+    // receiver download current lobby
     private BroadcastReceiver bReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -75,25 +97,6 @@ public class ParkedCarFragment extends Fragment implements ListCheckinAdapter.On
         if(bManager != null) {
             bManager.unregisterReceiver(bReceiver);
         }
-    }
-
-    public ParkedCarFragment() {
-    }
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        parkedCarFragment = this;
-        entryDao = EntryDao.getInstance(getContext());
-
-        bManager = LocalBroadcastManager.getInstance(getContext());
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(RECEIVE_CURRENT_LOBBY_DATA);
-        bManager.registerReceiver(bReceiver, intentFilter);
-    }
-
-    public static ParkedCarFragment getInstance() {
-        return parkedCarFragment;
     }
 
     @Override
@@ -157,14 +160,16 @@ public class ParkedCarFragment extends Fragment implements ListCheckinAdapter.On
 
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-        //clearData();
-        PrefManager.getInstance(getContext()).saveLobbyType(i);
-        if (ApiClient.isNetworkAvailable(getContext())) {
-            downloadCheckinList(i);
-        }else {
-            Toast.makeText(getContext(), "Download failed, please check your internet connection", Toast.LENGTH_SHORT).show();
+        if (countSpinner >= 1) {
+            clearData();
+            PrefManager.getInstance(getContext()).saveLobbyType(i);
+            if (ApiClient.isNetworkAvailable(getContext())) {
+                downloadCheckinList(i);
+            }else {
+                Toast.makeText(getContext(), "Download failed, please check your internet connection", Toast.LENGTH_SHORT).show();
+            }
         }
-
+        countSpinner++;
     }
 
     private void clearData() {
@@ -181,14 +186,17 @@ public class ParkedCarFragment extends Fragment implements ListCheckinAdapter.On
 
         @Override
         protected List<EntryCheckinResponse> doInBackground(Void... voids) {
+            if (entryDao == null) {
+                entryDao = EntryDao.getInstance(getContext());
+            }
             return entryDao.fetchAllCheckinResponse();
         }
 
         @Override
         protected void onPostExecute(List<EntryCheckinResponse> entryCheckinResponses) {
             super.onPostExecute(entryCheckinResponses);
+            clearData();
             if (entryCheckinResponses != null && !entryCheckinResponses.isEmpty()) {
-                responseList.clear();
                 responseList.addAll(entryCheckinResponses);
                 adapter.notifyDataSetChanged();
                 textEmpty.setVisibility(View.GONE);
@@ -229,8 +237,13 @@ public class ParkedCarFragment extends Fragment implements ListCheckinAdapter.On
                     @Override
                     public void onResponse(Call<CheckinList> call, Response<CheckinList> response) {
                         if (response != null && response.body() != null) {
-                            clearData();
-                            entryDao.insertListCheckin(response.body().getCheckinResponseList());
+                            //clearData();
+                            List<EntryCheckinResponse.Data> checkinList = response.body().getCheckinResponseList();
+                            if (!checkinList.isEmpty()) {
+                                entryDao.insertListCheckin(checkinList);
+                            }else {
+                                //Toast.makeText(getContext(), "Data Empty", Toast.LENGTH_SHORT).show();
+                            }
                         }
                         new LoadCheckinTask().execute();
                     }

@@ -442,4 +442,18 @@ public class FinishCheckOut {
 
 
     }
+
+    public static class Table {
+        public static final String TABLE_NAME = "checkout_data";
+
+        public static final String COL_ID = "_id";
+        public static final String COL_JSON_DATA = "json_data";
+        public static final String COL_DATA_ID = "data_id";
+        public static final String COL_NO_TIKET = "no_tiket";
+
+        public static final String CREATE = "CREATE TABLE " + TABLE_NAME + "( " + COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                COL_JSON_DATA + " TEXT, " +
+                COL_DATA_ID + " INTEGER, " +
+                COL_NO_TIKET + " TEXT);";
+    }
 }
