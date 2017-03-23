@@ -450,10 +450,12 @@ public class FinishCheckOut {
         public static final String COL_JSON_DATA = "json_data";
         public static final String COL_DATA_ID = "data_id";
         public static final String COL_NO_TIKET = "no_tiket";
+        public static final String COL_STATUS = "status";
 
         public static final String CREATE = "CREATE TABLE " + TABLE_NAME + "( " + COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 COL_JSON_DATA + " TEXT, " +
                 COL_DATA_ID + " INTEGER, " +
-                COL_NO_TIKET + " TEXT);";
+                COL_NO_TIKET + " TEXT, " +
+                COL_STATUS + " INTEGER DEFAULT 0);";
     }
 }

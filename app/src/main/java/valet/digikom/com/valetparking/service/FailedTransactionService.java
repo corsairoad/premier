@@ -68,7 +68,8 @@ public class FailedTransactionService extends IntentService {
     }
 
     private void startPostCheckoutService() {
-        Intent intent = new Intent(PostCheckoutService.ACTION);
+        Intent intent = new Intent(this, PostCheckoutService.class);
+        intent.setAction(PostCheckoutService.ACTION);
         startService(intent);
     }
 
@@ -84,7 +85,7 @@ public class FailedTransactionService extends IntentService {
         Log.d(TAG, "CANCELED");
     }
 
-    private void postCheckin(final EntryCheckinContainer entryCheckinContainer) {
+    private void postCheckin(final EntryCheckinContainer entryCheckinContainer) throws NumberFormatException {
         TokenDao.getToken(new ProcessRequest() {
             @Override
             public void process(String token) {

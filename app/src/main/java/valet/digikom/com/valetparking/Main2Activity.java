@@ -56,6 +56,8 @@ public class Main2Activity extends AppCompatActivity
     TextView txtCountCalledCar;
     PrefManager prefManager;
 
+    MaterialDialog materialDialog;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,8 +80,6 @@ public class Main2Activity extends AppCompatActivity
         }
 
         setTitle();
-
-        checkPrinter();
 
         setDefaultKeyMode(DEFAULT_KEYS_SEARCH_LOCAL);
 
@@ -117,6 +117,12 @@ public class Main2Activity extends AppCompatActivity
 
         startCheckoutEntryAlarm();
         startAllServices();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        checkPrinter();
     }
 
     private void setTitle() {
@@ -361,7 +367,7 @@ public class Main2Activity extends AppCompatActivity
         PrefManager prefManager = PrefManager.getInstance(this);
         String printer = prefManager.getPrinterMacAddress();
         if (printer == null) {
-            new MaterialDialog.Builder(this)
+            materialDialog = new MaterialDialog.Builder(this)
                     .title("Connect to Printer")
                     .content("You are not connected to printer. Connect now?")
                     .positiveText("Oke")
@@ -372,13 +378,26 @@ public class Main2Activity extends AppCompatActivity
                         public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                             startActivity(new Intent(Main2Activity.this, PrinterActivity.class));
                         }
-                    }).show();
+                    }).build();
+            materialDialog.show();
         }
     }
 
     private String getCurrentDate() {
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MMMM/yyyy");
         return sdf.format(new Date());
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (materialDialog != null) {
+            if (materialDialog.isShowing()) {
+                materialDialog.dismiss();
+            }
+            materialDialog = null;
+
+        }
     }
 
     // checkin, checkout, download current lobby data

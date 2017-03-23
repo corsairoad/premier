@@ -57,6 +57,9 @@ public class FinishCheckoutDao implements ProcessRequest {
     private PaymentMethod.Data paymentData;
     private Bank.Data bankData;
 
+    public static final int STATUS_SYNCED = 1;
+    public static final int STATUS_PENDING = 0;
+
     private FinishCheckoutDao(Context context) {
         this.context = context;
         dbHelper = ValetDbHelper.getInstance(context);
@@ -237,22 +240,10 @@ public class FinishCheckoutDao implements ProcessRequest {
         String[] args = new String[] {String.valueOf(id)};
         ContentValues cv = new ContentValues();
         cv.put(EntryCheckinResponse.Table.COL_IS_CHECKOUT, 1);
-        int updateSuccess = db.update(EntryCheckinResponse.Table.TABLE_NAME,cv, EntryCheckinResponse.Table.COL_REMOTE_VTHD_ID + " = ?", args);
+        int udpatSukes = db.update(EntryCheckinResponse.Table.TABLE_NAME,cv, EntryCheckinResponse.Table.COL_RESPONSE_ID + " = ?", args);
+        Log.d("Update to checkout", "" + udpatSukes);
 
     }
-
-    public boolean isAlreadyCheckout(int id) {
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-        String[] args = new String[] {String.valueOf(id)};
-        Cursor c = db.query(FinishCheckOut.Table.TABLE_NAME, null, FinishCheckOut.Table.COL_DATA_ID + "=?",args,null,null,null);
-
-        if (c.moveToFirst()) {
-            return true;
-        }
-
-        return false;
-    }
-
     public long saveDataCheckout(int remoteVthdId, FinishCheckOut finishCheckOut, String noTiket) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         String json = toJson(finishCheckOut);
@@ -268,14 +259,18 @@ public class FinishCheckoutDao implements ProcessRequest {
     public List<CheckoutData> getCheckoutData() {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         List<CheckoutData> checkoutDataList = new ArrayList<>();
+        String whereClause = FinishCheckOut.Table.COL_STATUS + "=?";
+        String[] args = new String[]{String.valueOf(STATUS_PENDING)};
 
-        Cursor c = db.rawQuery("SELECT * FROM " + FinishCheckOut.Table.TABLE_NAME, new String[] {});
+        //Cursor c = db.rawQuery("SELECT * FROM " + FinishCheckOut.Table.TABLE_NAME, new String[] {});
+        Cursor c = db.query(FinishCheckOut.Table.TABLE_NAME,null,whereClause,args,null,null,null);
 
         if (c.moveToFirst()) {
             do{
                 CheckoutData checkoutData = new CheckoutData();
                 checkoutData.setRemoteVthdId(c.getInt(c.getColumnIndex(FinishCheckOut.Table.COL_DATA_ID)));
                 checkoutData.setJsonData(c.getString(c.getColumnIndex(FinishCheckOut.Table.COL_JSON_DATA)));
+                checkoutData.setNoTiket(c.getString(c.getColumnIndex(FinishCheckOut.Table.COL_NO_TIKET)));
 
                 checkoutDataList.add(checkoutData);
             } while (c.moveToNext());
@@ -302,6 +297,28 @@ public class FinishCheckoutDao implements ProcessRequest {
         String[] args = new String[] {String.valueOf(remoteVthdId)};
 
         return db.delete(FinishCheckOut.Table.TABLE_NAME, whereClaue,args);
+    }
+
+    public int updateStatus(int dataId, int status) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        String whereClause = FinishCheckOut.Table.COL_DATA_ID + " = ?";
+        String[] args = new String[] {String.valueOf(dataId)};
+
+        ContentValues cv = new ContentValues();
+        cv.put(FinishCheckOut.Table.COL_STATUS, status);
+
+        return db.update(FinishCheckOut.Table.TABLE_NAME,cv,whereClause, args);
+    }
+
+    public boolean isAlreadyCheckout(String noTiket) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        String whereClause = FinishCheckOut.Table.COL_NO_TIKET + " = ?";
+
+        Cursor c = db.query(FinishCheckOut.Table.TABLE_NAME,null,whereClause,new String[]{noTiket},null,null,null);
+        if (c.moveToFirst()) {
+            return true;
+        }
+        return false;
     }
 
     private String toJson(FinishCheckOut dataCheckout) {

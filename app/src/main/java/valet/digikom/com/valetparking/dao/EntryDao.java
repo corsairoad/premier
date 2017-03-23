@@ -95,19 +95,18 @@ public class EntryDao {
 
     public void insertListCheckin(List<EntryCheckinResponse.Data> checkinList) {
         int rows = removeUploadSuccess();
-        //FinishCheckoutDao finishCheckoutDao = FinishCheckoutDao.getInstance(dbHelper.getContext());
+        FinishCheckoutDao finishCheckoutDao = FinishCheckoutDao.getInstance(dbHelper.getContext());
         if (!checkinList.isEmpty()) {
             for (EntryCheckinResponse.Data e : checkinList) {
                 if (e != null) {
                     //removeEntryById(e.getAttribute().getId());
-
-                    EntryCheckinResponse entryCheckinResponse = new EntryCheckinResponse();
-                    entryCheckinResponse.setData(e);
-
-                    //int remoteVthdId = entryCheckinResponse.getData().getAttribute().getId();
-
-                    insertEntryResponse(entryCheckinResponse,EntryCheckinResponse.FLAG_UPLOAD_SUCCESS);
-
+                    int remoteVthdId = e.getAttribute().getId();
+                    String noTiket = e.getAttribute().getNoTiket().trim();
+                    if (!finishCheckoutDao.isAlreadyCheckout(noTiket)) {
+                        EntryCheckinResponse entryCheckinResponse = new EntryCheckinResponse();
+                        entryCheckinResponse.setData(e);
+                        insertEntryResponse(entryCheckinResponse,EntryCheckinResponse.FLAG_UPLOAD_SUCCESS);
+                    }
                 }
             }
         }
@@ -124,7 +123,7 @@ public class EntryDao {
         String[] args = new String[] {String.valueOf(id)};
         int remoteId = 0;
         Cursor c = db.rawQuery("SELECT " + EntryCheckinResponse.Table.COL_REMOTE_VTHD_ID + " FROM " + EntryCheckinResponse.Table.TABLE_NAME
-        + " WHERE " + EntryCheckinResponse.Table.COL_RESPONSE_ID + " = ? AND " + EntryCheckinResponse.Table.COL_IS_UPLOADED + " = " + EntryCheckinResponse.FLAG_UPLOAD_SUCCESS, args);
+        + " WHERE " + EntryCheckinResponse.Table.COL_RESPONSE_ID + " = ? ", args);
 
         if (c.moveToFirst()) {
             remoteId = c.getInt(0);

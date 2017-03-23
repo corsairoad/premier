@@ -110,8 +110,6 @@ public class DefectDao implements ProcessRequest {
         }
     }
 
-
-
     @Override
     public void process(String token) {
         downloadDefects(token);

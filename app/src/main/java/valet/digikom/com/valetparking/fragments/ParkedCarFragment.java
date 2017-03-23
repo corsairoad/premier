@@ -160,6 +160,16 @@ public class ParkedCarFragment extends Fragment implements ListCheckinAdapter.On
 
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+        //manageSpinnerValetType(i);;
+        PrefManager.getInstance(getContext()).saveLobbyType(i);
+        if (ApiClient.isNetworkAvailable(getContext())) {
+            downloadCheckinList(i);
+        }else {
+            Toast.makeText(getContext(), "Download failed, please check your internet connection", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void manageSpinnerValetType(int i) {
         if (countSpinner >= 1) {
             clearData();
             PrefManager.getInstance(getContext()).saveLobbyType(i);
@@ -242,7 +252,7 @@ public class ParkedCarFragment extends Fragment implements ListCheckinAdapter.On
                             if (!checkinList.isEmpty()) {
                                 entryDao.insertListCheckin(checkinList);
                             }else {
-                                //Toast.makeText(getContext(), "Data Empty", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getContext(), "Data Empty", Toast.LENGTH_SHORT).show();
                             }
                         }
                         new LoadCheckinTask().execute();

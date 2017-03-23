@@ -8,6 +8,7 @@ public class CheckoutData {
 
     private int remoteVthdId;
     private String jsonData;
+    private String noTiket;
 
     public CheckoutData() {
     }
@@ -26,5 +27,13 @@ public class CheckoutData {
 
     public void setJsonData(String jsonData) {
         this.jsonData = jsonData;
+    }
+
+    public String getNoTiket() {
+        return noTiket;
+    }
+
+    public void setNoTiket(String noTiket) {
+        this.noTiket = noTiket;
     }
 }

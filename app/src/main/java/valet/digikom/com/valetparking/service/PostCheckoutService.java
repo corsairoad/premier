@@ -55,6 +55,7 @@ public class PostCheckoutService extends IntentService {
     private void post(CheckoutData data) {
         final int remoteVthdId = data.getRemoteVthdId();
         final FinishCheckOut finishCheckOut = toObject(data.getJsonData());
+        final String noTiket = data.getNoTiket();
         if (finishCheckOut != null) {
             Log.d(TAG, "posting data checkout");
             TokenDao.getToken(new ProcessRequest() {
@@ -66,11 +67,16 @@ public class PostCheckoutService extends IntentService {
                         @Override
                         public void onResponse(Call<FinishCheckoutResponse> call, Response<FinishCheckoutResponse> response) {
                             if (response != null && response.body() != null) {
-                                Log.d(TAG, "Checkout from bg service success. VthdId: " + remoteVthdId);
-                                checkoutDao.deleteDatabyRemoteId(remoteVthdId);
-                                //setCheckoutCar(remoteVthdId);
+                                Log.d(TAG, "Checkout from bg service success. VthdId: " + remoteVthdId + ", Tiket:" + noTiket);
+                                //checkoutDao.deleteDatabyRemoteId(remoteVthdId);
+                                int statusUpdate = checkoutDao.updateStatus(remoteVthdId, FinishCheckoutDao.STATUS_SYNCED);
+                                if (statusUpdate > 0) {
+                                    Log.d(TAG, "Checkout data synced. VthdId: " + remoteVthdId + ", Tiket:" + noTiket);
+                                }else {
+                                    Log.d(TAG, "Sync Checkout data failed. VthdId: " + remoteVthdId + ", Tiket:" + noTiket);
+                                }
                             }else {
-                                Log.d(TAG, "Checkout from bg service failed. VthdId: " + remoteVthdId);
+                                Log.d(TAG, "Checkout from bg service failed. VthdId: " + remoteVthdId + ", Tiket:" + noTiket);
                             }
                         }
 
@@ -91,12 +97,4 @@ public class PostCheckoutService extends IntentService {
         return gson.fromJson(json,FinishCheckOut.class);
     }
 
-    private void setCheckoutCar(int id) {
-        ValetDbHelper dbHelper = ValetDbHelper.getInstance(this);
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-        String[] args = new String[] {String.valueOf(id)};
-        ContentValues cv = new ContentValues();
-        cv.put(EntryCheckinResponse.Table.COL_IS_CHECKOUT, 1);
-        db.update(EntryCheckinResponse.Table.TABLE_NAME,cv, EntryCheckinResponse.Table.COL_REMOTE_VTHD_ID + " = ?", args);
-    }
 }

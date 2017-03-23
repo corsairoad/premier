@@ -78,6 +78,7 @@ public class AddCarActivity extends FragmentActivity implements StepOneFragmet.O
     private void submitCheckin(final EntryCheckinContainer checkinContainer, final EntryCheckin.Builder builder) {
         processFailedCheckin(builder, checkinContainer);
         goToMain();
+
         /*
         if (!ApiClient.isNetworkAvailable(this)) {
             processFailedCheckin(builder, checkinContainer);
@@ -255,7 +256,7 @@ public class AddCarActivity extends FragmentActivity implements StepOneFragmet.O
         attr.setColor(builder.getColorMaster().getAttrib().getColorName());
 
         data.setAttribute(attr);
-        data.setId(String.valueOf(attr.getId())); // vthdid
+        data.setId(String.valueOf(fakeVthdId)); // vthdid
         data.setType("ad_entry_checkin");
         entryCheckinResponse.setData(data);
 

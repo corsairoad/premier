@@ -442,14 +442,8 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
                 .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
                     @Override
                     public void onClick(SweetAlertDialog sweetAlertDialog) {
+                        submitCheckout();
                         sweetAlertDialog.dismissWithAnimation();
-
-                        if (ApiClient.isNetworkAvailable(CheckoutActivity.this)) {
-                            Toast.makeText(CheckoutActivity.this, "Closing... please wait", Toast.LENGTH_SHORT).show();
-                            submitCheckout();
-                        }else {
-                            Toast.makeText(CheckoutActivity.this, "No Internet connection.", Toast.LENGTH_SHORT).show();
-                        }
                     }
                 })
                 .setCancelText("Cancel")
@@ -532,7 +526,7 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
         //TokenDao.getToken(finishCheckoutDao, this);
         new FinishCheckoutProcess(finishCheckoutDao).execute();
 
-        goToMain();
+
     }
 
     private class FinishCheckoutProcess extends AsyncTask<String,String,String> {
@@ -545,11 +539,17 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
         @Override
         protected String doInBackground(String... strings) {
 
-            finishCheckoutDao.saveDataCheckout(remoteValetHeader, finishCheckoutDao.getFinishCheckOut(), noTiket.trim());
+            finishCheckoutDao.saveDataCheckout(idValetHeader, finishCheckoutDao.getFinishCheckOut(), noTiket.trim());
             finishCheckoutDao.setCheckoutCar(idValetHeader);
-            finishCheckoutDao.print(remoteValetHeader);
+            finishCheckoutDao.print(idValetHeader);
 
             return null;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            goToMain();
         }
     }
 
