@@ -2,6 +2,7 @@ package valet.digikom.com.valetparking.service;
 
 import android.app.IntentService;
 import android.content.Intent;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -21,6 +22,7 @@ import valet.digikom.com.valetparking.dao.FinishCheckoutDao;
 import valet.digikom.com.valetparking.dao.TokenDao;
 import valet.digikom.com.valetparking.domain.EntryCheckinContainer;
 import valet.digikom.com.valetparking.domain.EntryCheckinResponse;
+import valet.digikom.com.valetparking.fragments.ParkedCarFragment;
 import valet.digikom.com.valetparking.util.CheckinCheckoutAlarm;
 import valet.digikom.com.valetparking.util.PrefManager;
 
@@ -116,6 +118,10 @@ public class FailedTransactionService extends IntentService {
                                 int deleteSuccess = containerDao.deleteById(String.valueOf(fakeVthdId));
                                 Log.d(TAG,"remove failed-checkin " + deleteSuccess);
                                 Log.d(TAG, "No. TICKET: " +  response.body().getData().getAttribute().getIdTransaksi());
+
+                                // reload checkin list
+                                Intent RTReturn = new Intent(ParkedCarFragment.RECEIVE_CURRENT_LOBBY_DATA);
+                                LocalBroadcastManager.getInstance(FailedTransactionService.this).sendBroadcast(RTReturn);
                             }
 
                         }else {
