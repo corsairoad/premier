@@ -215,6 +215,17 @@ public class EntryDao {
         return checkinResponse;
     }
 
+    public boolean isSynced(int id) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        String[] args = new String[] {String.valueOf(id), String.valueOf(EntryCheckinResponse.FLAG_UPLOAD_SUCCESS)};
+        Cursor c = db.query(EntryCheckinResponse.Table.TABLE_NAME,null,EntryCheckinResponse.Table.COL_RESPONSE_ID +" = ? AND " + EntryCheckinResponse.Table.COL_IS_UPLOADED + " = ?",args,null,null,null);
+
+        if (c.moveToFirst()) {
+            return true;
+        }
+        return false;
+    }
+
     public int removeEntryById(int id) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         String[] args = new String[] {String.valueOf(id)};

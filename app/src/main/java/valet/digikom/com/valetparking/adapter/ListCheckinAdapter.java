@@ -5,6 +5,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -14,6 +15,7 @@ import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import valet.digikom.com.valetparking.R;
+import valet.digikom.com.valetparking.dao.EntryDao;
 import valet.digikom.com.valetparking.domain.Checkin;
 import valet.digikom.com.valetparking.domain.EntryCheckinResponse;
 
@@ -27,12 +29,14 @@ public class ListCheckinAdapter extends RecyclerView.Adapter<ListCheckinAdapter.
     Context context;
     List<EntryCheckinResponse> responsesList;
     OnItemCheckinListener onItemCheckinListener;
+    EntryDao entryDao;
 
     public ListCheckinAdapter(List<Checkin> checkinList, List<EntryCheckinResponse> responseList, Context context, OnItemCheckinListener onItemCheckinListener) {
         this.checkinList = checkinList;
         this.context = context;
         this.responsesList = responseList;
         this.onItemCheckinListener = onItemCheckinListener;
+        entryDao = EntryDao.getInstance(context);
     }
 
     @Override
@@ -55,6 +59,12 @@ public class ListCheckinAdapter extends RecyclerView.Adapter<ListCheckinAdapter.
     public void onBindViewHolder(ViewHolder holder, final int position) {
         EntryCheckinResponse response = responsesList.get(position);
         String logoMobil = response.getData().getAttribute().getLogoMobil();
+
+        int id = response.getData().getAttribute().getId();
+        if (entryDao.isSynced(id)) {
+            holder.imgSync.setVisibility(View.GONE);
+        }
+
         Glide.with(context)
                 .load(logoMobil)
                 .centerCrop()
@@ -68,7 +78,6 @@ public class ListCheckinAdapter extends RecyclerView.Adapter<ListCheckinAdapter.
         holder.textPlatNo.setText(platNo);
         holder.textRunnerName.setText(checkinTime);
 
-        int id = (int) getItemId(position);
         holder.layoutContainer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -95,6 +104,7 @@ public class ListCheckinAdapter extends RecyclerView.Adapter<ListCheckinAdapter.
         TextView textRunnerName;
         TextView textIdCheckin;
         CircleImageView imgCar;
+        ImageView imgSync;
 
         public ViewHolder(View view) {
             super(view);
@@ -103,6 +113,7 @@ public class ListCheckinAdapter extends RecyclerView.Adapter<ListCheckinAdapter.
             textIdCheckin = (TextView) view.findViewById(R.id.id_checkin);
             layoutContainer = (LinearLayout) view.findViewById(R.id.container_checkin);
             imgCar = (CircleImageView) view.findViewById(R.id.img_car);
+            imgSync = (ImageView) view.findViewById(R.id.img_sync);
         }
     }
 

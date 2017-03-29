@@ -13,6 +13,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -84,6 +85,8 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
     FineFeeDao fineFeeDao;
     FineFee.Fine mLostTicketFine;
     FineFee.Fine mOvernightFine;
+    ProgressBar progressBar;
+
     int fee = 0;
     int lostTicketFine = 0;
     int overNightFine = 0;
@@ -131,6 +134,7 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
         btnCheckout = (Button) findViewById(R.id.btn_checkout);
         cbVoucher = (CheckBox) findViewById(R.id.cb_voucher);
         inputVoucher = (EditText) findViewById(R.id.input_voucher);
+        progressBar = (ProgressBar) findViewById(R.id.progressBar);
         inputMembershipId = (EditText) findViewById(R.id.input_membership_id);
         inputPaymentToken = (EditText) findViewById(R.id.input_payment_token);
         cbMembership = (CheckBox) findViewById(R.id.cb_membership);
@@ -534,6 +538,13 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
 
         public FinishCheckoutProcess(FinishCheckoutDao finishCheckoutDao) {
             this.finishCheckoutDao = finishCheckoutDao;
+            progressBar.setVisibility(View.VISIBLE);
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
         }
 
         @Override
@@ -549,6 +560,7 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
+            progressBar.setVisibility(View.GONE);
             goToMain();
         }
     }
