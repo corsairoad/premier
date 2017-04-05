@@ -170,14 +170,14 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
         ClosingDao closingDao = ClosingDao.getInstance(this);
         String readInfo = inputRemark.getText().toString();
         closingDao.close(readInfo,startDate,endDate);
-
+        print(flagHeader, flagPrint);
+        
         /*
-        ------------ PRINTER CARA LAMA
+        ------------ PRINT CARA LAMA
         PrintClosing printClosing = new PrintClosing(this, closingData, lokasi, siteName, startDate,endDate,"Admin", reg,exc,total);
         printClosing.print();
         */
 
-        print(flagHeader, flagPrint);
     }
 
     private void print(String flagHeader, int flagPrint) {
@@ -205,10 +205,12 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
 
     @Override
     public void onClick(final View viewx) {
+
         if (closingData.isEmpty()) {
             Toast.makeText(this, "Data empty", Toast.LENGTH_SHORT).show();
             return;
         }
+
         int id = viewx.getId();
         Toast.makeText(this, "Printing.. please wait", Toast.LENGTH_SHORT).show();
         switch (id) {

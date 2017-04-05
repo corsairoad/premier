@@ -122,6 +122,9 @@ public class FailedTransactionService extends IntentService {
                                 // reload checkin list
                                 Intent RTReturn = new Intent(ParkedCarFragment.RECEIVE_CURRENT_LOBBY_DATA);
                                 LocalBroadcastManager.getInstance(FailedTransactionService.this).sendBroadcast(RTReturn);
+
+                                startDownloadCurrentLobbyService();
+
                             }
 
                         }else {

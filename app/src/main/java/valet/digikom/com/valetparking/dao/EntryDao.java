@@ -85,6 +85,7 @@ public class EntryDao {
     public int updateRemoteAndTicketSequenceId(String fakeVthdId, int remoteVthdId, String ticketSeq) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         String[] args = new String[] {fakeVthdId};
+
         ContentValues cv = new ContentValues();
         cv.put(EntryCheckinResponse.Table.COL_REMOTE_VTHD_ID, remoteVthdId);
         cv.put(EntryCheckinResponse.Table.COL_TICKET_SEQUENCE, ticketSeq);
