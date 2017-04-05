@@ -117,7 +117,6 @@ public class PrintReceiptChekin extends PrintReceipt {
             builder.addText(disclaimer);
             builder.addFeedLine(1);
             builder.addCut(Builder.CUT_FEED);
-
     }
 
     private void buildDataForKeyGuard(Builder builder, StringBuilder sb) throws EposException {

@@ -118,6 +118,7 @@ public abstract class PrintReceipt implements StatusChangeEventListener {
             }
             //ShowMsg.showStatus(EposException.SUCCESS, status[0], battery[0], context);
         } catch (EposException e) {
+            closePrinter();
             e.printStackTrace();
             //ShowMsg.showStatus(e.getErrorStatus(), e.getPrinterStatus(), e.getBatteryStatus(), context);
         }

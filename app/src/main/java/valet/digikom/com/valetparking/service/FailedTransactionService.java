@@ -107,13 +107,15 @@ public class FailedTransactionService extends IntentService {
 
                             PrefManager.getInstance(FailedTransactionService.this).saveLastTicketCounter(lastTicketCounter);
 
+                            // update vthd id and transaction id (not ticket number)
                             int updateSuccess = EntryDao.getInstance(FailedTransactionService.this)
                                     .updateRemoteAndTicketSequenceId(String.valueOf(fakeVthdId), remoteVthdId, tiketSeq);
 
+                            // update vthd id in checkout data if exist
                             int updateIdDataCheckout = FinishCheckoutDao.getInstance(FailedTransactionService.this)
                                     .updateCheckoutVthdId(noTiket, remoteVthdId);
 
-                            if (updateSuccess > 0) {
+                                // remove checkin data from db while succeed
                                 EntryCheckinContainerDao containerDao = EntryCheckinContainerDao.getInstance(FailedTransactionService.this);
                                 int deleteSuccess = containerDao.deleteById(String.valueOf(fakeVthdId));
                                 Log.d(TAG,"remove failed-checkin " + deleteSuccess);
@@ -124,13 +126,7 @@ public class FailedTransactionService extends IntentService {
                                 LocalBroadcastManager.getInstance(FailedTransactionService.this).sendBroadcast(RTReturn);
 
                                 startDownloadCurrentLobbyService();
-
                             }
-
-                        }else {
-                            //debugJsonCheckin(entryCheckinContainer);
-                            Log.d(TAG,"post failed-checkin failed");
-                        }
                     }
 
                     @Override
