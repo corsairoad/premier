@@ -293,9 +293,8 @@
                             android:layout_width="0dp"
                             android:layout_weight="1"
                             android:layout_height="match_parent"
+                            android:visibility="gone"
                             android:src="@drawable/ic_view_agenda_black_24dp"/>
-
-
 
                             <Button
                                 android:id="@+id/btn_print_summary"
@@ -313,8 +312,9 @@
                     </LinearLayout>
 
                     <View
-                        android:layout_width="1dp"
-                        android:layout_height="match_parent"
+                        android:layout_width="0.5dp"
+                        android:layout_height="25dp"
+                        android:layout_marginTop="15dp"
                         android:background="@color/cardview_light_background"/>
 
                     <LinearLayout
@@ -325,6 +325,7 @@
                         android:background="?attr/selectableItemBackground">
 
                         <ImageView
+                            android:visibility="gone"
                             android:layout_width="0dp"
                             android:layout_height="match_parent"
                             android:layout_weight="1"

@@ -43,6 +43,7 @@ import valet.digikom.com.valetparking.dao.EntryDao;
 import valet.digikom.com.valetparking.dao.FineFeeDao;
 import valet.digikom.com.valetparking.dao.FinishCheckoutDao;
 import valet.digikom.com.valetparking.dao.PaymentDao;
+import valet.digikom.com.valetparking.dao.ReprintDao;
 import valet.digikom.com.valetparking.dao.TokenDao;
 import valet.digikom.com.valetparking.domain.Bank;
 import valet.digikom.com.valetparking.domain.EntryCheckinResponse;
@@ -304,7 +305,64 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        int idItem = item.getItemId();
+        switch (idItem) {
+            case R.id.reprint:
+                reprintCheckinData(noTiket);
+                break;
+        }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void reprintCheckinData(final String noTiket) {
+        if (noTiket != null) {
+            noTiket.trim();
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(CheckoutActivity.this,"Please wait", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+                    ReprintDao reprintDao = ReprintDao.getInstance(CheckoutActivity.this);
+                    int statusPrint = reprintDao.rePrint(noTiket);
+                    String message = "Reprint ticket " + noTiket;
+                    String content = "";
+                    switch (statusPrint) {
+                        case ReprintDao.STATUS_PRINT_SUCCEED:
+                            message = message + " Succeed";
+                            content = "Reprint succeed. You can only reprint once a time";
+                            reprintDao.removeReprintData(noTiket);
+                            break;
+                        case ReprintDao.STATUS_PRINT_FAILED:
+                            message = message + " Failed";
+                            content = "Either you already reprinted or using different device";
+                            break;
+                        case ReprintDao.STATUS_PRINT_ERROR:
+                            message = message + " Error";
+                            content = "Please check the printer and try again later.";
+                            break;
+                    }
+                    final String finalMessage = message;
+                    final String finalContent = content;
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            new MaterialDialog.Builder(CheckoutActivity.this)
+                                    .title(finalMessage)
+                                    .content(finalContent)
+                                    .positiveText("Oke")
+                                    .build()
+                                    .show();
+                        }
+                    });
+                }
+            }).start();
+        }
     }
 
     public void setRemoteValetHeader(int fakeId) {

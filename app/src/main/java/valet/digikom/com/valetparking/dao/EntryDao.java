@@ -93,6 +93,18 @@ public class EntryDao {
         return db.update(EntryCheckinResponse.Table.TABLE_NAME,cv, EntryCheckinResponse.Table.COL_RESPONSE_ID + " = ? ", args);
     }
 
+    public int updateRemoteAndTicketSecByTicketNo(String ticketNo, int remoteVthdId, String ticketSeq) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        String[] args = new String[] {ticketNo};
+
+        ContentValues cv = new ContentValues();
+        cv.put(EntryCheckinResponse.Table.COL_REMOTE_VTHD_ID, remoteVthdId);
+        cv.put(EntryCheckinResponse.Table.COL_TICKET_SEQUENCE, ticketSeq);
+        cv.put(EntryCheckinResponse.Table.COL_IS_UPLOADED, EntryCheckinResponse.FLAG_UPLOAD_SUCCESS);
+
+        return db.update(EntryCheckinResponse.Table.TABLE_NAME,cv, EntryCheckinResponse.Table.COL_TICKET_SEQUENCE + " = ? ", args);
+    }
+
     public void insertListCheckin(List<EntryCheckinResponse.Data> checkinList) {
         int rows = removeUploadSuccess();
         FinishCheckoutDao finishCheckoutDao = FinishCheckoutDao.getInstance(dbHelper.getContext());

@@ -21,6 +21,8 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.MaterialDialog;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,6 +35,7 @@ import valet.digikom.com.valetparking.R;
 import valet.digikom.com.valetparking.adapter.ListCheckinAdapter;
 import valet.digikom.com.valetparking.dao.CheckoutDao;
 import valet.digikom.com.valetparking.dao.EntryDao;
+import valet.digikom.com.valetparking.dao.ReprintDao;
 import valet.digikom.com.valetparking.dao.TokenDao;
 import valet.digikom.com.valetparking.domain.Checkin;
 import valet.digikom.com.valetparking.domain.CheckinList;
@@ -43,7 +46,8 @@ import valet.digikom.com.valetparking.service.ApiEndpoint;
 import valet.digikom.com.valetparking.service.ProcessRequest;
 import valet.digikom.com.valetparking.util.PrefManager;
 
-public class ParkedCarFragment extends Fragment implements ListCheckinAdapter.OnItemCheckinListener, CheckoutDao.OnCarReadyListener, AdapterView.OnItemSelectedListener {
+public class ParkedCarFragment extends Fragment implements ListCheckinAdapter.OnItemCheckinListener,
+        CheckoutDao.OnCarReadyListener, AdapterView.OnItemSelectedListener, ListCheckinAdapter.OnOptionReprintListener {
 
     RecyclerView listCheckin;
     ListCheckinAdapter adapter;
@@ -68,7 +72,6 @@ public class ParkedCarFragment extends Fragment implements ListCheckinAdapter.On
         super.onCreate(savedInstanceState);
         parkedCarFragment = this;
         entryDao = EntryDao.getInstance(getContext());
-
         bManager = LocalBroadcastManager.getInstance(getContext());
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(RECEIVE_CURRENT_LOBBY_DATA);
@@ -111,7 +114,7 @@ public class ParkedCarFragment extends Fragment implements ListCheckinAdapter.On
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         listCheckin.setHasFixedSize(true);
         listCheckin.setLayoutManager(layoutManager);
-        adapter = new ListCheckinAdapter(checkins, responseList,getContext(), this);
+        adapter = new ListCheckinAdapter(checkins, responseList,getContext(), this, this);
         listCheckin.setAdapter(adapter);
 
         ArrayAdapter<CharSequence> spLobbyAdapter = ArrayAdapter.createFromResource(getContext(),R.array.array_lobby_checkin,  R.layout.text_item_spinner_report);
@@ -190,6 +193,60 @@ public class ParkedCarFragment extends Fragment implements ListCheckinAdapter.On
     @Override
     public void onNothingSelected(AdapterView<?> adapterView) {
 
+    }
+
+    @Override
+    public void onOptionReprintClicked(final String noTiket) {
+        if (noTiket != null) {
+            noTiket.trim();
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getContext(),"Please wait..", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+                    ReprintDao reprintDao = ReprintDao.getInstance(getContext());
+                    int statusPrint = reprintDao.rePrint(noTiket);
+                    String message = "Reprint ticket " + noTiket;
+                    String content = "";
+
+                    switch (statusPrint) {
+                        case ReprintDao.STATUS_PRINT_SUCCEED:
+                            message = message + " Succeed";
+                            content = "Reprint succeed. You can only reprint once a time";
+                            reprintDao.removeReprintData(noTiket);
+                            break;
+                        case ReprintDao.STATUS_PRINT_FAILED:
+                            message = message + " Failed";
+                            content = "Either you already reprinted or using different device";
+                            break;
+                        case ReprintDao.STATUS_PRINT_ERROR:
+                            message = message + " Error";
+                            content = "Please check the printer and try again later.";
+                            break;
+                    }
+
+                    final String finalMessage = message;
+                    final String finalContent = content;
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            new MaterialDialog.Builder(getContext())
+                                    .title(finalMessage)
+                                    .content(finalContent)
+                                    .positiveText("Oke")
+                                    .build()
+                                    .show();
+                        }
+                    });
+                }
+            }).start();
+        }
     }
 
     private class LoadCheckinTask extends AsyncTask<Void, Void, List<EntryCheckinResponse>> {

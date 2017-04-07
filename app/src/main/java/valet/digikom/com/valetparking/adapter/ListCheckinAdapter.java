@@ -35,13 +35,15 @@ public class ListCheckinAdapter extends RecyclerView.Adapter<ListCheckinAdapter.
     List<EntryCheckinResponse> responsesList;
     OnItemCheckinListener onItemCheckinListener;
     EntryDao entryDao;
+    OnOptionReprintListener reprintListener;
 
-    public ListCheckinAdapter(List<Checkin> checkinList, List<EntryCheckinResponse> responseList, Context context, OnItemCheckinListener onItemCheckinListener) {
+    public ListCheckinAdapter(List<Checkin> checkinList, List<EntryCheckinResponse> responseList, Context context, OnItemCheckinListener onItemCheckinListener, OnOptionReprintListener optionReprintListener) {
         this.checkinList = checkinList;
         this.context = context;
         this.responsesList = responseList;
         this.onItemCheckinListener = onItemCheckinListener;
         entryDao = EntryDao.getInstance(context);
+        reprintListener = optionReprintListener;
     }
 
     @Override
@@ -109,7 +111,8 @@ public class ListCheckinAdapter extends RecyclerView.Adapter<ListCheckinAdapter.
                     public boolean onMenuItemClick(MenuItem item) {
                         switch (item.getItemId()) {
                             case R.id.reprint:
-                                rePrintCurrentCheckin(getNomorTiket(position));
+                                reprintListener.onOptionReprintClicked(getNomorTiket(position));
+                                //rePrintCurrentCheckin(getNomorTiket(position));
                                 break;
                         }
                         return false;
@@ -118,41 +121,6 @@ public class ListCheckinAdapter extends RecyclerView.Adapter<ListCheckinAdapter.
                 popupMenu.show();
             }
         });
-    }
-
-    private String getNomorTiket(int position) {
-        return responsesList.get(position).getData().getAttribute().getNoTiket().trim();
-    }
-
-    private void rePrintCurrentCheckin(String noTiket) {
-        if (noTiket!=null) {
-            ReprintDao reprintDao = ReprintDao.getInstance(context);
-            int status = reprintDao.rePrint(noTiket);
-
-            switch (status) {
-                case 1:
-                    Toast.makeText(context,"Reprint succeed: " + noTiket, Toast.LENGTH_SHORT).show();
-                    reprintDao.removeReprintData(noTiket);
-                    break;
-                case 0:
-                    new MaterialDialog.Builder(context)
-                            .title("Reprint Aborted")
-                            .content("Either you already reprinted or using different device")
-                            .positiveText("Oke")
-                            .build()
-                            .show();
-                    break;
-                case -1:
-                    new MaterialDialog.Builder(context)
-                            .title("Reprint Error")
-                            .content("Please check the printer and try again.")
-                            .positiveText("Oke")
-                            .build()
-                            .show();
-                    break;
-            }
-        }
-
     }
 
     @Override
@@ -181,7 +149,46 @@ public class ListCheckinAdapter extends RecyclerView.Adapter<ListCheckinAdapter.
         }
     }
 
+    private String getNomorTiket(int position) {
+        return responsesList.get(position).getData().getAttribute().getNoTiket().trim();
+    }
+
+    private void rePrintCurrentCheckin(String noTiket) {
+        if (noTiket!=null) {
+            ReprintDao reprintDao = ReprintDao.getInstance(context);
+            int status = reprintDao.rePrint(noTiket);
+
+            switch (status) {
+                case ReprintDao.STATUS_PRINT_SUCCEED:
+                    Toast.makeText(context,"Reprint succeed: " + noTiket, Toast.LENGTH_SHORT).show();
+                    reprintDao.removeReprintData(noTiket);
+                    break;
+                case ReprintDao.STATUS_PRINT_FAILED:
+                    new MaterialDialog.Builder(context)
+                            .title("Reprint Aborted")
+                            .content("Either you already reprinted or using different device")
+                            .positiveText("Oke")
+                            .build()
+                            .show();
+                    break;
+                case ReprintDao.STATUS_PRINT_ERROR:
+                    new MaterialDialog.Builder(context)
+                            .title("Reprint Error")
+                            .content("Please check the printer and try again.")
+                            .positiveText("Oke")
+                            .build()
+                            .show();
+                    break;
+            }
+        }
+
+    }
+
     public interface OnItemCheckinListener {
         void onItemCheckinClick(int id);
+    }
+
+    public interface OnOptionReprintListener {
+        void onOptionReprintClicked(String noTiket);
     }
 }

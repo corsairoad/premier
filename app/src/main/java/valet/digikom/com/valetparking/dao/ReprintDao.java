@@ -33,6 +33,10 @@ public class ReprintDao {
     static ReprintDao reprintDao;
     Gson gson;
 
+    public static final int STATUS_PRINT_SUCCEED = 1;
+    public static final int STATUS_PRINT_FAILED = 0;
+    public static final int STATUS_PRINT_ERROR = -1;
+
     private ReprintDao(Context context) {
         this.context = context;
         dbHelper = ValetDbHelper.getInstance(context);
@@ -92,17 +96,17 @@ public class ReprintDao {
             ReprintCheckin reprintCheckin = new ReprintCheckin(context,entry,bmpDefects,bmpSignature, stuffs);
             try {
                 reprintCheckin.buildPrintData();
-                return 1;
+                return STATUS_PRINT_SUCCEED;
             }catch (EposException e) {
                 e.printStackTrace();
                 //ShowMsg.showResult(e.getPrinterStatus(),"error reprint ticket", context.getApplicationContext());
                 reprintCheckin.closePrinter();
-                return -1;
+                return STATUS_PRINT_ERROR;
             }
 
         }
         c.close();
-        return 0;
+        return STATUS_PRINT_FAILED;
     }
 
     public void removeReprintData(String noTiket) {
@@ -117,6 +121,11 @@ public class ReprintDao {
         Type type = new TypeToken<List<AdditionalItems>>(){}.getType();
         List<AdditionalItems> items = gson.fromJson(string,type);
         return items;
+    }
+
+    public void clearAllDataReprint() {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        db.delete(Table.TABLE_NAME, null, new String[]{});
     }
 
     public static class Table {

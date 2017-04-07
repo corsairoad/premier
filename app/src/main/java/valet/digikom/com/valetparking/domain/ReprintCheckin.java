@@ -41,7 +41,7 @@ public class ReprintCheckin extends PrintReceiptChekin {
     private void addReprintHeader(Builder builder) throws EposException {
         builder.addTextAlign(Builder.ALIGN_CENTER);
         builder.addTextSize(1, 1);
-        builder.addText("Reprint");
+        builder.addText("REPRINT");
         builder.addFeedLine(1);
     }
 }

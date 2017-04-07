@@ -97,11 +97,10 @@ public class FailedTransactionService extends IntentService {
                         if (response != null && response.body() != null) {
                             //int fakeVthdId = entryCheckinContainer.getEntryCheckin().getAttrib().getLastTicketCounter(); // fake vthd id diambil dari last ticket counter
                             String noTiket = response.body().getData().getAttribute().getNoTiket().trim();
+                            int remoteVthdId = response.body().getData().getAttribute().getId();
+                            String tiketSeq = response.body().getData().getAttribute().getIdTransaksi();
                             try{
                                 int fakeVthdId = Integer.parseInt(entryCheckinContainer.getEntryCheckin().getId());
-                                int remoteVthdId = response.body().getData().getAttribute().getId();
-                                String tiketSeq = response.body().getData().getAttribute().getIdTransaksi();
-
                                 int lastTicketCounter = response.body().getData().getAttribute().getLastTicketCounter();
                                 Log.d(TAG, "TICKET C0UNTER "+ lastTicketCounter);
 
@@ -128,8 +127,14 @@ public class FailedTransactionService extends IntentService {
 
                             }catch (Exception e) {
                                 e.printStackTrace();
+                                // remove checkin data from db
                                 EntryCheckinContainerDao.getInstance(FailedTransactionService.this)
                                         .deleteCheckinDataByTicketNo(noTiket);
+
+                                // update synced checkin item in checkin list
+                                EntryDao.getInstance(FailedTransactionService.this)
+                                        .updateRemoteAndTicketSecByTicketNo(noTiket, remoteVthdId, tiketSeq);
+
                                 startDownloadCurrentLobbyService();
                             }
                         }
