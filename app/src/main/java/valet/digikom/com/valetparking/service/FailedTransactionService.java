@@ -54,8 +54,6 @@ public class FailedTransactionService extends IntentService {
             startPostCheckoutService();
 
             Log.d(TAG, "STARTED");
-
-
         }
     }
 
@@ -98,22 +96,24 @@ public class FailedTransactionService extends IntentService {
                     public void onResponse(Call<EntryCheckinResponse> call, Response<EntryCheckinResponse> response) {
                         if (response != null && response.body() != null) {
                             //int fakeVthdId = entryCheckinContainer.getEntryCheckin().getAttrib().getLastTicketCounter(); // fake vthd id diambil dari last ticket counter
-                            int fakeVthdId = Integer.parseInt(entryCheckinContainer.getEntryCheckin().getId());
-                            int remoteVthdId = response.body().getData().getAttribute().getId();
-                            String tiketSeq = response.body().getData().getAttribute().getIdTransaksi();
                             String noTiket = response.body().getData().getAttribute().getNoTiket().trim();
-                            int lastTicketCounter = response.body().getData().getAttribute().getLastTicketCounter();
-                            Log.d(TAG, "TICKET C0UNTER "+ lastTicketCounter);
+                            try{
+                                int fakeVthdId = Integer.parseInt(entryCheckinContainer.getEntryCheckin().getId());
+                                int remoteVthdId = response.body().getData().getAttribute().getId();
+                                String tiketSeq = response.body().getData().getAttribute().getIdTransaksi();
 
-                            PrefManager.getInstance(FailedTransactionService.this).saveLastTicketCounter(lastTicketCounter);
+                                int lastTicketCounter = response.body().getData().getAttribute().getLastTicketCounter();
+                                Log.d(TAG, "TICKET C0UNTER "+ lastTicketCounter);
 
-                            // update vthd id and transaction id (not ticket number)
-                            int updateSuccess = EntryDao.getInstance(FailedTransactionService.this)
-                                    .updateRemoteAndTicketSequenceId(String.valueOf(fakeVthdId), remoteVthdId, tiketSeq);
+                                PrefManager.getInstance(FailedTransactionService.this).saveLastTicketCounter(lastTicketCounter);
 
-                            // update vthd id in checkout data if exist
-                            int updateIdDataCheckout = FinishCheckoutDao.getInstance(FailedTransactionService.this)
-                                    .updateCheckoutVthdId(noTiket, remoteVthdId);
+                                // update vthd id and transaction id (not ticket number)
+                                int updateSuccess = EntryDao.getInstance(FailedTransactionService.this)
+                                        .updateRemoteAndTicketSequenceId(String.valueOf(fakeVthdId), remoteVthdId, tiketSeq);
+
+                                // update vthd id in checkout data if exist
+                                int updateIdDataCheckout = FinishCheckoutDao.getInstance(FailedTransactionService.this)
+                                        .updateCheckoutVthdId(noTiket, remoteVthdId);
 
                                 // remove checkin data from db while succeed
                                 EntryCheckinContainerDao containerDao = EntryCheckinContainerDao.getInstance(FailedTransactionService.this);
@@ -124,9 +124,15 @@ public class FailedTransactionService extends IntentService {
                                 // reload checkin list
                                 Intent RTReturn = new Intent(ParkedCarFragment.RECEIVE_CURRENT_LOBBY_DATA);
                                 LocalBroadcastManager.getInstance(FailedTransactionService.this).sendBroadcast(RTReturn);
+                                startDownloadCurrentLobbyService();
 
+                            }catch (Exception e) {
+                                e.printStackTrace();
+                                EntryCheckinContainerDao.getInstance(FailedTransactionService.this)
+                                        .deleteCheckinDataByTicketNo(noTiket);
                                 startDownloadCurrentLobbyService();
                             }
+                        }
                     }
 
                     @Override

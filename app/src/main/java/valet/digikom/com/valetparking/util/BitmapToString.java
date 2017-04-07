@@ -1,6 +1,7 @@
 package valet.digikom.com.valetparking.util;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Base64;
 
 import java.io.ByteArrayOutputStream;
@@ -21,5 +22,14 @@ public class BitmapToString {
             return base64Image;
         }
         return null;
+    }
+
+    public static Bitmap reverse(String encodedImage) {
+        if (encodedImage == null) {
+            return null;
+        }
+
+        byte[] decodedString = Base64.decode(encodedImage, Base64.DEFAULT);
+        return BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
     }
 }

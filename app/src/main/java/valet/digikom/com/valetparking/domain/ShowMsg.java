@@ -123,7 +123,7 @@ public class ShowMsg {
         return return_text;
     }
 
-    private static String getCodeText(int state) {
+    public static String getCodeText(int state) {
         String return_text = "";
         switch (state) {
             case Epos2CallbackCode.CODE_SUCCESS:

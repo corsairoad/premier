@@ -3,6 +3,8 @@ package valet.digikom.com.valetparking.domain;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.util.Log;
+
 import com.epson.eposprint.Builder;
 import com.epson.eposprint.EposException;
 import java.text.SimpleDateFormat;
@@ -77,9 +79,8 @@ public class PrintReceiptChekin extends PrintReceipt {
     }
 
     @Override
-    public void buildPrintData() {
+    public void buildPrintData() throws EposException {
 
-        try {
             Builder builder = getBuilder();
             StringBuilder sb = new StringBuilder();
 
@@ -88,12 +89,10 @@ public class PrintReceiptChekin extends PrintReceipt {
             buildDataForDashboard(builder, sb);
 
             print();
-        } catch (EposException e) {
-            e.printStackTrace();
-        }
+
     }
 
-    private void buildDataForCustomer(Builder builder, StringBuilder sb) throws EposException {
+    public void buildDataForCustomer(Builder builder, StringBuilder sb) throws EposException {
             addLogo(builder, logoData);
 
             builder.addTextAlign(Builder.ALIGN_LEFT);
@@ -119,7 +118,7 @@ public class PrintReceiptChekin extends PrintReceipt {
             builder.addCut(Builder.CUT_FEED);
     }
 
-    private void buildDataForKeyGuard(Builder builder, StringBuilder sb) throws EposException {
+    public void buildDataForKeyGuard(Builder builder, StringBuilder sb) throws EposException {
             if ("exclusive".equals(valetType.toLowerCase())) {
                 addLogo(builder, logoData);
             }
@@ -172,12 +171,9 @@ public class PrintReceiptChekin extends PrintReceipt {
             }
             builder.addFeedLine(1);
             builder.addCut(Builder.CUT_FEED);
-
     }
 
-    private void buildDataForDashboard(Builder builder, StringBuilder sb) throws EposException {
-
-
+    public void buildDataForDashboard(Builder builder, StringBuilder sb) throws EposException {
             if ("exclusive".equals(valetType.toLowerCase())) {
                 addLogo(builder, logoData);
             }

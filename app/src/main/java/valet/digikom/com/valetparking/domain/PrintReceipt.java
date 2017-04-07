@@ -17,6 +17,7 @@ import com.epson.eposprint.Print;
 import com.epson.eposprint.StatusChangeEventListener;
 
 import valet.digikom.com.valetparking.R;
+import valet.digikom.com.valetparking.util.MyPrinterException;
 import valet.digikom.com.valetparking.util.PrefManager;
 
 /**
@@ -54,14 +55,8 @@ public abstract class PrintReceipt implements StatusChangeEventListener {
 
         }catch (EposException e) {
             //ShowMsg.showException(e,"OPEN_PRINTER", context.getApplicationContext());
-            try {
-                printer.closePrinter();
-            } catch (EposException e1) {
-                e1.printStackTrace();
-            }
+            closePrinter();
             e.printStackTrace();
-            Log.e("open printer", "error status " + ShowMsg.getEposExceptionText(e.getErrorStatus()));
-            Log.e("open printer", "printer status " + e.getPrinterStatus());
             return false;
         }
         return true;
@@ -96,10 +91,11 @@ public abstract class PrintReceipt implements StatusChangeEventListener {
         return mBuilder;
     }
 
-    public void print() {
+    public void print() throws EposException {
 
         if (!openPrinter()) {
-            return;
+            throw new EposException(1);
+            //return;
         }
 
         if (mBuilder == null) {
@@ -109,19 +105,13 @@ public abstract class PrintReceipt implements StatusChangeEventListener {
         int[] status = new int[1];
         int[] battery = new int[1];
 
-        try {
-            printer.sendData(mBuilder, SEND_TIMEOUT, status, battery);
+        printer.sendData(mBuilder, SEND_TIMEOUT, status, battery);
 
-            // two copies receipt if it checkout
-            if (this instanceof PrintReceiptCheckout){
+        // two copies receipt if it checkout
+        if (this instanceof PrintReceiptCheckout){
                 printer.sendData(mBuilder, SEND_TIMEOUT, status, battery);
-            }
-            //ShowMsg.showStatus(EposException.SUCCESS, status[0], battery[0], context);
-        } catch (EposException e) {
-            closePrinter();
-            e.printStackTrace();
-            //ShowMsg.showStatus(e.getErrorStatus(), e.getPrinterStatus(), e.getBatteryStatus(), context);
         }
+        //ShowMsg.showStatus(EposException.SUCCESS, status[0], battery[0], context);
 
         closePrinter();
     }
@@ -147,7 +137,7 @@ public abstract class PrintReceipt implements StatusChangeEventListener {
     }
 
     //abstract method
-    public abstract void buildPrintData();
+    public abstract void buildPrintData() throws EposException;
 
 
     public Bitmap scaleBitmap(Bitmap b, int x, int y) {

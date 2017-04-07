@@ -7,6 +7,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -107,7 +110,6 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
     SpinnerBankAdapter spinnerBankAdapter;
     MembershipResponse.Data dataMembership;
     EntryCheckinResponse entryCheckinResponse;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -291,6 +293,18 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
     @Override
     public void onNothingSelected(AdapterView<?> adapterView) {
 
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = new MenuInflater(this);
+        inflater.inflate(R.menu.menu_reprint, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        return super.onOptionsItemSelected(item);
     }
 
     public void setRemoteValetHeader(int fakeId) {

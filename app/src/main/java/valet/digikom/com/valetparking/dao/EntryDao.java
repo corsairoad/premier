@@ -63,7 +63,6 @@ public class EntryDao {
         cv.put(EntryCheckinResponse.Table.COL_JSON_RESPONSE, jsonResponse);
         cv.put(EntryCheckinResponse.Table.COL_PLAT_NO, platNo);
         cv.put(EntryCheckinResponse.Table.COL_NO_TRANS, noTrans);
-
         cv.put(EntryCheckinResponse.Table.COL_REMOTE_VTHD_ID, id);
         cv.put(EntryCheckinResponse.Table.COL_TICKET_SEQUENCE, noTrans);
         cv.put(EntryCheckinResponse.Table.COL_IS_CHECKOUT, 0);
@@ -91,7 +90,7 @@ public class EntryDao {
         cv.put(EntryCheckinResponse.Table.COL_TICKET_SEQUENCE, ticketSeq);
         cv.put(EntryCheckinResponse.Table.COL_IS_UPLOADED, EntryCheckinResponse.FLAG_UPLOAD_SUCCESS);
 
-        return db.update(EntryCheckinResponse.Table.TABLE_NAME,cv, EntryCheckinResponse.Table.COL_RESPONSE_ID + "=?", args);
+        return db.update(EntryCheckinResponse.Table.TABLE_NAME,cv, EntryCheckinResponse.Table.COL_RESPONSE_ID + " = ? ", args);
     }
 
     public void insertListCheckin(List<EntryCheckinResponse.Data> checkinList) {

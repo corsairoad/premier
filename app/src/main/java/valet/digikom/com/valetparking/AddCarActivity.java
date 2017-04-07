@@ -13,6 +13,7 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.epson.eposprint.EposException;
 import com.google.gson.Gson;
 
 import java.io.File;
@@ -22,12 +23,14 @@ import java.util.List;
 
 import valet.digikom.com.valetparking.dao.EntryCheckinContainerDao;
 import valet.digikom.com.valetparking.dao.EntryDao;
+import valet.digikom.com.valetparking.dao.ReprintDao;
 import valet.digikom.com.valetparking.domain.AdditionalItems;
 import valet.digikom.com.valetparking.domain.DefectMaster;
 import valet.digikom.com.valetparking.domain.EntryCheckin;
 import valet.digikom.com.valetparking.domain.EntryCheckinContainer;
 import valet.digikom.com.valetparking.domain.EntryCheckinResponse;
 import valet.digikom.com.valetparking.domain.PrintReceiptChekin;
+import valet.digikom.com.valetparking.domain.ShowMsg;
 import valet.digikom.com.valetparking.domain.ValetTypeJson;
 import valet.digikom.com.valetparking.fragments.DefectFragment;
 import valet.digikom.com.valetparking.fragments.ReviewFragment;
@@ -36,6 +39,7 @@ import valet.digikom.com.valetparking.fragments.StepOneFragmet;
 import valet.digikom.com.valetparking.fragments.StepThreeFragment;
 import valet.digikom.com.valetparking.fragments.StepTwoFragment;
 import valet.digikom.com.valetparking.util.CheckinCheckoutAlarm;
+import valet.digikom.com.valetparking.util.MyPrinterException;
 import valet.digikom.com.valetparking.util.PrefManager;
 
 public class AddCarActivity extends FragmentActivity implements StepOneFragmet.OnRegsitrationValid, StepTwoFragment.OnDefectSelectedListener,
@@ -223,7 +227,19 @@ public class AddCarActivity extends FragmentActivity implements StepOneFragmet.O
         //PrintCheckin printCheckin = new PrintCheckin(AddCarActivity.this, response,fragmentReview.getBitmapDefect(), fragmentReview.getSignatureBmp(), fragmentReview.getItemsList());
         //printCheckin.print();
         PrintReceiptChekin printReceiptChekin = new PrintReceiptChekin(this,response, fragmentReview.getBitmapDefect(), fragmentReview.getSignatureBmp(), fragmentReview.getItemsList());
-        printReceiptChekin.buildPrintData();
+        try {
+            printReceiptChekin.buildPrintData();
+        } catch (final EposException e) {
+            printReceiptChekin.closePrinter();
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    ShowMsg.showResult(e.getPrinterStatus(),"Error print checkin", AddCarActivity.this);
+                    Toast.makeText(AddCarActivity.this,"Print error: " + e.getPrinterStatus(), Toast.LENGTH_LONG).show();
+                }
+            });
+            e.printStackTrace();
+        }
     }
 
     private void processFailedCheckin(EntryCheckin.Builder builder, EntryCheckinContainer checkinContainer) {
@@ -278,7 +294,20 @@ public class AddCarActivity extends FragmentActivity implements StepOneFragmet.O
         //debugJsonCheckin(checkinContainer);
 
         //startAlarmForUploadCheckin();
+
         print(entryCheckinResponse);
+
+        saveReprintData(entryCheckinResponse,noTiket.trim());
+    }
+
+    private void saveReprintData(EntryCheckinResponse entryCheckinResponse, String noTiket) {
+
+        Bitmap bmpSignature = fragmentReview.getSignatureBmp();
+        Bitmap bmpDefects = fragmentReview.getBitmapDefect();
+        List<AdditionalItems> stuffs = fragmentReview.getItemsList();
+
+        ReprintDao reprintDao = ReprintDao.getInstance(AddCarActivity.this);
+        reprintDao.saveReprintData(entryCheckinResponse, noTiket.trim(), bmpDefects, bmpSignature,stuffs);
     }
 
     private void startAlarmForUploadCheckin() {

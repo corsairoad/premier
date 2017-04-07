@@ -48,6 +48,31 @@ public class EntryCheckinContainerDao {
         return db.insert(EntryCheckinContainer.Table.TABLE_NAME, null, cv);
     }
 
+    public void deleteCheckinDataByTicketNo(String ticketNo) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        Cursor c = db.rawQuery("SELECT * FROM " + EntryCheckinContainer.Table.TABLE_NAME, new String[]{});
+        if (c.moveToFirst()) {
+            do {
+                String json = c.getString(c.getColumnIndex(EntryCheckinContainer.Table.COL_JSON_DATA));
+                int rowId = c.getInt(c.getColumnIndex(EntryCheckinContainer.Table.COL_ID));
+                EntryCheckinContainer container = gson.fromJson(json, EntryCheckinContainer.class);
+                if (ticketNo.trim().equals(container.getEntryCheckin().getAttrib().getTicketNo().trim())) {
+                    deleteRowByRowId(rowId);
+                    return;
+                }
+            }while (c.moveToNext());
+        }
+        c.close();
+    }
+
+    private void deleteRowByRowId(int rowId) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        String condition = EntryCheckinContainer.Table.COL_ID + " = ?";
+        String[] args = new String[]{String.valueOf(rowId)};
+
+        db.delete(EntryCheckinContainer.Table.TABLE_NAME,condition,args);
+    }
+
     public List<EntryCheckinContainer> fetchAll() {
         List<EntryCheckinContainer> containers = new ArrayList<>();
         SQLiteDatabase db = dbHelper.getWritableDatabase();

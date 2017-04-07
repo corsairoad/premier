@@ -287,6 +287,7 @@
     <string name="print_details">Print Details</string>
     <string name="id_transaksi">ID TRANSAKSI</string>
     <string name="username">Username</string>
+    <string name="reprint">Reprint Checkin</string>
 
     <string-array name="array_report_type">
         <item>PER LOBBY</item>

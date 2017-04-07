@@ -5,6 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import valet.digikom.com.valetparking.dao.EntryDao;
+import valet.digikom.com.valetparking.dao.ReprintDao;
 import valet.digikom.com.valetparking.domain.AdditionalItems;
 import valet.digikom.com.valetparking.domain.Bank;
 import valet.digikom.com.valetparking.domain.CarMaster;
@@ -63,6 +64,7 @@ public class ValetDbHelper extends SQLiteOpenHelper {
         db.execSQL(Disclaimer.Table.CREATE);
         db.execSQL(EntryCheckinContainer.Table.CREATE);
         db.execSQL(FinishCheckOut.Table.CREATE);
+        db.execSQL(ReprintDao.Table.CREATE);
     }
 
     @Override
@@ -83,6 +85,7 @@ public class ValetDbHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + Disclaimer.Table.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + EntryCheckinContainer.Table.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + FinishCheckOut.Table.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + ReprintDao.Table.TABLE_NAME);
 
         onCreate(db);
     }
