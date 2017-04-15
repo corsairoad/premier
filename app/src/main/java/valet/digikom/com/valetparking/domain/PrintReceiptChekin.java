@@ -88,8 +88,12 @@ public class PrintReceiptChekin extends PrintReceipt {
             buildDataForKeyGuard(builder, sb);
             buildDataForDashboard(builder, sb);
 
-            print();
-
+            try {
+                print();
+            }catch (EposException e) {
+                e.printStackTrace();
+                throw e;
+            }
     }
 
     public void buildDataForCustomer(Builder builder, StringBuilder sb) throws EposException {

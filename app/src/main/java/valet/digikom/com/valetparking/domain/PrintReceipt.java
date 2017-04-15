@@ -28,8 +28,7 @@ public abstract class PrintReceipt implements StatusChangeEventListener {
 
     private static final String PRINTER_NAME = "TM-T88V";
     private static final int PRINTER_LANGUAGE = com.epson.eposprint.Builder.LANG_EN;
-    private static final int SEND_TIMEOUT = 10 * 1000;
-
+    private static final int SEND_TIMEOUT =  20 * 1000;
     private static Print printer;
     private Context context;
     private PrefManager prefManager;
@@ -87,6 +86,7 @@ public abstract class PrintReceipt implements StatusChangeEventListener {
         if (mBuilder == null) {
             mBuilder = new Builder(PRINTER_NAME, PRINTER_LANGUAGE, context.getApplicationContext());
         }
+        mBuilder.clearCommandBuffer();
         mBuilder.addTextFont(Builder.FONT_B);
         return mBuilder;
     }
@@ -94,7 +94,7 @@ public abstract class PrintReceipt implements StatusChangeEventListener {
     public void print() throws EposException {
 
         if (!openPrinter()) {
-            throw new EposException(1);
+            throw new EposException(EposException.ERR_OPEN);
             //return;
         }
 
@@ -102,40 +102,54 @@ public abstract class PrintReceipt implements StatusChangeEventListener {
             return;
         }
 
-        int[] status = new int[1];
-        int[] battery = new int[1];
-
-        printer.sendData(mBuilder, SEND_TIMEOUT, status, battery);
-
-        // two copies receipt if it checkout
-        if (this instanceof PrintReceiptCheckout){
-                printer.sendData(mBuilder, SEND_TIMEOUT, status, battery);
+        if (!processPrint()) {
+            throw new EposException(EposException.ERR_CONNECT);
         }
-        //ShowMsg.showStatus(EposException.SUCCESS, status[0], battery[0], context);
 
         closePrinter();
     }
 
+    private boolean processPrint() {
+        try{
+            int[] status = new int[1];
+            int[] battery = new int[1];
+
+            printer.sendData(mBuilder, SEND_TIMEOUT, status, battery);
+
+            // two copies receipt if it checkout
+            if (this instanceof PrintReceiptCheckout){
+                printer.sendData(mBuilder, SEND_TIMEOUT, status, battery);
+            }
+            //ShowMsg.showStatus(EposException.SUCCESS, status[0], battery[0], context);
+        }catch (EposException e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+
     public void closePrinter() {
+
+        //remove builder
+        if(mBuilder != null){
+            try{
+                mBuilder.clearCommandBuffer();
+                mBuilder = null;
+            }catch(Exception e){
+                mBuilder = null;
+            }
+        }
+
         if(printer != null){
             try{
-                //remove builder
-                if(mBuilder != null){
-                    try{
-                        mBuilder.clearCommandBuffer();
-                        mBuilder = null;
-                    }catch(Exception e){
-                        mBuilder = null;
-                    }
-                }
                 printer.closePrinter();
                 printer = null;
             }catch(Exception e){
                 printer = null;
             }
         }
-    }
 
+    }
     //abstract method
     public abstract void buildPrintData() throws EposException;
 

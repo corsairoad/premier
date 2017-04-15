@@ -57,6 +57,7 @@ public class AddCarActivity extends FragmentActivity implements StepOneFragmet.O
     private EntryDao entryDao;
     private EntryCheckinContainerDao entryCheckinContainerDao;
     private SignDialogFragment sdf;
+    private MaterialDialog materialDialog;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -81,7 +82,7 @@ public class AddCarActivity extends FragmentActivity implements StepOneFragmet.O
 
     private void submitCheckin(final EntryCheckinContainer checkinContainer, final EntryCheckin.Builder builder) {
         processFailedCheckin(builder, checkinContainer);
-        goToMain();
+        //goToMain();
 
         /*
         if (!ApiClient.isNetworkAvailable(this)) {
@@ -204,10 +205,7 @@ public class AddCarActivity extends FragmentActivity implements StepOneFragmet.O
             sdf.dismiss();
         }
 
-        new MaterialDialog.Builder(this)
-                .title("Registration success")
-                .customView(R.layout.layout_scrolling_image, false)
-                .show();
+        showDialog(true);
 
         fragmentReview.setSignBitmap(bitMapSign);
         //showConfirmDialog(fragmentReview);
@@ -218,27 +216,47 @@ public class AddCarActivity extends FragmentActivity implements StepOneFragmet.O
             @Override
             public void run() {
                 submitCheckin(fragmentReview.getEntryCheckinContainer(), fragmentReview.getBuilder());
+                //processFailedCheckin(fragmentReview.getBuilder(),fragmentReview.getEntryCheckinContainer());
                 //goToMain();
             }
         }).start();
     }
 
+    private void showDialog(boolean show) {
+        if (show) {
+            materialDialog = new MaterialDialog.Builder(this)
+                    .title("Please wait...")
+                    .customView(R.layout.layout_scrolling_image, false)
+                    .build();
+            materialDialog.show();
+        }else {
+            if (materialDialog != null) {
+                materialDialog.dismiss();
+            }
+        }
+    }
+
     private void print(EntryCheckinResponse response) {
         //PrintCheckin printCheckin = new PrintCheckin(AddCarActivity.this, response,fragmentReview.getBitmapDefect(), fragmentReview.getSignatureBmp(), fragmentReview.getItemsList());
         //printCheckin.print();
-        PrintReceiptChekin printReceiptChekin = new PrintReceiptChekin(this,response, fragmentReview.getBitmapDefect(), fragmentReview.getSignatureBmp(), fragmentReview.getItemsList());
+        final PrintReceiptChekin printReceiptChekin = new PrintReceiptChekin(this,response, fragmentReview.getBitmapDefect(), fragmentReview.getSignatureBmp(), fragmentReview.getItemsList());
         try {
             printReceiptChekin.buildPrintData();
+            //goToMain();
         } catch (final EposException e) {
+            final int errStatus = e.getErrorStatus();
+            e.printStackTrace();
             printReceiptChekin.closePrinter();
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    ShowMsg.showResult(e.getPrinterStatus(),"Error print checkin", AddCarActivity.this);
-                    Toast.makeText(AddCarActivity.this,"Print error: " + e.getPrinterStatus(), Toast.LENGTH_LONG).show();
+                    showDialog(false);
+                    printReceiptChekin.closePrinter();
+                    ShowMsg.showResult(errStatus,"Error print checkin", AddCarActivity.this);
+                    Toast.makeText(AddCarActivity.this,"Print error: " + errStatus, Toast.LENGTH_LONG).show();
                 }
             });
-            e.printStackTrace();
+
         }
     }
 
@@ -287,21 +305,16 @@ public class AddCarActivity extends FragmentActivity implements StepOneFragmet.O
         entryCheckin.getAttrib().setAppId(prefManager.getAppId());
         entryCheckin.getAttrib().setLastTicketCounter(lastTicketCounter);
 
-        entryDao.insertEntryResponse(entryCheckinResponse, EntryCheckinResponse.FLAG_UPLOAD_PENDING);
+        print(entryCheckinResponse);
+        saveReprintData(entryCheckinResponse,noTiket.trim());
 
+        entryDao.insertEntryResponse(entryCheckinResponse, EntryCheckinResponse.FLAG_UPLOAD_PENDING);
         entryCheckinContainerDao.insert(checkinContainer);
 
-        //debugJsonCheckin(checkinContainer);
-
-        //startAlarmForUploadCheckin();
-
-        print(entryCheckinResponse);
-
-        saveReprintData(entryCheckinResponse,noTiket.trim());
+        goToMain();
     }
 
     private void saveReprintData(EntryCheckinResponse entryCheckinResponse, String noTiket) {
-
         Bitmap bmpSignature = fragmentReview.getSignatureBmp();
         Bitmap bmpDefects = fragmentReview.getBitmapDefect();
         List<AdditionalItems> stuffs = fragmentReview.getItemsList();

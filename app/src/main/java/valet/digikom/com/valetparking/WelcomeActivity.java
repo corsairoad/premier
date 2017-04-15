@@ -59,11 +59,16 @@ public class WelcomeActivity extends AppCompatActivity {
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                prefManager.setIdSite(mRoleOption.getSiteId());
-                prefManager.setSiteName(mRoleOption.getSiteName());
-                patch(dropPointMaster.getAttrib().getDropId());
 
-                goToMain();
+                if (ApiClient.isNetworkAvailable(WelcomeActivity.this)) {
+                    prefManager.setIdSite(mRoleOption.getSiteId());
+                    prefManager.setSiteName(mRoleOption.getSiteName());
+                    patch(dropPointMaster.getAttrib().getDropId());
+                    goToMain();
+                }else {
+                    Toast.makeText(WelcomeActivity.this,"Upps, you are not connected to internet. Please try again later", Toast.LENGTH_SHORT).show();
+                }
+
             }
         });
 

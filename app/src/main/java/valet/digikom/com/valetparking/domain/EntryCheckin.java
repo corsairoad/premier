@@ -515,6 +515,7 @@ public class EntryCheckin {
         }
 
         public String generateTicketNo(Context context, int lastTicketCounter) {
+            String sCounter = String.format("%06d",lastTicketCounter);
             String prefix = "R/";
             if ("exclusive".equals(valetType.getAttrib().getValetTypeName().toLowerCase())) {
                 prefix = "E/";

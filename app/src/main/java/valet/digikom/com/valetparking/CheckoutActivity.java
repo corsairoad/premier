@@ -622,9 +622,15 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
         @Override
         protected String doInBackground(String... strings) {
 
-            finishCheckoutDao.saveDataCheckout(idValetHeader, finishCheckoutDao.getFinishCheckOut(), noTiket.trim());
-            finishCheckoutDao.setCheckoutCar(idValetHeader);
-            finishCheckoutDao.print(idValetHeader);
+            try {
+                finishCheckoutDao.print(idValetHeader);
+                finishCheckoutDao.saveDataCheckout(idValetHeader, finishCheckoutDao.getFinishCheckOut(), noTiket.trim());
+                finishCheckoutDao.setCheckoutCar(idValetHeader);
+                ReprintDao.getInstance(CheckoutActivity.this).removeReprintData(noTiket);
+            }catch (Exception e) {
+                e.printStackTrace();
+            }
+
 
             return null;
         }

@@ -77,6 +77,9 @@ public class ReprintDao {
     }
 
     public int rePrint(String noTiket) {
+        if (noTiket == null) {
+            return STATUS_PRINT_FAILED;
+        }
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         String sql = "SELECT * FROM " + Table.TABLE_NAME + " WHERE " + Table.COL_NO_TIKET + " = ?;";
         String[] args = new String[] {noTiket};
@@ -110,8 +113,12 @@ public class ReprintDao {
     }
 
     public void removeReprintData(String noTiket) {
+        if (noTiket == null) {
+            return;
+        }
+
         SQLiteDatabase db = dbHelper.getWritableDatabase();
-        db.delete(Table.TABLE_NAME, Table.COL_NO_TIKET + " =? ", new String[]{noTiket});
+        db.delete(Table.TABLE_NAME, Table.COL_NO_TIKET + " =? ", new String[]{noTiket.trim()});
     }
 
     private List<AdditionalItems> stringToList(String string) {

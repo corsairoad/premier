@@ -307,7 +307,11 @@ public class ParkedCarFragment extends Fragment implements ListCheckinAdapter.On
                             //clearData();
                             List<EntryCheckinResponse.Data> checkinList = response.body().getCheckinResponseList();
                             if (!checkinList.isEmpty()) {
-                                entryDao.insertListCheckin(checkinList);
+                                try {
+                                    entryDao.insertListCheckin(checkinList);
+                                }catch (Exception e) {
+                                    e.printStackTrace();
+                                }
                             }else {
                                 Toast.makeText(getContext(), "Data Empty", Toast.LENGTH_SHORT).show();
                             }

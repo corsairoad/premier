@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 
 import com.epson.epos2.Epos2CallbackCode;
 import com.epson.epos2.Epos2Exception;
+import com.epson.eposprint.EposException;
 import com.epson.eposprint.Print;
 
 import valet.digikom.com.valetparking.R;
@@ -36,13 +37,13 @@ public class ShowMsg {
             msg = String.format(
                       "\t%s\n\t%s\n",
                       context.getString(R.string.title_msg_result),
-                      getCodeText(code));
+                      myCodeText(code));
         }
         else {
             msg = String.format(
                       "\t%s\n\t%s\n\n\t%s\n\t%s\n",
                       context.getString(R.string.title_msg_result),
-                      getCodeText(code),
+                      myCodeText(code),
                       context.getString(R.string.title_msg_description),
                       errMsg);
         }
@@ -182,6 +183,43 @@ public class ShowMsg {
                 break;
         }
         return return_text;
+    }
+
+    public static String myCodeText(int errStatus) {
+        String returnText = "";
+        switch (errStatus) {
+            case EposException.ERR_OPEN:
+                returnText = "ERROR_OPEN_PRINTER";
+                break;
+            case EposException.ERR_CONNECT:
+                returnText = "ERROR_CONNECT";
+                break;
+            case EposException.ERR_FAILURE:
+                returnText = "ERROR_FAILURE";
+                break;
+            case EposException.ERR_ILLEGAL:
+                returnText = "ERROR_ILLEGAL";
+                break;
+            case EposException.ERR_MEMORY:
+                returnText = "ERROR_MEMORY";
+                break;
+            case EposException.ERR_PARAM:
+                returnText = "ERROR_PARAM";
+                break;
+            case EposException.ERR_TIMEOUT:
+                returnText = "ERROR_TIMEOUT";
+                break;
+            case EposException.ERR_OFF_LINE:
+                returnText = "ERROR_OFFLINE";
+                break;
+            case EposException.ERR_PROCESSING:
+                returnText = "ERROR_PROCESSING";
+                break;
+            case EposException.ERR_UNSUPPORTED:
+                returnText = "ERROR_UNSUPPORTED";
+                break;
+        }
+        return returnText;
     }
 
     static void showStatus(int result, int status, int battery, Context context){
