@@ -6,12 +6,15 @@ import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import java.util.List;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import valet.digikom.com.valetparking.dao.EntryDao;
 import valet.digikom.com.valetparking.dao.TokenDao;
 import valet.digikom.com.valetparking.domain.CheckinList;
+import valet.digikom.com.valetparking.domain.EntryCheckinResponse;
 import valet.digikom.com.valetparking.fragments.ParkedCarFragment;
 
 /**

@@ -42,10 +42,10 @@
 
                 <fragment
                     android:id="@+id/step_one_fragment"
+                    android:name="valet.digikom.com.valetparking.fragments.StepOneFragmet"
                     android:layout_width="0dp"
-                    android:layout_weight="4"
                     android:layout_height="match_parent"
-                    android:name="valet.digikom.com.valetparking.fragments.StepOneFragmet"/>
+                    android:layout_weight="4" />
 
                 <fragment
                     android:id="@+id/stuff_fragment"

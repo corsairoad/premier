@@ -25,6 +25,7 @@ public class PrefManager {
     public static final String KEY_LAST_COUNTER_TICKET = "last_counter_ticket";
     public static final String KEY_LAST_PRINTED_TICKET_COUNTER = "last_printed_ticket_counter";
     public static final String KEY_LOBBY_TYPE = "key_lobby_type";
+    public static final String KEY_TOKEN = "key_token";
 
     private Context context;
     private static PrefManager prefManager;
@@ -72,6 +73,15 @@ public class PrefManager {
     public String getIdDefaultDropPoint() {
         String id = sharedPreferences.getString(KEY_DEFAULT_DROPPOINT, null);
         return id;
+    }
+
+    public void saveToken(String token) {
+        editor.putString(KEY_TOKEN, token);
+        editor.commit();
+    }
+
+    public String getToken() {
+        return sharedPreferences.getString(KEY_TOKEN,null);
     }
 
     public void saveRemoteDeviceId(String remoteDevId) {
@@ -134,8 +144,13 @@ public class PrefManager {
     }
 
     public void saveAuthResponse(AuthResponse authResponse) {
-        String jsonAuthResponse = gson.toJson(authResponse);
-        editor.putString(AuthResponse.KEY, jsonAuthResponse);
+        if (authResponse == null) {
+            editor.putString(AuthResponse.KEY, null);
+        }else {
+            String jsonAuthResponse = gson.toJson(authResponse);
+            editor.putString(AuthResponse.KEY, jsonAuthResponse);
+        }
+
         editor.commit();
     }
 

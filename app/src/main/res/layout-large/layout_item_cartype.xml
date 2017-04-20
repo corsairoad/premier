@@ -15,18 +15,18 @@
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/circle_image"
-            android:layout_width="16dp"
-            android:layout_height="16dp"
-            app:civ_border_width="0.5dp"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            app:civ_border_width="2dp"
             app:civ_border_color="@android:color/black"/>
 
         <TextView
             android:id="@+id/text_cartype"
-            android:paddingLeft="6dp"
+            android:paddingLeft="@dimen/activity_vertical_margin"
             android:textColor="@color/color_text_plat_no_checkin"
             android:layout_width="match_parent"
             android:gravity="center_vertical"
-            android:textSize="12sp"
+            android:textSize="20sp"
             android:layout_height="wrap_content" />
 
     </LinearLayout>

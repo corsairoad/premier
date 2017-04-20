@@ -9,6 +9,9 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.Toast;
+
+import com.google.gson.Gson;
+
 import java.util.ArrayList;
 import java.util.List;
 import retrofit2.Call;
@@ -66,7 +69,7 @@ public class WelcomeActivity extends AppCompatActivity {
                     patch(dropPointMaster.getAttrib().getDropId());
                     goToMain();
                 }else {
-                    Toast.makeText(WelcomeActivity.this,"Upps, you are not connected to internet. Please try again later", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(WelcomeActivity.this,"Oops, you are not connected to internet. Please try again later", Toast.LENGTH_SHORT).show();
                 }
 
             }

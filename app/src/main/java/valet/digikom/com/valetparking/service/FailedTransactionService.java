@@ -114,16 +114,23 @@ public class FailedTransactionService extends IntentService {
                                 int updateIdDataCheckout = FinishCheckoutDao.getInstance(FailedTransactionService.this)
                                         .updateCheckoutVthdId(noTiket, remoteVthdId);
 
-                                // remove checkin data from db while succeed
-                                EntryCheckinContainerDao containerDao = EntryCheckinContainerDao.getInstance(FailedTransactionService.this);
+                                // remove checkin data from db if succeed
+                                /*EntryCheckinContainerDao containerDao = EntryCheckinContainerDao.getInstance(FailedTransactionService.this);
                                 int deleteSuccess = containerDao.deleteById(String.valueOf(fakeVthdId));
                                 Log.d(TAG,"remove failed-checkin " + deleteSuccess);
                                 Log.d(TAG, "No. TICKET: " +  response.body().getData().getAttribute().getIdTransaksi());
+                                */
+
+                                EntryCheckinContainerDao.getInstance(FailedTransactionService.this)
+                                        .deleteCheckinDataByTicketNo(noTiket);
 
                                 // reload checkin list
                                 Intent RTReturn = new Intent(ParkedCarFragment.RECEIVE_CURRENT_LOBBY_DATA);
                                 LocalBroadcastManager.getInstance(FailedTransactionService.this).sendBroadcast(RTReturn);
+
                                 startDownloadCurrentLobbyService();
+
+                                Log.d("Post Checkin", noTiket + " successfully posted");
 
                             }catch (Exception e) {
                                 e.printStackTrace();
@@ -134,6 +141,9 @@ public class FailedTransactionService extends IntentService {
                                 // update synced checkin item in checkin list
                                 EntryDao.getInstance(FailedTransactionService.this)
                                         .updateRemoteAndTicketSecByTicketNo(noTiket, remoteVthdId, tiketSeq);
+
+                                Intent RTReturn = new Intent(ParkedCarFragment.RECEIVE_CURRENT_LOBBY_DATA);
+                                LocalBroadcastManager.getInstance(FailedTransactionService.this).sendBroadcast(RTReturn);
 
                                 startDownloadCurrentLobbyService();
                             }

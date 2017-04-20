@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import com.google.gson.Gson;
 
@@ -108,6 +109,9 @@ public class EntryDao {
     public void insertListCheckin(List<EntryCheckinResponse.Data> checkinList) {
         int rows = removeUploadSuccess();
         FinishCheckoutDao finishCheckoutDao = FinishCheckoutDao.getInstance(dbHelper.getContext());
+
+        filterUnsyncedData(checkinList);
+
         if (!checkinList.isEmpty()) {
             for (EntryCheckinResponse.Data e : checkinList) {
                 if (e != null) {
@@ -122,6 +126,31 @@ public class EntryDao {
                 }
             }
         }
+    }
+
+    private void filterUnsyncedData(List<EntryCheckinResponse.Data> checkinList) {
+        List<EntryCheckinResponse> unSyncedResponses = getUnsyncedResponse();
+
+        for (EntryCheckinResponse.Data dataDownload : checkinList) {
+            String noTiketDownload = dataDownload.getAttribute().getNoTiket().trim().toLowerCase();
+            String platNoDownload = dataDownload.getAttribute().getPlatNo().trim().toLowerCase();
+            for (EntryCheckinResponse dataLocal : unSyncedResponses) {
+                String noTiketLokal = dataLocal.getData().getAttribute().getNoTiket().trim().toLowerCase();
+                String platNoLokal = dataLocal.getData().getAttribute().getPlatNo().trim().toLowerCase();
+                if (noTiketDownload.equals(noTiketLokal) && platNoDownload.equals(platNoLokal)) {
+                    int removeStatus = removeByPlatNo(dataLocal.getData().getAttribute().getPlatNo());
+                    Log.d("remove status", "" + removeStatus);
+                }
+            }
+        }
+    }
+
+    private int removeByPlatNo(String platNo) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        String where = EntryCheckinResponse.Table.COL_PLAT_NO + " = ? ";
+        String[] args = new String[]{platNo};
+
+        return db.delete(EntryCheckinResponse.Table.TABLE_NAME,where, args);
     }
 
     private int removeUploadSuccess() {
@@ -162,6 +191,25 @@ public class EntryDao {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         // Cursor c = db.query(EntryCheckinResponse.Table.TABLE_NAME,null, EntryCheckinResponse.Table.COL_IS_CHECKOUT + "=? AND " + EntryCheckinResponse.Table.COL_IS_CALLED + "=0",new String[]{"0"},null,null,EntryCheckinResponse.Table.COL_RESPONSE_ID + " DESC");
         Cursor c = db.query(EntryCheckinResponse.Table.TABLE_NAME,null, EntryCheckinResponse.Table.COL_IS_CHECKOUT + "=? AND " + EntryCheckinResponse.Table.COL_IS_READY_CHECKOUT + "=0",new String[]{"0"},null,null,EntryCheckinResponse.Table.COL_ID + " DESC");
+        List<EntryCheckinResponse> responseList = new ArrayList<>();
+
+        if (c.moveToFirst()) {
+            do {
+                String jsonResponse = c.getString(c.getColumnIndex(EntryCheckinResponse.Table.COL_JSON_RESPONSE));
+                EntryCheckinResponse checkinResponse = gson.fromJson(jsonResponse, EntryCheckinResponse.class);
+                responseList.add(checkinResponse);
+            }while (c.moveToNext());
+        }
+
+        c.close();
+
+        return responseList;
+    }
+
+    private List<EntryCheckinResponse> getUnsyncedResponse() {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        String[] args = new String[] {String.valueOf(EntryCheckinResponse.FLAG_UPLOAD_SUCCESS)};
+        Cursor c = db.query(EntryCheckinResponse.Table.TABLE_NAME,null, EntryCheckinResponse.Table.COL_IS_UPLOADED + " != ?",args,null,null,EntryCheckinResponse.Table.COL_ID + " DESC");
         List<EntryCheckinResponse> responseList = new ArrayList<>();
 
         if (c.moveToFirst()) {

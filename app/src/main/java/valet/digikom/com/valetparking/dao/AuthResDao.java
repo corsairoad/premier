@@ -46,6 +46,10 @@ public class AuthResDao {
         prefManager.savePassword(pwx);
     }
 
+    private void saveToken(String token) {
+        prefManager.saveToken(token);
+    }
+
     public String getUserName() {
         return prefManager.getUserName();
     }
@@ -68,12 +72,14 @@ public class AuthResDao {
             public void onResponse(Call<AuthResponse> call, Response<AuthResponse> response) {
                 if (response != null && response.body() != null) {
                     AuthResponse.Data.Role role = response.body().getData().getRole();
+                    String token = response.body().getMeta().getToken();
                     if (role.getRoleId() != 20) {
                         onAuthListener.loginFailed();
                         return;
                     }
                     saveAuthRes(response.body());
                     savePwx(password);
+                    saveToken(token);
                     isOke[0] = true;
                     onAuthListener.loginSuccess();
                 }else {

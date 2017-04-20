@@ -69,12 +69,10 @@ public class Main2Activity extends AppCompatActivity
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         prefManager = PrefManager.getInstance(this);
-        if(prefManager.getIdSite() == 0 && prefManager.getAuthResponse() != null) {
-            startActivity(new Intent(this, WelcomeActivity.class));
-            finish();
-        }
 
-        if (prefManager.getAuthResponse() == null) {
+        // back to login
+        if (prefManager.getAuthResponse() == null || prefManager.getIdSite() == 0) {
+            prefManager.saveAuthResponse(null);
             startActivity(new Intent(this, SplashActivity.class));
             finish();
         }

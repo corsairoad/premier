@@ -313,7 +313,7 @@ public class ParkedCarFragment extends Fragment implements ListCheckinAdapter.On
                                     e.printStackTrace();
                                 }
                             }else {
-                                Toast.makeText(getContext(), "Data Empty", Toast.LENGTH_SHORT).show();
+                                //Toast.makeText(getContext(), "Data Empty", Toast.LENGTH_SHORT).show();
                             }
                         }
                         new LoadCheckinTask().execute();

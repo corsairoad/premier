@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import com.google.gson.Gson;
 
@@ -57,7 +58,8 @@ public class EntryCheckinContainerDao {
                 int rowId = c.getInt(c.getColumnIndex(EntryCheckinContainer.Table.COL_ID));
                 EntryCheckinContainer container = gson.fromJson(json, EntryCheckinContainer.class);
                 if (ticketNo.trim().equals(container.getEntryCheckin().getAttrib().getTicketNo().trim())) {
-                    deleteRowByRowId(rowId);
+                    int row = deleteRowByRowId(rowId);
+                    Log.d(" Delete row checkin", "" + row);
                     return;
                 }
             }while (c.moveToNext());
@@ -65,12 +67,12 @@ public class EntryCheckinContainerDao {
         c.close();
     }
 
-    private void deleteRowByRowId(int rowId) {
+    private int deleteRowByRowId(int rowId) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         String condition = EntryCheckinContainer.Table.COL_ID + " = ?";
         String[] args = new String[]{String.valueOf(rowId)};
 
-        db.delete(EntryCheckinContainer.Table.TABLE_NAME,condition,args);
+        return db.delete(EntryCheckinContainer.Table.TABLE_NAME,condition,args);
     }
 
     public List<EntryCheckinContainer> fetchAll() {
