@@ -50,7 +50,7 @@ public class FailedTransactionService extends IntentService {
                 }
             }
 
-            startDownloadCurrentLobbyService();
+            //startDownloadCurrentLobbyService();
             startPostCheckoutService();
 
             Log.d(TAG, "STARTED");
@@ -135,6 +135,7 @@ public class FailedTransactionService extends IntentService {
                             }catch (Exception e) {
                                 e.printStackTrace();
                                 // remove checkin data from db
+                                Log.d("Post Checkin from error", noTiket + " successfully posted");
                                 EntryCheckinContainerDao.getInstance(FailedTransactionService.this)
                                         .deleteCheckinDataByTicketNo(noTiket);
 

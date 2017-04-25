@@ -186,8 +186,10 @@ public class ParkedCarFragment extends Fragment implements ListCheckinAdapter.On
     }
 
     private void clearData() {
-        responseList.clear();
-        adapter.notifyDataSetChanged();
+        if (adapter != null) {
+            responseList.clear();
+            adapter.notifyDataSetChanged();
+        }
     }
 
     @Override

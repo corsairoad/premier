@@ -71,7 +71,7 @@ public class EntryDao {
 
         db.insert(EntryCheckinResponse.Table.TABLE_NAME,null,cv);
 
-        db.close();
+        //db.close();
     }
 
     public void updateUploadFlag(int id, int flag) {
@@ -201,7 +201,6 @@ public class EntryDao {
             }while (c.moveToNext());
         }
 
-        c.close();
 
         return responseList;
     }
@@ -220,7 +219,7 @@ public class EntryDao {
             }while (c.moveToNext());
         }
 
-        c.close();
+
 
         return responseList;
     }

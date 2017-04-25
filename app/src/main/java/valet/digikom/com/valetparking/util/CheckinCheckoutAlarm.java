@@ -13,13 +13,11 @@ import valet.digikom.com.valetparking.service.FailedTransactionService;
 
 public class CheckinCheckoutAlarm {
 
-    private Context context;
     private PendingIntent pendingIntent;
     private AlarmManager alarmManager;
     private static CheckinCheckoutAlarm checkinCheckoutAlarm;
 
     private CheckinCheckoutAlarm(Context context) {
-        this.context = context;
         Intent intent = new Intent(context.getApplicationContext(), FailedTransactionService.class);
         pendingIntent = PendingIntent.getService(context,99,intent,0);
         alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
@@ -33,7 +31,7 @@ public class CheckinCheckoutAlarm {
     }
 
     public void startAlarm() {
-        alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 1 * 60 * 1000, pendingIntent);
+        alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 5 * 60 * 1000, pendingIntent);
     }
 
     public void cancelAlarm() {

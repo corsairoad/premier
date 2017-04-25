@@ -33,8 +33,10 @@ import valet.digikom.com.valetparking.domain.DropPointMaster;
 import valet.digikom.com.valetparking.domain.EntryCheckoutCont;
 import valet.digikom.com.valetparking.fragments.CalledCarFragment;
 import valet.digikom.com.valetparking.fragments.ParkedCarFragment;
+import valet.digikom.com.valetparking.service.FailedTransactionService;
 import valet.digikom.com.valetparking.util.CheckinCheckoutAlarm;
 import valet.digikom.com.valetparking.util.CheckoutReadyAlarm;
+import valet.digikom.com.valetparking.util.DownloadCheckinAlarm;
 import valet.digikom.com.valetparking.util.PrefManager;
 import valet.digikom.com.valetparking.util.ValetDbHelper;
 
@@ -238,11 +240,16 @@ public class Main2Activity extends AppCompatActivity
             if(parkedCarFragment != null) {
                 parkedCarFragment.downloadCheckinList(indexLobbyType);
             }
-
+            //postCheckinData();
             return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void postCheckinData(){
+        Intent intent = new Intent(this, FailedTransactionService.class);
+        startService(intent);
     }
 
     @SuppressWarnings("StatementWithEmptyBody")
@@ -401,6 +408,9 @@ public class Main2Activity extends AppCompatActivity
     // checkin, checkout, download current lobby data
     private void startAllServices() {
         CheckinCheckoutAlarm checkinCheckoutAlarm = CheckinCheckoutAlarm.getInstance(this);
+        DownloadCheckinAlarm downloadCheckinAlarm = DownloadCheckinAlarm.getInstance(this);
+
         checkinCheckoutAlarm.startAlarm();
+        downloadCheckinAlarm.startAlarm();
     }
 }
