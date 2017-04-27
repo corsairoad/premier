@@ -16,9 +16,12 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:replace="android:icon">
+
         <activity android:name=".MainActivity" />
+
         <activity
             android:name=".SplashActivity"
+            android:windowSoftInputMode="adjustPan|stateVisible"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen">
         </activity>
 

@@ -57,8 +57,10 @@ public class Main2Activity extends AppCompatActivity
     TextView txtCountParkedCar;
     TextView txtCountCalledCar;
     PrefManager prefManager;
-
     MaterialDialog materialDialog;
+
+    private CheckinCheckoutAlarm checkinCheckoutAlarm;
+    private DownloadCheckinAlarm downloadCheckinAlarm;
 
 
     @Override
@@ -69,6 +71,9 @@ public class Main2Activity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        checkinCheckoutAlarm = CheckinCheckoutAlarm.getInstance(this);
+        downloadCheckinAlarm = DownloadCheckinAlarm.getInstance(this);
 
         prefManager = PrefManager.getInstance(this);
 
@@ -116,13 +121,13 @@ public class Main2Activity extends AppCompatActivity
         handleIntent(getIntent());
 
         startCheckoutEntryAlarm();
-        startAllServices();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         checkPrinter();
+        startAllServices();
     }
 
     private void setTitle() {
@@ -278,23 +283,6 @@ public class Main2Activity extends AppCompatActivity
         return true;
     }
 
-    private void startCheckoutEntryAlarm() {
-        CheckoutReadyAlarm checkoutReadyAlarm = CheckoutReadyAlarm.getInstance(this);
-        checkoutReadyAlarm.startAlarm();
-        /*
-        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        //Intent intent = new Intent(context, EntryCheckoutService.class);
-        Intent intent = new Intent();
-        intent.setClass(this,valet.digikom.com.valetparking.CheckoutReceiver.class);
-        intent.setAction("com.valet.dki");
-
-        //this.sendBroadcast(intent);
-
-        PendingIntent alarmIntent = PendingIntent.getBroadcast(context,0,intent,0);
-        alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 10000, alarmIntent);
-        //alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, System.currentTimeMillis(),8000,alarmIntent);
-        */
-    }
 
     @Override
     public void onClick(View view) {
@@ -311,7 +299,11 @@ public class Main2Activity extends AppCompatActivity
                 .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
                     @Override
                     public void onClick(SweetAlertDialog sweetAlertDialog) {
-                        PrefManager.getInstance(Main2Activity.this).logoutUser();
+                        PrefManager prefManager = PrefManager.getInstance(Main2Activity.this);
+
+                        stopAllService();
+                        prefManager.logoutUser();
+                        prefManager.setPrinterMacAddress(null);
                         goToSplash();
                     }
                 })
@@ -407,10 +399,34 @@ public class Main2Activity extends AppCompatActivity
 
     // checkin, checkout, download current lobby data
     private void startAllServices() {
-        CheckinCheckoutAlarm checkinCheckoutAlarm = CheckinCheckoutAlarm.getInstance(this);
-        DownloadCheckinAlarm downloadCheckinAlarm = DownloadCheckinAlarm.getInstance(this);
-
         checkinCheckoutAlarm.startAlarm();
         downloadCheckinAlarm.startAlarm();
+
+        //startCheckoutEntryAlarm();
+
     }
+
+    private void stopAllService() {
+        checkinCheckoutAlarm.cancelAlarm();
+        downloadCheckinAlarm.cancelAlarm();
+    }
+
+    private void startCheckoutEntryAlarm() {
+        CheckoutReadyAlarm checkoutReadyAlarm = CheckoutReadyAlarm.getInstance(this);
+        checkoutReadyAlarm.startAlarm();
+        /*
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        //Intent intent = new Intent(context, EntryCheckoutService.class);
+        Intent intent = new Intent();
+        intent.setClass(this,valet.digikom.com.valetparking.CheckoutReceiver.class);
+        intent.setAction("com.valet.dki");
+
+        //this.sendBroadcast(intent);
+
+        PendingIntent alarmIntent = PendingIntent.getBroadcast(context,0,intent,0);
+        alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 10000, alarmIntent);
+        //alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, System.currentTimeMillis(),8000,alarmIntent);
+        */
+    }
+
 }
