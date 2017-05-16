@@ -57,11 +57,12 @@ public class PrintReceiptChekin extends PrintReceipt {
         platNo = response.getData().getAttribute().getPlatNo();
         valetType = response.getData().getAttribute().getValetType();
         logoData = BitmapFactory.decodeResource(getContext().getResources(), R.mipmap.logo_1);
-        logoExlusive = BitmapFactory.decodeResource(getContext().getResources(), R.mipmap.logo_exclusive);
-
+        //logoExlusive = BitmapFactory.decodeResource(getContext().getResources(), R.mipmap.logo_exclusive);
+        /*
         if ("exclusive".equals(valetType.toLowerCase())) {
             logoData = combineImages(logoExlusive, logoData);
         }
+        */
     }
 
     private void setBitmapSignature(Bitmap bitmapSign) {
@@ -96,8 +97,22 @@ public class PrintReceiptChekin extends PrintReceipt {
             }
     }
 
+    private boolean isVip(){
+        if ("exclusive".equals(valetType.toLowerCase())) {
+            return true;
+        }
+        return false;
+    }
+
     public void buildDataForCustomer(Builder builder, StringBuilder sb) throws EposException {
             addLogo(builder, logoData);
+
+            if (isVip()){
+                builder.addTextAlign(Builder.ALIGN_CENTER);
+                builder.addTextSize(2,2);
+                builder.addText("VIP");
+                builder.addFeedLine(2);
+            }
 
             builder.addTextAlign(Builder.ALIGN_LEFT);
             builder.addTextSize(1, 1);
@@ -123,9 +138,18 @@ public class PrintReceiptChekin extends PrintReceipt {
     }
 
     public void buildDataForKeyGuard(Builder builder, StringBuilder sb) throws EposException {
-            if ("exclusive".equals(valetType.toLowerCase())) {
+        /*
+        if ("exclusive".equals(valetType.toLowerCase())) {
                 addLogo(builder, logoData);
             }
+          */
+            if (isVip()){
+                builder.addTextAlign(Builder.ALIGN_CENTER);
+                builder.addTextSize(2,2);
+                builder.addText("VIP");
+                builder.addFeedLine(2);
+            }
+
             builder.addTextAlign(Builder.ALIGN_LEFT);
             builder.addTextSize(1, 1);
             sb.append(" No. Tiket     : " + noTransaksi + "\n");
@@ -178,8 +202,16 @@ public class PrintReceiptChekin extends PrintReceipt {
     }
 
     public void buildDataForDashboard(Builder builder, StringBuilder sb) throws EposException {
-            if ("exclusive".equals(valetType.toLowerCase())) {
+        /*
+        if ("exclusive".equals(valetType.toLowerCase())) {
                 addLogo(builder, logoData);
+            }
+        */
+            if (isVip()){
+                builder.addTextAlign(Builder.ALIGN_CENTER);
+                builder.addTextSize(2,2);
+                builder.addText("VIP");
+                builder.addFeedLine(2);
             }
 
             builder.addTextAlign(Builder.ALIGN_LEFT);

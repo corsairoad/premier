@@ -22,6 +22,14 @@ public class PrintReceiptCheckout extends PrintReceipt {
         this.printCheckoutParam = printCheckoutParam;
     }
 
+    private boolean isVIP(String valetType){
+        if ("exclusive".equals(valetType.toLowerCase())) {
+            //setLogoData(combineImages(getLogoExclusive(), getLogoData()));
+            return true;
+        }
+        return false;
+    }
+
     @Override
     public void buildPrintData() {
         try {
@@ -49,15 +57,25 @@ public class PrintReceiptCheckout extends PrintReceipt {
             String totalBayar = printCheckoutParam.getTotalBayar();
             Disclaimer.Data disclaimerObj = DisclaimerDao.getInstance(getContext()).getDisclaimer(DisclaimerDao.FLAG_CHECKOUT_DISCLAIMER);
             String disclaimer = "";
+
             if (disclaimerObj != null) {
                 disclaimer = disclaimerObj.getAttrib().getDscDesc();
             }
 
+            /*
             if ("exclusive".equals(valetType.toLowerCase())) {
                 setLogoData(combineImages(getLogoExclusive(), getLogoData()));
             }
+            */
 
             addLogo(builder,getLogoData());
+
+            if (isVIP(valetType)) {
+                builder.addTextAlign(Builder.ALIGN_CENTER);
+                builder.addTextSize(2,2);
+                builder.addText("VIP");
+                builder.addFeedLine(2);
+            }
 
             builder.addTextSize(1,1);
             builder.addText(site);

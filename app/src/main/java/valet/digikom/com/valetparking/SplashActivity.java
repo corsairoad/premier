@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -18,6 +19,8 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.Calendar;
 import java.util.UUID;
 import valet.digikom.com.valetparking.dao.AuthResDao;
 import valet.digikom.com.valetparking.service.ApiClient;
@@ -92,9 +95,16 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
         String deviceId = telephonyManager.getDeviceId();
         String appId = UUID.randomUUID().toString();
 
-        if (!TextUtils.isEmpty(deviceId) && !TextUtils.isEmpty(appId)) {
-            PrefManager.getInstance(this).saveDeviceAndAppId(deviceId, appId);
+        if (TextUtils.isEmpty(deviceId)) {
+            deviceId = String.valueOf(Calendar.getInstance().getTimeInMillis());
         }
+
+        if (TextUtils.isEmpty(appId)) {
+            appId = String.valueOf(Calendar.getInstance().getTimeInMillis());
+        }
+
+        PrefManager.getInstance(this).saveDeviceAndAppId(deviceId, appId);
+
 
     }
 
