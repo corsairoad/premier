@@ -550,6 +550,7 @@ public class EntryCheckin {
             }
 
             prefManager.saveLastPrintedTicketCounter(lastTicketCounter);
+            prefManager.saveLastTicketCounter(lastTicketCounter);
 
             return lastTicketCounter;
         }
