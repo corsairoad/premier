@@ -11,11 +11,24 @@ import java.util.List;
 public class ClosingData {
 
     @SerializedName("data")
-    List<Data> dataList;
+    private List<Data> dataList;
+    @SerializedName("links")
+    private Links links;
+    @SerializedName("meta")
+    private Meta meta;
+
+    public Meta getMeta() {
+        return meta;
+    }
 
     public List<Data> getDataList() {
         return dataList;
     }
+
+    public Links getLinks() {
+        return links;
+    }
+
 
     public static class Data {
         @SerializedName("type")
@@ -157,6 +170,122 @@ public class ClosingData {
                 public String getHref() {
                     return href;
                 }
+            }
+        }
+    }
+
+    public static class Links{
+        @SerializedName("self")
+        private Data.Links.Self self;
+        @SerializedName("first")
+        private First first;
+        @SerializedName("next")
+        private Next next;
+        @SerializedName("last")
+        private Last last;
+
+        public Data.Links.Self getSelf() {
+            return self;
+        }
+
+        public First getFirst() {
+            return first;
+        }
+
+        public Next getNext() {
+            return next;
+        }
+
+        public Last getLast() {
+            return last;
+        }
+
+        public static class Self{
+            @SerializedName("href")
+            private String href;
+
+            public String getHref() {
+                return href;
+            }
+
+            public void setHref(String href) {
+                this.href = href;
+            }
+        }
+
+        public static class First{
+            @SerializedName("href")
+            private String href;
+
+            public String getHref() {
+                return href;
+            }
+
+            public void setHref(String href) {
+                this.href = href;
+            }
+        }
+
+        public static class Next{
+            @SerializedName("href")
+            private String href;
+
+            public String getHref() {
+                return href;
+            }
+
+            public void setHref(String href) {
+                this.href = href;
+            }
+        }
+
+        public static class Last{
+            @SerializedName("href")
+            private String href;
+
+            public String getHref() {
+                return href;
+            }
+
+            public void setHref(String href) {
+                this.href = href;
+            }
+        }
+    }
+
+    public static class Meta {
+
+        @SerializedName("page")
+        private Page page;
+
+        public Page getPage() {
+            return page;
+        }
+
+        public static class Page {
+            @SerializedName("total")
+            private int total;
+            @SerializedName("last")
+            private int last;
+            @SerializedName("number")
+            private int number;
+            @SerializedName("size")
+            private int size;
+
+            public int getTotal() {
+                return total;
+            }
+
+            public int getLast() {
+                return last;
+            }
+
+            public int getNumber() {
+                return number;
+            }
+
+            public int getSize() {
+                return size;
             }
         }
     }

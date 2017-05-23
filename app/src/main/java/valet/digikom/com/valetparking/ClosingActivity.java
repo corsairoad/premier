@@ -41,6 +41,7 @@ import valet.digikom.com.valetparking.domain.PrintReceiptClosing;
 import valet.digikom.com.valetparking.service.ApiClient;
 import valet.digikom.com.valetparking.service.ApiEndpoint;
 import valet.digikom.com.valetparking.service.ProcessRequest;
+import valet.digikom.com.valetparking.util.PaginationScrollListener;
 import valet.digikom.com.valetparking.util.PrefManager;
 
 public class ClosingActivity extends AppCompatActivity implements View.OnClickListener, ListClosingAdapter.OnClosingItemClickListener, AdapterView.OnItemSelectedListener {
@@ -90,6 +91,15 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
     String endDate = "";
     String selectedReport;
 
+    // pagination properties
+    private static final int PAGE_START = 1;
+    private static final int DATA_PER_PAGE = 50;
+    private boolean isLoading;
+    private boolean isLastPage;
+    private int total_data = 0;
+    private int total_page = 0;
+    private int currentPage = PAGE_START;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -115,8 +125,30 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         listClosingView.setLayoutManager(layoutManager);
-        closingAdapter = new ListClosingAdapter(closingData, this);
+        closingAdapter = new ListClosingAdapter(this);
         listClosingView.setAdapter(closingAdapter);
+        listClosingView.addOnScrollListener(new PaginationScrollListener((LinearLayoutManager) layoutManager) {
+            @Override
+            protected void loadMoreItems() {
+                currentPage+=1;
+                downloadData(DOWNLOAD_PER_LOBBY);
+            }
+
+            @Override
+            public int getTotalPageCount() {
+                return closingAdapter.getItemCount();
+            }
+
+            @Override
+            public boolean isLastPage() {
+                return currentPage == total_page;
+            }
+
+            @Override
+            public boolean isLoading() {
+                return isLoading;
+            }
+        });
 
         ArrayAdapter<CharSequence> spReportAdapter = ArrayAdapter.createFromResource(this, R.array.array_report_type,  R.layout.text_item_spinner_report);
         spReportAdapter.setDropDownViewResource(R.layout.text_dropdown_item_spinner_report);
@@ -134,10 +166,10 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
 
         handleIntent();
 
-        downloadData(DOWNLOAD_PER_LOBBY);
-
         startDate = inputDateFrom.getText().toString();
         endDate = inputDateUntil.getText().toString();
+
+        downloadData(DOWNLOAD_PER_LOBBY);
     }
 
     private void handleIntent() {
@@ -156,8 +188,8 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     private void downloadData(String flagDownload) {
-        closingData.clear();
-        closingAdapter.notifyDataSetChanged();
+        //closingData.clear();
+        //closingAdapter.notifyDataSetChanged();
         new DownloadClosingDataTask().execute(flagDownload);
     }
 
@@ -206,7 +238,7 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     public void onClick(final View viewx) {
 
-        if (closingData.isEmpty()) {
+        if (closingAdapter.getItemCount()== 0) {
             Toast.makeText(this, "Data empty", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -325,7 +357,7 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
 
     private void showDialogDetail(int vthdId) { // vthdid changed to position on adapter
         final View view = getLayoutInflater().inflate(R.layout.layout_closing_detail_dialog, null);
-        final ClosingData.Data data = closingData.get(vthdId);
+        final ClosingData.Data data = closingAdapter.get(vthdId);
         if (data != null) {
             TokenDao.getToken(new ProcessRequest() {
                 @Override
@@ -417,14 +449,14 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
                 public void process(String token) {
                     String flag = strings[0];
                     ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class, token);
-                    Call<ClosingData> call = apiEndpoint.getClosingData(900);
+                    Call<ClosingData> call = apiEndpoint.getClosingData(currentPage, DATA_PER_PAGE);
                     if (flag != null) {
                         switch (flag) {
                             case DOWNLOAD_PER_SHIFT:
-                                call = apiEndpoint.getClosingDataShift(900);
+                                call = apiEndpoint.getClosingDataShift(currentPage, DATA_PER_PAGE);
                                 break;
                             case DOWNLOAD_PER_SITE:
-                                call = apiEndpoint.getClosingDataSite(900);
+                                call = apiEndpoint.getClosingDataSite(currentPage, DATA_PER_PAGE);
                                 break;
                             default:
                                 break;
@@ -435,6 +467,7 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
                         @Override
                         public void onResponse(Call<ClosingData> call, Response<ClosingData> response) {
                             if (response != null && response.body() != null) {
+                                calculateTotalPage(response.body());
                                 updateListClosing(response.body().getDataList());
                             }else {
                                 progressBar.setVisibility(View.GONE);
@@ -465,12 +498,27 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
             @Override
             public void run() {
                 progressBar.setVisibility(View.GONE);
-                countValetType(datas);
-                closingData.clear();
-                closingData.addAll(datas);
-                closingAdapter.notifyDataSetChanged();
+                closingAdapter.addAll(datas);
+                //countValetType(datas);
+                //closingData.clear();
+                //closingData.addAll(datas);
+                //closingAdapter.notifyDataSetChanged();
             }
         });
+    }
+
+    private void calculateTotalPage(ClosingData data) {
+        ClosingData.Meta.Page pageDetails = data.getMeta().getPage();
+        if (pageDetails != null) {
+            total_data = pageDetails.getTotal();
+            textTotal.setText(String.valueOf(total_data));
+            if (total_data <= DATA_PER_PAGE) {
+                total_page = 1;
+            } else {
+                double cal = total_data / DATA_PER_PAGE;
+                total_page = (int) Math.round(cal);
+            }
+        }
     }
 
     private void countValetType (List<ClosingData.Data> datas) {
@@ -489,11 +537,11 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
 
         reg = regular;
         exc = exclusive;
-        total = datas.size();
+        total += closingAdapter.getItemCount();
 
         textRegular.setText(String.valueOf(regular));
         textExclusive.setText(String.valueOf(exclusive));
-        textTotal.setText(String.valueOf(datas.size()));
+        textTotal.setText(String.valueOf(total_data));
     }
 
 }

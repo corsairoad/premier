@@ -105,7 +105,7 @@ public interface ApiEndpoint {
 
     //GET CLOSING DATA
     @GET("ad_checkout_finish_fine")
-    Call<ClosingData> getClosingData(@Query("page[size]")int pageSize);
+    Call<ClosingData> getClosingData(@Query("page[number]") int pageNumber,@Query("page[size]")int pageSize);
 
     //GET CLOSING DATA PER LOBBY
     @GET("ad_print_lobby")
@@ -113,11 +113,11 @@ public interface ApiEndpoint {
 
     //GET CLOSING DATA PER SHIFT
     @GET("ad_print_shift")
-    Call<ClosingData> getClosingDataShift(@Query("page[size]")int pageSize);
+    Call<ClosingData> getClosingDataShift(@Query("page[number]")int pageNumber, @Query("page[size]")int pageSize);
 
     //GET CLOSING DATA PER SITE
     @GET("ad_print_site")
-    Call<ClosingData> getClosingDataSite(@Query("page[size]")int pageSize);
+    Call<ClosingData> getClosingDataSite(@Query("page[number]")int pageNumber, @Query("page[size]")int pageSize);
 
     // CLOSING EOD
     @POST("report_administrative")

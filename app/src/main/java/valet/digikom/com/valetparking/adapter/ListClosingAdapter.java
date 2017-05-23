@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -24,6 +25,9 @@ import valet.digikom.com.valetparking.domain.ClosingData;
 
 public class ListClosingAdapter extends RecyclerView.Adapter<ListClosingAdapter.MyViewHolder> {
 
+    private static final int ITEM = 0;
+    private static final int LOADING = 1;
+    private boolean isLoadingAdded = false;
     private List<ClosingData.Data> closingData;
     private Context context;
     private OnClosingItemClickListener onClosingItemClickListener;
@@ -34,14 +38,35 @@ public class ListClosingAdapter extends RecyclerView.Adapter<ListClosingAdapter.
         onClosingItemClickListener = (OnClosingItemClickListener) context;
     }
 
+    public ListClosingAdapter(Context context) {
+        this.context = context;
+        closingData = new ArrayList<>();
+        onClosingItemClickListener = (OnClosingItemClickListener) context;
+    }
+
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_checkin,parent, false);
-        return new MyViewHolder(view);
+        View viewLoading = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_progress, parent, false);
+        RecyclerView.ViewHolder viewHolder = null;
+
+        switch (viewType) {
+            case ITEM:
+                viewHolder = new MyViewHolder(view);
+                break;
+            case LOADING:
+                viewHolder = new LoadingVH(viewLoading);
+                break;
+        }
+        return (MyViewHolder) viewHolder;
     }
 
     @Override
     public void onBindViewHolder(MyViewHolder holder, final int position) {
+        if (getItemViewType(position) == LOADING) {
+            return;
+        }
+
         ClosingData.Data.Attr attr = closingData.get(position).getAttributes();
         String platNo = attr.getPlatNo();
         String noTiket = attr.getNoTiket();
@@ -88,13 +113,22 @@ public class ListClosingAdapter extends RecyclerView.Adapter<ListClosingAdapter.
 
     @Override
     public int getItemCount() {
-        return closingData.size();
+        return closingData == null? 0: closingData.size();
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return (position == closingData.size() - 1 && isLoadingAdded) ? LOADING : ITEM;
     }
 
     @Override
     public long getItemId(int position) {
         return Long.valueOf(closingData.get(position).getId());
     }
+
+    /*
+    HELPERS
+     */
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
         LinearLayout layoutContainer;
@@ -119,7 +153,30 @@ public class ListClosingAdapter extends RecyclerView.Adapter<ListClosingAdapter.
             container = (LinearLayout) view.findViewById(R.id.container_checkin);
         }
     }
+
+    public class LoadingVH extends RecyclerView.ViewHolder {
+
+        public LoadingVH(View itemView) {
+            super(itemView);
+        }
+    }
+
     public interface OnClosingItemClickListener{
         void OnClosingItemClick(int vthdId);
+    }
+
+    public void addAll( List<ClosingData.Data> closingData) {
+        for (ClosingData.Data data : closingData) {
+            add(data);
+        }
+    }
+
+    public void add(ClosingData.Data data) {
+        closingData.add(data);
+        notifyItemInserted(closingData.size() - 1);
+    }
+
+    public ClosingData.Data get(int index) {
+        return closingData.get(index);
     }
 }
