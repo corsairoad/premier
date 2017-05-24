@@ -1,5 +1,8 @@
 package valet.digikom.com.valetparking.domain;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
@@ -28,7 +31,6 @@ public class ClosingData {
     public Links getLinks() {
         return links;
     }
-
 
     public static class Data {
         @SerializedName("type")

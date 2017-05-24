@@ -61,8 +61,8 @@ public class PrintReceiptClosing extends PrintReceipt {
     }
 
     @Override
-    public void buildPrintData() {
-        try {
+    public void buildPrintData() throws EposException {
+
             Toast.makeText(getContext(), "Printing", Toast.LENGTH_SHORT).show();
 
             Builder builder = getBuilder();
@@ -182,10 +182,7 @@ public class PrintReceiptClosing extends PrintReceipt {
             builder.addTextFont(Builder.FONT_A);
 
             print();
-        } catch (EposException e) {
-            Toast.makeText(getContext(), "Print failed", Toast.LENGTH_SHORT).show();
-            e.printStackTrace();
-        }
+
     }
 
 

@@ -3,10 +3,12 @@ package valet.digikom.com.valetparking;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -20,6 +22,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.epson.epos2.Epos2Exception;
+import com.epson.eposprint.EposException;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 import java.text.SimpleDateFormat;
@@ -50,9 +54,9 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
     private static final int OPEN = 1;
     private static final int CLOSING = 2;
 
-    private static final String DOWNLOAD_PER_LOBBY = "lobby";
-    private static final String DOWNLOAD_PER_SHIFT = "shift";
-    private static final String DOWNLOAD_PER_SITE = "site";
+    public static final String DOWNLOAD_PER_LOBBY = "lobby";
+    public static final String DOWNLOAD_PER_SHIFT = "shift";
+    public static final String DOWNLOAD_PER_SITE = "site";
 
     public static final int PRINT_CLOSING = 0;
     public static final int PRINT_SUMMARY = 1;
@@ -93,12 +97,16 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
 
     // pagination properties
     private static final int PAGE_START = 1;
-    private static final int DATA_PER_PAGE = 50;
+    private int DATA_PER_PAGE = 100;
     private boolean isLoading;
     private boolean isLastPage;
     private int total_data = 0;
     private int total_page = 0;
+    private int downloadedTotal = 0;
     private int currentPage = PAGE_START;
+    private boolean isTotalPageRetrieved;
+    private DownloadClosingDataTask downloadClosingDataTask;
+    private  Call<ClosingData> call;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -127,10 +135,11 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
         listClosingView.setLayoutManager(layoutManager);
         closingAdapter = new ListClosingAdapter(this);
         listClosingView.setAdapter(closingAdapter);
+        /*
         listClosingView.addOnScrollListener(new PaginationScrollListener((LinearLayoutManager) layoutManager) {
             @Override
             protected void loadMoreItems() {
-                currentPage+=1;
+                //currentPage = closingAdapter.getItemCount();
                 downloadData(DOWNLOAD_PER_LOBBY);
             }
 
@@ -141,7 +150,17 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
 
             @Override
             public boolean isLastPage() {
-                return currentPage == total_page;
+                if (currentPage > total_page){
+                    try {
+                        DATA_PER_PAGE = total_data % 50;
+                    }catch (ArithmeticException e) {
+                        DATA_PER_PAGE = total_data - downloadedTotal;
+                    }
+
+                    downloadData(DOWNLOAD_PER_LOBBY);
+                    return true;
+                }
+                return false;
             }
 
             @Override
@@ -149,6 +168,7 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
                 return isLoading;
             }
         });
+        */
 
         ArrayAdapter<CharSequence> spReportAdapter = ArrayAdapter.createFromResource(this, R.array.array_report_type,  R.layout.text_item_spinner_report);
         spReportAdapter.setDropDownViewResource(R.layout.text_dropdown_item_spinner_report);
@@ -169,7 +189,40 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
         startDate = inputDateFrom.getText().toString();
         endDate = inputDateUntil.getText().toString();
 
-        downloadData(DOWNLOAD_PER_LOBBY);
+        //downloadData(DOWNLOAD_PER_LOBBY);
+        downloadClosingData(DOWNLOAD_PER_LOBBY);
+    }
+
+
+    @Override
+    protected void onDestroy() {
+        Log.d(TAG, "DESTROYED");
+        //cancelTask();
+        if (call != null) {
+            call.cancel();
+        }
+        super.onDestroy();
+    }
+
+    @Override
+    protected void onPause() {
+        Log.d(TAG, "PAUSED");
+        //cancelTask();
+        super.onPause();
+    }
+
+    @Override
+    protected void onStop() {
+        Log.d(TAG, "STOPPED");
+        //cancelTask();
+        super.onStop();
+    }
+
+    private void cancelTask() {
+        if (downloadClosingDataTask != null) {
+            downloadClosingDataTask.cancel(true);
+            finish();
+        }
     }
 
     private void handleIntent() {
@@ -187,10 +240,12 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
         toolbar.setVisibility(View.VISIBLE);
     }
 
-    private void downloadData(String flagDownload) {
+    private void downloadData(final String flagDownload) {
         //closingData.clear();
         //closingAdapter.notifyDataSetChanged();
-        new DownloadClosingDataTask().execute(flagDownload);
+        Log.d(TAG, "Downloading data");
+        downloadClosingDataTask =  new DownloadClosingDataTask();
+        downloadClosingDataTask.execute(flagDownload);
     }
 
     @Override
@@ -199,11 +254,18 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     private synchronized void close(String flagHeader, int flagPrint) {
-        ClosingDao closingDao = ClosingDao.getInstance(this);
-        String readInfo = inputRemark.getText().toString();
-        closingDao.close(readInfo,startDate,endDate);
-        print(flagHeader, flagPrint);
-        
+        try {
+            print(flagHeader, flagPrint);
+            ClosingDao closingDao = ClosingDao.getInstance(this);
+            String readInfo = inputRemark.getText().toString();
+            closingDao.close(readInfo,startDate,endDate);
+            closingAdapter.clearData();
+            setTextTotal(0,0);
+        }catch (EposException e) {
+            Toast.makeText(ClosingActivity.this, "Print failed, please check printer", Toast.LENGTH_SHORT).show();
+            e.printStackTrace();
+        }
+
         /*
         ------------ PRINT CARA LAMA
         PrintClosing printClosing = new PrintClosing(this, closingData, lokasi, siteName, startDate,endDate,"Admin", reg,exc,total);
@@ -212,14 +274,14 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
 
     }
 
-    private void print(String flagHeader, int flagPrint) {
+    private void print(String flagHeader, int flagPrint) throws EposException {
         PrefManager prefManager = PrefManager.getInstance(this);
         String lobbyName = prefManager.getDefaultDropPointName();
         String siteName = prefManager.getSiteName();
 
         // CREATE CLOSING PARAMETER
         PrintClosingParam closingParam = new PrintClosingParam.Builder()
-                .setClosingData(closingData)
+                .setClosingData(closingAdapter.getClosingData())
                 .setSiteName(siteName)
                 .setLobbyName(lobbyName)
                 .setDateFrom(startDate)
@@ -244,7 +306,6 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
         }
 
         int id = viewx.getId();
-        Toast.makeText(this, "Printing.. please wait", Toast.LENGTH_SHORT).show();
         switch (id) {
             case R.id.btn_closing:
                 new SweetAlertDialog(this)
@@ -255,25 +316,36 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
                         .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
                             @Override
                             public void onClick(SweetAlertDialog sweetAlertDialog) {
-                                sweetAlertDialog.dismissWithAnimation();
+                                sweetAlertDialog.dismiss();
+                                Toast.makeText(ClosingActivity.this, "Printing..", Toast.LENGTH_SHORT).show();
                                 close(null, PRINT_CLOSING);
-                                new DownloadClosingDataTask().execute(DOWNLOAD_PER_LOBBY);
+                                //new DownloadClosingDataTask().execute(DOWNLOAD_PER_LOBBY);
                             }
                         })
                         .setCancelClickListener(new SweetAlertDialog.OnSweetClickListener() {
                             @Override
                             public void onClick(SweetAlertDialog sweetAlertDialog) {
-                                sweetAlertDialog.dismissWithAnimation();
+                                sweetAlertDialog.dismiss();
                             }
                         })
                         .showCancelButton(true)
                         .show();
                 break;
             case R.id.btn_print_summary:
-                print(selectedReport,PRINT_SUMMARY);
+                try {
+                    print(selectedReport,PRINT_SUMMARY);
+                } catch (EposException e) {
+                    e.printStackTrace();
+                    Toast.makeText(ClosingActivity.this, "Print failed", Toast.LENGTH_SHORT).show();
+                }
                 break;
             case R.id.btn_print_detail:
-                print(selectedReport, PRINT_DETAILS);
+                try {
+                    print(selectedReport, PRINT_DETAILS);
+                } catch (EposException e) {
+                    e.printStackTrace();
+                    Toast.makeText(ClosingActivity.this, "Print failed", Toast.LENGTH_SHORT).show();
+                }
                 break;
             default:
                 Calendar calendar = Calendar.getInstance();
@@ -423,13 +495,16 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
         selectedReport = (String) adapterView.getSelectedItem();
         switch (i) {
             case 0:
-                downloadData(DOWNLOAD_PER_LOBBY);
+                //downloadData(DOWNLOAD_PER_LOBBY);
+                downloadClosingData(DOWNLOAD_PER_LOBBY);
                 break;
             case 1:
-                downloadData(DOWNLOAD_PER_SITE);
+                //downloadData(DOWNLOAD_PER_SITE);
+                downloadClosingData(DOWNLOAD_PER_SITE);
                 break;
             case 2:
-                downloadData(DOWNLOAD_PER_SHIFT);
+                //downloadData(DOWNLOAD_PER_SHIFT);
+                downloadClosingData(DOWNLOAD_PER_SHIFT);
                 break;
             default:break;
         }
@@ -440,10 +515,70 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
 
     }
 
+    private void keepTrying(String flag) {
+        downloadClosingData(flag);
+    }
+
+    private void downloadClosingData(final String flag) {
+        TokenDao.getToken(new ProcessRequest() {
+            @Override
+            public void process(String token) {
+                ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class, token);
+               call = apiEndpoint.getClosingData(currentPage, DATA_PER_PAGE);
+
+                if (flag != null) {
+                    switch (flag) {
+                        case DOWNLOAD_PER_SHIFT:
+                            call = apiEndpoint.getClosingDataShift(currentPage, DATA_PER_PAGE);
+                            break;
+                        case DOWNLOAD_PER_SITE:
+                            call = apiEndpoint.getClosingDataSite(currentPage, DATA_PER_PAGE);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+
+                call.enqueue(new Callback<ClosingData>() {
+                    @Override
+                    public void onResponse(Call<ClosingData> call, Response<ClosingData> response) {
+                        if (response != null && response.body() != null) {
+                            calculateTotalPage(response.body());
+                            updateListClosing(response.body().getDataList());
+                        }else {
+                            progressBar.setVisibility(View.GONE);
+                            Toast.makeText(ClosingActivity.this, "Can not download closing data. Please try again later", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<ClosingData> call, Throwable t) {
+                        //Toast.makeText(ClosingActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
+                        if (t.getMessage().contains(" ECONNRESET")){
+                            call.cancel();
+                            keepTrying(flag);
+                            Log.d(TAG, t.getMessage());
+                        } else {
+                            progressBar.setVisibility(View.GONE);
+                        }
+
+                    }
+                });
+            }
+        }, ClosingActivity.this);
+    }
+
     private class DownloadClosingDataTask extends AsyncTask<String, Void, List<ClosingData.Data>> {
 
         @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            progressBar.setVisibility(View.VISIBLE);
+        }
+
+        @Override
         protected List<ClosingData.Data> doInBackground(final String... strings) {
+
             TokenDao.getToken(new ProcessRequest() {
                 @Override
                 public void process(String token) {
@@ -477,8 +612,13 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
 
                         @Override
                         public void onFailure(Call<ClosingData> call, Throwable t) {
-                            progressBar.setVisibility(View.GONE);
-                            Toast.makeText(ClosingActivity.this, "Can not download closing data. Please try again later", Toast.LENGTH_SHORT).show();
+                            //Toast.makeText(ClosingActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
+                            if (t.getMessage().contains(" ECONNRESET")){
+                                Log.d(TAG, t.getMessage());
+                                downloadData(DOWNLOAD_PER_LOBBY);
+                            } else {
+                                progressBar.setVisibility(View.GONE);
+                            }
 
                         }
                     });
@@ -494,31 +634,75 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     private void updateListClosing(final List<ClosingData.Data> datas) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
+
+        try {
+            downloadedTotal+= datas.size();
+            closingAdapter.addAll(datas);
+            setTextTotal(downloadedTotal, total_data);
+            if ((total_data>0) && (downloadedTotal <= total_data)){
+                currentPage = (downloadedTotal / DATA_PER_PAGE) + 1;
+
+                if (currentPage == total_page){
+                    DATA_PER_PAGE = total_data % 100;
+                }
+
+                if ((total_page > 1)  && (currentPage <= total_page)) {
+                    //downloadData(DOWNLOAD_PER_LOBBY);
+                    Handler handler = new Handler();
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            downloadClosingData(DOWNLOAD_PER_LOBBY);
+                        }
+                    }, 2000);
+
+                }else {
+                    progressBar.setVisibility(View.GONE);
+                    closingAdapter.notifyDataSetChanged();
+                }
+
+                Log.d(TAG, "Data per page: " + DATA_PER_PAGE);
+                Log.d(TAG, "Next Page: " + currentPage);
+                Log.d(TAG, "Total Page: " + total_page);
+            }else {
                 progressBar.setVisibility(View.GONE);
-                closingAdapter.addAll(datas);
-                //countValetType(datas);
-                //closingData.clear();
-                //closingData.addAll(datas);
-                //closingAdapter.notifyDataSetChanged();
+                //Toast.makeText(ClosingActivity.this, "Data empty", Toast.LENGTH_SHORT).show();
             }
-        });
+
+        }catch (ArithmeticException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void  setTextTotal(int downloadedTotal, int total_data) {
+        if (downloadedTotal > total_data){
+            downloadedTotal = total_data;
+        }
+        String totalString =  String.format("%d / %d", downloadedTotal, total_data);
+        textTotal.setText(String.valueOf(totalString));
     }
 
     private void calculateTotalPage(ClosingData data) {
+        if (isTotalPageRetrieved) {
+            return;
+        }
+
         ClosingData.Meta.Page pageDetails = data.getMeta().getPage();
         if (pageDetails != null) {
             total_data = pageDetails.getTotal();
-            textTotal.setText(String.valueOf(total_data));
             if (total_data <= DATA_PER_PAGE) {
                 total_page = 1;
             } else {
                 double cal = total_data / DATA_PER_PAGE;
-                total_page = (int) Math.round(cal);
+                total_page = ((int) Math.round(cal)) + 1;
             }
+            isTotalPageRetrieved = true;
         }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
     }
 
     private void countValetType (List<ClosingData.Data> datas) {

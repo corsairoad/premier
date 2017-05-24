@@ -171,6 +171,12 @@
                 <action android:name="premier.valet.post.checkout.data"/>
             </intent-filter>
         </service>
+
+        <service android:name=".service.DownloadClosingDataService" android:exported="false">
+            <intent-filter>
+                <action android:name="premier.valet.download.closing.data"/>
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>

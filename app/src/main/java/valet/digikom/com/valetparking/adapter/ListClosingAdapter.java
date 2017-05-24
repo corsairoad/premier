@@ -173,10 +173,19 @@ public class ListClosingAdapter extends RecyclerView.Adapter<ListClosingAdapter.
 
     public void add(ClosingData.Data data) {
         closingData.add(data);
-        notifyItemInserted(closingData.size() - 1);
+        //notifyItemInserted(closingData.size() - 1);
     }
 
     public ClosingData.Data get(int index) {
         return closingData.get(index);
+    }
+
+    public List<ClosingData.Data> getClosingData() {
+        return this.closingData;
+    }
+
+    public void clearData() {
+        closingData.clear();
+        notifyDataSetChanged();
     }
 }

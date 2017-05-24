@@ -1,8 +1,10 @@
 package valet.digikom.com.valetparking;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
@@ -21,6 +23,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
@@ -257,7 +260,29 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
     // submit checkout
     @Override
     public void onClick(View view) {
-        showConfirmDialog();
+        checkPrinter();
+    }
+
+    private void checkPrinter() {
+        PrefManager prefManager = PrefManager.getInstance(this);
+        String printer = prefManager.getPrinterMacAddress();
+        if (printer == null) {
+            MaterialDialog materialDialog = new MaterialDialog.Builder(this)
+                    .title("Connect to Printer")
+                    .content("You are not connected to printer. Connect now?")
+                    .positiveText("Oke")
+                    .positiveColor(Color.parseColor("#00695c"))
+                    .negativeText("Cancel")
+                    .onPositive(new MaterialDialog.SingleButtonCallback() {
+                        @Override
+                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                            startActivity(new Intent(CheckoutActivity.this, PrinterActivity.class));
+                        }
+                    }).build();
+            materialDialog.show();
+        }else {
+            showConfirmDialog();
+        }
     }
 
     @Override
