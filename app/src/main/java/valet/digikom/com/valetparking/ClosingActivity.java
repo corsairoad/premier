@@ -1,9 +1,12 @@
 package valet.digikom.com.valetparking;
 
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.TypedArray;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -22,6 +25,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.daimajia.numberprogressbar.NumberProgressBar;
 import com.epson.epos2.Epos2Exception;
 import com.epson.eposprint.EposException;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
@@ -80,6 +84,7 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
     LinearLayout layoutPrintSummary;
     Spinner spReport;
     Toolbar toolbar;
+    NumberProgressBar numberProgressBar;
 
     int mYear;
     int mMonth;
@@ -94,6 +99,7 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
     String startDate = "";
     String endDate = "";
     String selectedReport;
+    boolean isReportOnly;
 
     // pagination properties
     private static final int PAGE_START = 1;
@@ -115,7 +121,13 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         progressBar = (MaterialProgressBar) findViewById(R.id.progressbar);
-        progressBar.setVisibility(View.VISIBLE);
+        //progressBar.setVisibility(View.VISIBLE);
+
+        numberProgressBar = (NumberProgressBar) findViewById(R.id.number_progress_bar);
+
+        numberProgressBar.setMax(100);
+
+
         textRegular = (TextView) findViewById(R.id.text_regular);
         textExclusive = (TextView) findViewById(R.id.text_exclusive);
         textTotal = (TextView) findViewById(R.id.text_total);
@@ -190,7 +202,27 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
         endDate = inputDateUntil.getText().toString();
 
         //downloadData(DOWNLOAD_PER_LOBBY);
-        downloadClosingData(DOWNLOAD_PER_LOBBY);
+        if (ApiClient.isNetworkAvailable(this)){
+            downloadClosingData(DOWNLOAD_PER_LOBBY);
+        }else {
+            numberProgressBar.setVisibility(View.GONE);
+            progressBar.setVisibility(View.GONE);
+            showDialogNoInternet();
+        }
+
+    }
+
+    private void showDialogNoInternet() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this)
+                .setTitle("No Internet Connection")
+                .setMessage("Can not download closing data. Please check your internet connection")
+                .setPositiveButton("Oke", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+        builder.show();
     }
 
 
@@ -229,7 +261,8 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
         if (getIntent() != null) {
             if (Main2Activity.ACTION_REPORT.equals(getIntent().getAction())) {
                 getSupportActionBar().setTitle(getString(R.string.report)); // set title
-                showPrintButtonOnly();
+                isReportOnly = true;
+                //showPrintButtonOnly();
             }
         }
     }
@@ -275,6 +308,8 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     private void print(String flagHeader, int flagPrint) throws EposException {
+        Toast.makeText(this, "Printing..", Toast.LENGTH_LONG).show();
+
         PrefManager prefManager = PrefManager.getInstance(this);
         String lobbyName = prefManager.getDefaultDropPointName();
         String siteName = prefManager.getSiteName();
@@ -605,7 +640,7 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
                                 calculateTotalPage(response.body());
                                 updateListClosing(response.body().getDataList());
                             }else {
-                                progressBar.setVisibility(View.GONE);
+                                //progressBar.setVisibility(View.GONE);
                                 Toast.makeText(ClosingActivity.this, "Can not download closing data. Please try again later", Toast.LENGTH_SHORT).show();
                             }
                         }
@@ -617,7 +652,7 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
                                 Log.d(TAG, t.getMessage());
                                 downloadData(DOWNLOAD_PER_LOBBY);
                             } else {
-                                progressBar.setVisibility(View.GONE);
+                                //progressBar.setVisibility(View.GONE);
                             }
 
                         }
@@ -637,9 +672,13 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
 
         try {
             downloadedTotal+= datas.size();
-            closingAdapter.addAll(datas);
             setTextTotal(downloadedTotal, total_data);
+
             if ((total_data>0) && (downloadedTotal <= total_data)){
+                closingAdapter.addAll(datas);
+
+                updateProgressBar(downloadedTotal);
+
                 currentPage = (downloadedTotal / DATA_PER_PAGE) + 1;
 
                 if (currentPage == total_page){
@@ -657,21 +696,52 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
                     }, 2000);
 
                 }else {
+                    Log.d(TAG, "Total Data: " + closingAdapter.getItemCount());
+                    showButton();
                     progressBar.setVisibility(View.GONE);
                     closingAdapter.notifyDataSetChanged();
                 }
 
                 Log.d(TAG, "Data per page: " + DATA_PER_PAGE);
                 Log.d(TAG, "Next Page: " + currentPage);
-                Log.d(TAG, "Total Page: " + total_page);
-            }else {
-                progressBar.setVisibility(View.GONE);
+                Log.d(TAG, "Total Pages: " + total_page);
+            } else {
+                Log.d(TAG, "Total Data: " + closingAdapter.getItemCount());
+                numberProgressBar.setProgress(100);
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                progressBar.setVisibility(View.GONE);
+                                numberProgressBar.setVisibility(View.GONE);
+                                closingAdapter.notifyDataSetChanged();
+                            }
+                        });
+                    }
+                }, 1000);
+                //progressBar.setVisibility(View.GONE);
                 //Toast.makeText(ClosingActivity.this, "Data empty", Toast.LENGTH_SHORT).show();
             }
 
         }catch (ArithmeticException e) {
             e.printStackTrace();
         }
+    }
+
+    private void showButton(){
+        if (isReportOnly) {
+            showPrintButtonOnly();
+        }else {
+            btnClosing.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void updateProgressBar(int downloadedTotal) {
+        float value = ((float) downloadedTotal) / ((float) total_data);
+        float percent = value * 100;
+        numberProgressBar.setProgress(Math.round(percent));
     }
 
     private void  setTextTotal(int downloadedTotal, int total_data) {

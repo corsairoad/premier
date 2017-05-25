@@ -83,7 +83,7 @@ public class ApiClient {
 
             Request request = requestBuilder.build();
             return chain.proceed(request);
-        } catch (SocketTimeoutException exception) {
+        } catch (Exception exception) {
             exception.printStackTrace();
         }
 

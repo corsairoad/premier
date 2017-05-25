@@ -83,14 +83,14 @@ public class AuthResDao {
                     isOke[0] = true;
                     onAuthListener.loginSuccess();
                 }else {
-                    Toast.makeText(context,"Login Failed", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context,"Login Failed, Username or password incorrect.", Toast.LENGTH_SHORT).show();
                     onAuthListener.loginFailed();
                 }
             }
 
             @Override
             public void onFailure(Call<AuthResponse> call, Throwable t) {
-                Toast.makeText(context,"Login Failed", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context,"Login Failed, Connection problem.", Toast.LENGTH_SHORT).show();
                 isOke[0] = false;
                 onAuthListener.loginFailed();
             }

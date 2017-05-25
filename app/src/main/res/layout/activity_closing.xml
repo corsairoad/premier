@@ -245,9 +245,20 @@
 
                 <me.zhanghai.android.materialprogressbar.MaterialProgressBar
                     android:id="@+id/progressbar"
-                    android:layout_centerVertical="true"
-                    android:layout_width="match_parent"
+                    android:layout_above="@+id/number_progress_bar"
+                    android:layout_centerInParent="true"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
+
+                <com.daimajia.numberprogressbar.NumberProgressBar
+                    android:id="@+id/number_progress_bar"
+                    android:layout_width="wrap_content"
+                    android:paddingLeft="@dimen/activity_horizontal_margin"
+                    android:paddingRight="@dimen/activity_horizontal_margin"
+                    android:layout_height="wrap_content"
+                    style="@style/NumberProgressBar_Beauty_Red"
+                    android:layout_centerInParent="true"
+                    />
 
                 <android.support.v7.widget.RecyclerView
                     android:id="@+id/list_closing_view"
@@ -274,6 +285,7 @@
                     android:textSize="20sp"
                     android:background="@drawable/buttonshape"
                     android:layout_width="match_parent"
+                    android:visibility="invisible"
                     android:layout_height="wrap_content" />
 
                 <LinearLayout
