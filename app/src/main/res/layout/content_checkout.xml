@@ -383,7 +383,6 @@
                         </LinearLayout>
 
 
-
                     </LinearLayout>
 
 
@@ -395,7 +394,6 @@
                         android:paddingTop="16dp"
                         android:paddingBottom="16dp"
                         android:orientation="horizontal">
-
 
                         <CheckBox
                             android:id="@+id/cb_fine_fee"

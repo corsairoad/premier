@@ -58,7 +58,7 @@ public class FineFee {
         }
 
         public static class Attrib {
-            @SerializedName("id")
+            @SerializedName("ffsd_id")
             private int id;
             @SerializedName("ffsd_fee")
             private int fee;
@@ -68,6 +68,12 @@ public class FineFee {
             private String desc;
             @SerializedName("ffsd_type")
             private String fine_type;
+            @SerializedName("vfsd_key")
+            private String key;
+            @SerializedName("vfsd_name")
+            private String keyName;
+            @SerializedName("vfsd_type")
+            private String isDefault;
 
             public Attrib() {
             }
@@ -111,6 +117,18 @@ public class FineFee {
             public void setFine_type(String fine_type) {
                 this.fine_type = fine_type;
             }
+
+            public String getKey() {
+                return key;
+            }
+
+            public String getKeyName() {
+                return keyName;
+            }
+
+            public String getIsDefault() {
+                return isDefault;
+            }
         }
 
     }
@@ -122,11 +140,15 @@ public class FineFee {
         public static final String COL_FINE_ID = "id_fine";
         public static final String COL_JSON_FINE = "json_fine";
         public static final String COL_FINE_TYPE = "fine_type";
+        public static final String COL_KEY = "fine_key";
+        public static final String COL_KEY_NAME = "fine_key_name";
 
         public static final String CREATE = "CREATE TABLE "  + TABLE_NAME + "(" + COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 COL_FINE_ID + " INTEGER, " +
                 COL_JSON_FINE + " TEXT, " +
-                COL_FINE_TYPE + " TEXT);";
+                COL_FINE_TYPE + " TEXT, " +
+                COL_KEY + " TEXT, " +
+                COL_KEY_NAME + " TEXT);";
     }
 
 }

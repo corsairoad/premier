@@ -101,6 +101,7 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
     int feeMembership = 0;
     int idValetHeader;
     int remoteValetHeader;
+    String valetType = "R";
     String noTiket;
 
     List<MembershipResponse.Data> listMemberShip = new ArrayList<>();
@@ -155,11 +156,11 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
         if (getIntent() != null) {
             idValetHeader = getIntent().getIntExtra(EntryCheckoutCont.KEY_ENTRY_CHECKOUT,0);
             setRemoteValetHeader(idValetHeader);
-            new LoadEntryTask().execute(idValetHeader);
+            new LoadEntryTask().execute(idValetHeader); // load checkin data and load fine task
             new FetchCheckoutTask().execute(idValetHeader);
-            new LoadFineTask().execute();
             new LoadPaymentTask().execute();
             new LoadBanksTask().execute();
+            //new LoadFineTask().execute();
         }
 
         spMembership.setOnItemSelectedListener(this);
@@ -215,6 +216,55 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
 
     @Override
     public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+        int id = compoundButton.getId();
+
+        switch (id) {
+            case R.id.cb_fine_fee:
+                if (mLostTicketFine != null) {
+                    if (!compoundButton.isChecked()) {
+                        lostTicketFine = 0;
+                    }else {
+                        lostTicketFine = mLostTicketFine.getAttrib().getFee();
+                    }
+                    txtFineFee.setText(MakeCurrencyString.fromInt(lostTicketFine));
+                }
+                break;
+            case R.id.cb_stay_overnight:
+                if (mOvernightFine != null) {
+                    if (!compoundButton.isChecked()) {
+                        overNightFine = 0;
+                    }else {
+                        overNightFine = mOvernightFine.getAttrib().getFee();
+                    }
+                    txtOvernight.setText(MakeCurrencyString.fromInt(overNightFine));
+                }
+                break;
+            case R.id.cb_voucher:
+                if (!b) {
+                    inputVoucher.setVisibility(View.INVISIBLE);
+                }else {
+                    inputVoucher.setVisibility(View.VISIBLE);
+                }
+                break;
+            case R.id.cb_membership:
+                if (!b) {
+                    spMembership.setVisibility(View.INVISIBLE);
+                    inputMembershipId.setVisibility(View.GONE);
+                    dataMembership = null;
+                    feeMembership = 0;
+                }else {
+                    dataMembership = membershipAdapter.getItem(0);
+                    feeMembership = Integer.valueOf(dataMembership.getAttr().getPrice());
+                    spMembership.setVisibility(View.VISIBLE);
+                    inputMembershipId.setVisibility(View.VISIBLE);
+                }
+                break;
+            default: break;
+        }
+
+        calculateTotal();
+        /*
+
         if (compoundButton == cbFineFe) {
             if (mLostTicketFine != null) {
                 if (!compoundButton.isChecked()) {
@@ -252,8 +302,8 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
                 inputMembershipId.setVisibility(View.VISIBLE);
             }
         }
-
         calculateTotal();
+        */
 
     }
 
@@ -425,13 +475,19 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
         }
     }
 
-    private class LoadFineTask extends AsyncTask<Void, Void, Void> {
+    private class LoadFineTask extends AsyncTask<Void,Void, List<FineFee.Fine>> {
 
         @Override
-        protected Void doInBackground(Void... voids) {
-            mLostTicketFine = fineFeeDao.getLostTickeFine();
+        protected List<FineFee.Fine> doInBackground(Void... voids) {
+            mLostTicketFine = fineFeeDao.getLostTickeFine(valetType);
             mOvernightFine = fineFeeDao.getOvernightFine();
+            //List<FineFee.Fine> fineList = fineFeeDao.getAllFineFees();
             return null;
+        }
+
+        @Override
+        protected void onPostExecute(List<FineFee.Fine> fines) {
+            super.onPostExecute(fines);
         }
     }
 
@@ -479,6 +535,7 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
             String platNo = attrib.getPlatNo();
             String lokasiParkir = attrib.getAreaParkir() + " " + attrib.getBlokParkir() + " " + attrib.getSektorParkir();
             String logoMobil = response.getData().getAttribute().getLogoMobil();
+            String valetType = attrib.getValetType();
 
             Glide.with(this)
                     .load(logoMobil)
@@ -487,7 +544,7 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
                     .crossFade()
                     .into(imgCar);
 
-            txtValetType.setText(attrib.getValetType());
+            txtValetType.setText(valetType);
             txtPlatNo.setText(platNo);
             txtLokasiParkir.setText(lokasiParkir);
             txtDropPoint.setText(attrib.getDropPoint());
@@ -496,13 +553,23 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
             txtCheckinTime.setText(attrib.getCheckinTime());
             txtOvernight.setText(MakeCurrencyString.fromInt(overNightFine));
             txtFineFee.setText(MakeCurrencyString.fromInt(lostTicketFine));
+            setValetType(valetType);
 
+            new LoadFineTask().execute();
             calculateTotal();
         } else {
             Toast.makeText(this,"Transaction already checked out.", Toast.LENGTH_SHORT).show();
             goToMain();
         }
 
+    }
+
+    private void setValetType(String valetType) {
+        if ("reg".equals(valetType.substring(0,3).toLowerCase())) {
+            this.valetType = "R";
+        }else if ("exc".equals(valetType.substring(0,3).toLowerCase())){
+            this.valetType = "E";
+        }
     }
 
     private void init(EntryCheckoutCont.EntryChekout entryChekout) {

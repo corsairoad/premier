@@ -90,7 +90,7 @@ public class ApiClient {
         return chain.proceed(chain.request());
     }
 
-    public static void downloadData(Context context) {
+    public static void downloadData(Context context)  {
         ValetDbHelper dbHelper = ValetDbHelper.getInstance(context);
         TokenDao.getToken(DefectDao.getInstance(dbHelper), context);
         TokenDao.getToken(ItemsDao.getInstance(dbHelper), context);

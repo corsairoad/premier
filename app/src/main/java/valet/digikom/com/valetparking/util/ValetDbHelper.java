@@ -30,7 +30,7 @@ public class ValetDbHelper extends SQLiteOpenHelper {
 
     private Context context;
     private static final String DB_NAME  = "valetdb";
-    private static final int DB_VERSION = 1;
+    private static final int DB_VERSION = 2;
     private static ValetDbHelper dbHelper;
 
 

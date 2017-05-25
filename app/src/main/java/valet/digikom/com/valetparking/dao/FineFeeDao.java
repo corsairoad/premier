@@ -4,9 +4,11 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import com.google.gson.Gson;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -27,12 +29,13 @@ public class FineFeeDao implements ProcessRequest {
     private Context context;
     private ValetDbHelper dbHelper;
     private static FineFeeDao fineFeeDao;
-    Gson gson = new Gson();
+    Gson gson;
 
 
     private FineFeeDao(Context context) {
         this.context = context;
         dbHelper = ValetDbHelper.getInstance(context.getApplicationContext());
+         gson = new Gson();
     }
 
     public static FineFeeDao getInstance(Context context) {
@@ -40,6 +43,26 @@ public class FineFeeDao implements ProcessRequest {
             fineFeeDao = new FineFeeDao(context);
         }
         return fineFeeDao;
+    }
+
+    public List<FineFee.Fine> getAllFineFees() {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        List<FineFee.Fine> fineList = new ArrayList<>();
+        Cursor c = db.query(FineFee.Table.TABLE_NAME, null,null,null,null,null,null);
+
+        if (c.moveToFirst()) {
+            do {
+
+                String jsonFine = c.getString(c.getColumnIndex(FineFee.Table.COL_JSON_FINE));
+                if (jsonFine != null) {
+                    FineFee.Fine fine = gson.fromJson(jsonFine, FineFee.Fine.class);
+                    fineList.add(fine);
+                }
+            }while (c.moveToNext());
+        }
+
+        return fineList;
+
     }
 
     private void downloadFineFee(String token) {
@@ -55,7 +78,7 @@ public class FineFeeDao implements ProcessRequest {
 
             @Override
             public void onFailure(Call<FineFee> call, Throwable t) {
-
+                Log.d(FineFeeDao.class.getSimpleName(), t.getMessage());
             }
         });
     }
@@ -72,15 +95,17 @@ public class FineFeeDao implements ProcessRequest {
             cv.put(FineFee.Table.COL_FINE_ID,id);
             cv.put(FineFee.Table.COL_JSON_FINE, jsonFine);
             cv.put(FineFee.Table.COL_FINE_TYPE, fine.getAttrib().getFine_type());
+            cv.put(FineFee.Table.COL_KEY, fine.getAttrib().getKey());
+            cv.put(FineFee.Table.COL_KEY_NAME, fine.getAttrib().getKeyName());
 
             db.insert(FineFee.Table.TABLE_NAME,null, cv);
         }
     }
 
-    public FineFee.Fine getLostTickeFine() {
+    public FineFee.Fine getLostTickeFine(String key) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
-        String[] args = new String[] {FineFee.LOST_TICKET};
-        Cursor c = db.query(FineFee.Table.TABLE_NAME,null, FineFee.Table.COL_FINE_TYPE + "=?", args,null,null,null);
+        String[] args = new String[] {FineFee.LOST_TICKET, key};
+        Cursor c = db.query(FineFee.Table.TABLE_NAME,null, FineFee.Table.COL_FINE_TYPE + "=? AND " + FineFee.Table.COL_KEY + " = ?", args,null,null,null);
 
         if (c.moveToFirst()) {
             return  gson.fromJson(c.getString(c.getColumnIndex(FineFee.Table.COL_JSON_FINE)), FineFee.Fine.class);

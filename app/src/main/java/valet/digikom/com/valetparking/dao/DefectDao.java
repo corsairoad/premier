@@ -4,6 +4,8 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.widget.Toast;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import retrofit2.Call;
@@ -36,7 +38,7 @@ public class DefectDao implements ProcessRequest {
         return defectDao;
     }
 
-    private void downloadDefects(String token) {
+    private void downloadDefects(String token)  {
         ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class, token);
         Call<DefectResponse> call = apiEndpoint.getDefects();
         call.enqueue(new Callback<DefectResponse>() {

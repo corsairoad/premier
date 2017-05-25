@@ -2,6 +2,9 @@ package valet.digikom.com.valetparking.dao;
 
 import android.content.Context;
 import android.util.Log;
+
+import java.io.IOException;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -19,7 +22,7 @@ import valet.digikom.com.valetparking.util.PrefManager;
 
 public class TokenDao {
 
-    public static void getToken(final ProcessRequest request, Context context) {
+    public static void getToken(final ProcessRequest request, Context context){
         final PrefManager prefManager = PrefManager.getInstance(context);
         String token = prefManager.getToken();
         if (token != null) {
@@ -30,7 +33,7 @@ public class TokenDao {
             Call<TokenResponse> call = service.getToken(authResDao.getUserEmail(), authResDao.getPwx());
             call.enqueue(new Callback<TokenResponse>() {
                 @Override
-                public void onResponse(Call<TokenResponse> call, Response<TokenResponse> response) {
+                public void onResponse(Call<TokenResponse> call, Response<TokenResponse> response)  {
                     if ((response != null) && (response.body() != null)) {
                         Token token = response.body().getToken();
                         String v = token.getToken();

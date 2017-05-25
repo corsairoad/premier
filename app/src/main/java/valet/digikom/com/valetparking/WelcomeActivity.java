@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import retrofit2.Call;
@@ -125,7 +126,7 @@ public class WelcomeActivity extends AppCompatActivity {
         finish();
     }
 
-    private void patch(final int idLobby) {
+    private void patch(final int idLobby){
         TokenDao.getToken(new ProcessRequest() {
             @Override
             public void process(String token) {
