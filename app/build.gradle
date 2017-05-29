@@ -7,8 +7,8 @@ android {
         applicationId "valet.digikom.com.valetparking"
         minSdkVersion 16
         targetSdkVersion 24
-        versionCode 401
-        versionName "4.0.1[RELEASE]"
+        versionCode 403
+        versionName "4.0.3[RELEASE]"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
     }

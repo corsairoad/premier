@@ -72,6 +72,8 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
     private void requestPermissionForDevId() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE)  != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_PHONE_STATE}, 2);
+        }else {
+            saveDeviceAndAppId();
         }
     }
 
@@ -81,12 +83,9 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
             case 2:{
                 if (grantResults.length>0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     saveDeviceAndAppId();
-                }else {
-
                 }
                 return;
             }
-
         }
     }
 
@@ -104,8 +103,6 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
         }
 
         PrefManager.getInstance(this).saveDeviceAndAppId(deviceId, appId);
-
-
     }
 
 
