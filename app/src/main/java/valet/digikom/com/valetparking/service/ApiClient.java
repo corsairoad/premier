@@ -2,11 +2,10 @@ package valet.digikom.com.valetparking.service;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
+
 import java.io.IOException;
-import java.net.SocketTimeoutException;
 import java.util.concurrent.TimeUnit;
 
-import okhttp3.ConnectionPool;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;

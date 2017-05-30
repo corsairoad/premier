@@ -1,6 +1,5 @@
 package valet.digikom.com.valetparking.fragments;
 
-
 import android.content.Context;
 import android.graphics.Color;
 import android.os.AsyncTask;
@@ -291,6 +290,20 @@ public class StepOneFragmet extends Fragment implements View.OnClickListener, Ch
 
     @Override
     public void onClick(View view) {
+        int id = view.getId();
+        switch (id) {
+            case R.id.til_drop_point:
+                new FetchDropPointTask().execute();
+                break;
+            case R.id.til_car_type:
+                new FetchCarsTask().execute();
+                break;
+            case R.id.til_color_type:
+                new FetchColorsTask().execute();
+                break;
+            default:break;
+        }
+        /*
         if (view == tilDropPoint) {
             new FetchDropPointTask().execute();
         }else if(view == tilCarType) {
@@ -298,13 +311,13 @@ public class StepOneFragmet extends Fragment implements View.OnClickListener, Ch
         }else if (view == tilColorType) {
             new FetchColorsTask().execute();
         }
+        */
     }
 
     @Override
     public void onValetTypeChange(String index) {
         changeBgColor(index);
     }
-
 
     public interface OnRegsitrationValid{
         void setCheckin(String dropPoint, String platNo, String carType, String merk, String email, String warna);
@@ -382,6 +395,7 @@ public class StepOneFragmet extends Fragment implements View.OnClickListener, Ch
         @Override
         protected void onPostExecute(List<DropPointMaster> dropPointMasters) {
             if (!dropPointMasters.isEmpty()){
+
                 dpMasters.clear();
                 dpMasters.addAll(dropPointMasters);
                 adapter.notifyDataSetChanged();
@@ -393,6 +407,7 @@ public class StepOneFragmet extends Fragment implements View.OnClickListener, Ch
                         .setOnItemClickListener(new OnItemClickListener() {
                             @Override
                             public void onItemClick(DialogPlus dialog, Object item, View view, int position) {
+
                                 DropPointMaster dropPoint = (DropPointMaster) item;
                                 inputDropPoint.setText(dropPoint.getAttrib().getDropName());
                                 ReviewFragment.reviewFragment.setDropPoint(dropPoint);
@@ -402,6 +417,7 @@ public class StepOneFragmet extends Fragment implements View.OnClickListener, Ch
                                 }
 
                                 dialog.dismiss();
+
                             }
                         })
                         .setGravity(Gravity.CENTER)
@@ -428,10 +444,18 @@ public class StepOneFragmet extends Fragment implements View.OnClickListener, Ch
     }
 
     private void getDefualtDropPoint() {
+
+        String dropIdDefault = prefManager.getIdDefaultDropPoint();
+        String dropName = prefManager.getDefaultDropPointName();
+        inputDropPoint.setText(dropName);
+        /*
         new Thread(new Runnable() {
             @Override
             public void run() {
                 String dropIdDefault = prefManager.getIdDefaultDropPoint();
+                String dropName = prefManager.getDefaultDropPointName();
+                inputDropPoint.setText(dropName);
+
                 if (dropIdDefault != null) {
                     final DropPointMaster dropPointMaster = DropDao.getInstance(new ValetDbHelper(getContext())).getDropPointById(Integer.valueOf(dropIdDefault));
                     if (dropPointMaster == null) {
@@ -446,7 +470,7 @@ public class StepOneFragmet extends Fragment implements View.OnClickListener, Ch
                 }
 
             }
-        }).run();
+        }).run(); */
     }
 
     private InputFilter getInputFilterPlate() {

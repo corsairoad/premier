@@ -46,7 +46,6 @@ public class WelcomeActivity extends AppCompatActivity {
     DropPointMaster dropPointMaster;
     DropDao dropDao;
     ValetDbHelper valetDbHelper;
-
     AuthResponse.Data.RoleOption mRoleOption;
 
     @Override
@@ -67,6 +66,8 @@ public class WelcomeActivity extends AppCompatActivity {
                 if (ApiClient.isNetworkAvailable(WelcomeActivity.this)) {
                     prefManager.setIdSite(mRoleOption.getSiteId());
                     prefManager.setSiteName(mRoleOption.getSiteName());
+                    prefManager.setDefaultDropPoint(dropPointMaster.getAttrib().getDropId());
+                    prefManager.setDefaultDropPointName(dropPointMaster.getAttrib().getDropName());
                     patch(dropPointMaster.getAttrib().getDropId());
                     goToMain();
                 }else {
@@ -105,11 +106,14 @@ public class WelcomeActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 dropPointMaster = (DropPointMaster) dropPointAdapter.getItem(i);
+                updateBtnSave();
+                /*
                 if (dropPointMaster != null) {
                     prefManager.setDefaultDropPoint(dropPointMaster.getAttrib().getDropId());
                     prefManager.setDefaultDropPointName(dropPointMaster.getAttrib().getDropName());
                     updateBtnSave();
                 }
+                */
             }
 
             @Override
@@ -121,6 +125,7 @@ public class WelcomeActivity extends AppCompatActivity {
 
     private void goToMain() {
         Intent intent = new Intent(this, Main2Activity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
         intent.setAction(Main2Activity.ACTION_DOWNLOAD_CHECKIN);
         startActivity(intent);
         finish();

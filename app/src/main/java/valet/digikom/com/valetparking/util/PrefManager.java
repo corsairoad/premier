@@ -75,6 +75,12 @@ public class PrefManager {
         return id;
     }
 
+    public void resetDefaultDropPoint(){
+        editor.putString(KEY_DEFAULT_DROPPOINT, null);
+        editor.putString(KEY_DEFAULT_DROPPOINT_NAME, null);
+        editor.commit();
+    }
+
     public void saveToken(String token) {
         editor.putString(KEY_TOKEN, token);
         editor.commit();

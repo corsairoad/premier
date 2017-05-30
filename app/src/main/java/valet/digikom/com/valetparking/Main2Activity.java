@@ -62,6 +62,8 @@ public class Main2Activity extends AppCompatActivity
     private CheckinCheckoutAlarm checkinCheckoutAlarm;
     private DownloadCheckinAlarm downloadCheckinAlarm;
 
+    private String idDropPoint;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -135,7 +137,10 @@ public class Main2Activity extends AppCompatActivity
             @Override
             public void run() {
                 final DropDao dropDao = DropDao.getInstance(new ValetDbHelper(Main2Activity.this));
-                final String idDropPoint = prefManager.getIdDefaultDropPoint();
+                idDropPoint = prefManager.getIdDefaultDropPoint();
+                if (idDropPoint == null){
+                    return;
+                }
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -300,10 +305,10 @@ public class Main2Activity extends AppCompatActivity
                     @Override
                     public void onClick(SweetAlertDialog sweetAlertDialog) {
                         PrefManager prefManager = PrefManager.getInstance(Main2Activity.this);
-
-                        stopAllService();
+                        prefManager.resetDefaultDropPoint();
                         prefManager.logoutUser();
                         prefManager.setPrinterMacAddress(null);
+                        stopAllService();
                         goToSplash();
                     }
                 })
