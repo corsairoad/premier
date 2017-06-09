@@ -714,6 +714,7 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
                 Log.d(TAG, "Data per page: " + DATA_PER_PAGE);
                 Log.d(TAG, "Next Page: " + currentPage);
                 Log.d(TAG, "Total Pages: " + total_page);
+
             } else {
                 Log.d(TAG, "Total Data: " + closingAdapter.getItemCount());
                 numberProgressBar.setProgress(100);
@@ -824,6 +825,7 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
                             Log.d("REPRINT", "DOWNLOAD REPRINT FAILED");
                         }
                         showButton();
+                        numberProgressBar.setVisibility(View.GONE);
                         progressBar.setVisibility(View.GONE);
                         closingAdapter.notifyDataSetChanged();
                     }
@@ -832,6 +834,7 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
                     public void onFailure(Call<GetReprintCheckinResponse> call, Throwable t) {
                         Log.d("REPRINT", "DOWNLOAD REPRINT FAILED", t);
                         showButton();
+                        numberProgressBar.setVisibility(View.GONE);
                         progressBar.setVisibility(View.GONE);
                         closingAdapter.notifyDataSetChanged();
                     }

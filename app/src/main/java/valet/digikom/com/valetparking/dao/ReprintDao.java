@@ -44,7 +44,7 @@ import valet.digikom.com.valetparking.util.ValetDbHelper;
  * Created by DIGIKOM-EX4 on 4/5/2017.
  */
 
-public class ReprintDao implements ProcessRequest {
+public class ReprintDao{
 
     Context context;
     ValetDbHelper dbHelper;
@@ -189,52 +189,7 @@ public class ReprintDao implements ProcessRequest {
         db.delete(Table.TABLE_NAME, null, new String[]{});
     }
 
-    @Override
-    public void process(String token) {
-        ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class, token);
-        Call<GetReprintCheckinResponse> call = apiEndpoint.getReprintData(1,10,getReprintDataFilterParam());
-        //Call<GetReprintCheckinResponse> call = apiEndpoint.getReprintData(getReprintDataFilterParam());
-        call.enqueue(new Callback<GetReprintCheckinResponse>() {
-            @Override
-            public void onResponse(Call<GetReprintCheckinResponse> call, Response<GetReprintCheckinResponse> response) {
-                if (response != null && response.body() != null) {
-                    Log.d("REPRINT", "DOWNLOAD REPRINT SUCCEED");
-                }else {
-                    Log.d("REPRINT", "DOWNLOAD REPRINT FAILED");
-                }
-            }
 
-            @Override
-            public void onFailure(Call<GetReprintCheckinResponse> call, Throwable t) {
-                Log.d("REPRINT", "DOWNLOAD REPRINT FAILED", t);
-            }
-        });
-    }
-
-    private String getReprintDataFilterParam() {
-        TimeZone tz = TimeZone.getTimeZone("GMT+7");
-        Calendar cal1 = Calendar.getInstance(tz);
-        cal1.set(Calendar.HOUR_OF_DAY, 8);
-        cal1.set(Calendar.MINUTE, 0);
-        cal1.set(Calendar.SECOND, 0);
-
-        Calendar cal2 = Calendar.getInstance(tz);
-        cal2.set(Calendar.HOUR_OF_DAY, 23);
-        cal2.set(Calendar.MINUTE, 59);
-        cal2.set(Calendar.SECOND, 59);
-
-        Date date1 = cal1.getTime();
-        Date date2 = cal2.getTime();
-
-        DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault()); // Quoted "Z" to indicate UTC, no timezone offset
-        df.setTimeZone(tz);
-
-        String dateFrom = df.format(date1);
-        String dateTo = df.format(date2);
-
-        return String.format("and(ge(created_at,%s),le(created_at,%s))", dateFrom, dateTo);
-        //return "and(ge(created_at,2017-06-08T00:00:00Z),le(created_at,2017-06-08T23:59:59Z))";
-    }
 
     public static class Table {
         public static final String TABLE_NAME = "reprint_data";

@@ -24,7 +24,10 @@ import android.widget.Toast;
 import com.afollestad.materialdialogs.MaterialDialog;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -72,10 +75,12 @@ public class ParkedCarFragment extends Fragment implements ListCheckinAdapter.On
         super.onCreate(savedInstanceState);
         parkedCarFragment = this;
         entryDao = EntryDao.getInstance(getContext());
+
         bManager = LocalBroadcastManager.getInstance(getContext());
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(RECEIVE_CURRENT_LOBBY_DATA);
         bManager.registerReceiver(bReceiver, intentFilter);
+
         countSpinner = 0;
     }
 
@@ -265,12 +270,19 @@ public class ParkedCarFragment extends Fragment implements ListCheckinAdapter.On
         @Override
         protected void onPostExecute(List<EntryCheckinResponse> entryCheckinResponses) {
             super.onPostExecute(entryCheckinResponses);
-            clearData();
             if (entryCheckinResponses != null && !entryCheckinResponses.isEmpty()) {
-                responseList.addAll(entryCheckinResponses);
-                adapter.notifyDataSetChanged();
-                textEmpty.setVisibility(View.GONE);
+                //clearData();
+                //responseList.addAll(entryCheckinResponses);
+                //adapter.notifyDataSetChanged();
+                if (isNewExist(entryCheckinResponses)){
+                    adapter.addOneByOne(entryCheckinResponses); // trial
+                }else{
+                    clearData();
+                    responseList.addAll(entryCheckinResponses);
+                    adapter.notifyDataSetChanged();
+                }
 
+                textEmpty.setVisibility(View.GONE);
                 Log.d("Download", "Checkin List updated");
                 //textTotalCheckin.setText(getResources().getString(R.string.total_checkin) + " " + entryCheckinResponses.size());
                 listener.setCountParkedCar(entryCheckinResponses.size());
@@ -280,6 +292,11 @@ public class ParkedCarFragment extends Fragment implements ListCheckinAdapter.On
                 listener.setCountParkedCar(0);
             }
         }
+    }
+
+
+    private boolean isNewExist(List<EntryCheckinResponse> checkins) {
+        return checkins.removeAll(responseList);
     }
 
     public interface CountParkedCarListener {
@@ -330,4 +347,5 @@ public class ParkedCarFragment extends Fragment implements ListCheckinAdapter.On
             }
         }, getContext());
     }
+
 }
