@@ -30,10 +30,16 @@ import com.epson.epos2.Epos2Exception;
 import com.epson.eposprint.EposException;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
+
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.TimeZone;
+
 import cn.pedant.SweetAlert.SweetAlertDialog;
 import me.zhanghai.android.materialprogressbar.MaterialProgressBar;
 import retrofit2.Call;
@@ -44,6 +50,7 @@ import valet.digikom.com.valetparking.dao.ClosingDao;
 import valet.digikom.com.valetparking.dao.TokenDao;
 import valet.digikom.com.valetparking.domain.ClosingData;
 import valet.digikom.com.valetparking.domain.EntryCheckinResponse;
+import valet.digikom.com.valetparking.domain.GetReprintCheckinResponse;
 import valet.digikom.com.valetparking.domain.PrintClosingParam;
 import valet.digikom.com.valetparking.domain.PrintReceiptClosing;
 import valet.digikom.com.valetparking.service.ApiClient;
@@ -113,6 +120,7 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
     private boolean isTotalPageRetrieved;
     private DownloadClosingDataTask downloadClosingDataTask;
     private  Call<ClosingData> call;
+    private List<GetReprintCheckinResponse.Data> listDataReprint = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -325,6 +333,7 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
                 .setNumRegular(reg)
                 .setNumExClusive(exc)
                 .setNumTotal(total)
+                .setTotalReprint(listDataReprint.size())
                 .build();
 
         // BUILD AND PRINT CLOSING DATA
@@ -694,12 +703,12 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
                             downloadClosingData(DOWNLOAD_PER_LOBBY);
                         }
                     }, 2000);
-
                 }else {
                     Log.d(TAG, "Total Data: " + closingAdapter.getItemCount());
-                    showButton();
-                    progressBar.setVisibility(View.GONE);
-                    closingAdapter.notifyDataSetChanged();
+                    downloadReprintData();
+                    //showButton();
+                    //progressBar.setVisibility(View.GONE);
+                    //closingAdapter.notifyDataSetChanged();
                 }
 
                 Log.d(TAG, "Data per page: " + DATA_PER_PAGE);
@@ -796,6 +805,64 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
         textRegular.setText(String.valueOf(regular));
         textExclusive.setText(String.valueOf(exclusive));
         textTotal.setText(String.valueOf(total_data));
+    }
+
+    private void downloadReprintData() {
+        TokenDao.getToken(new ProcessRequest() {
+            @Override
+            public void process(String token) {
+                ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class, token);
+                Call<GetReprintCheckinResponse> call = apiEndpoint.getReprintData(1,100,getReprintDataFilterParam());
+                //Call<GetReprintCheckinResponse> call = apiEndpoint.getReprintData(getReprintDataFilterParam());
+                call.enqueue(new Callback<GetReprintCheckinResponse>() {
+                    @Override
+                    public void onResponse(Call<GetReprintCheckinResponse> call, Response<GetReprintCheckinResponse> response) {
+                        if (response != null && response.body() != null) {
+                            Log.d("REPRINT", "DOWNLOAD REPRINT SUCCEED");
+                            listDataReprint.addAll(response.body().getListData());
+                        }else {
+                            Log.d("REPRINT", "DOWNLOAD REPRINT FAILED");
+                        }
+                        showButton();
+                        progressBar.setVisibility(View.GONE);
+                        closingAdapter.notifyDataSetChanged();
+                    }
+
+                    @Override
+                    public void onFailure(Call<GetReprintCheckinResponse> call, Throwable t) {
+                        Log.d("REPRINT", "DOWNLOAD REPRINT FAILED", t);
+                        showButton();
+                        progressBar.setVisibility(View.GONE);
+                        closingAdapter.notifyDataSetChanged();
+                    }
+                });
+            }
+        }, this);
+    }
+
+    private String getReprintDataFilterParam() {
+        TimeZone tz = TimeZone.getTimeZone("GMT+7");
+        Calendar cal1 = Calendar.getInstance(tz);
+        cal1.set(Calendar.HOUR_OF_DAY, 8);
+        cal1.set(Calendar.MINUTE, 0);
+        cal1.set(Calendar.SECOND, 0);
+
+        Calendar cal2 = Calendar.getInstance(tz);
+        cal2.set(Calendar.HOUR_OF_DAY, 23);
+        cal2.set(Calendar.MINUTE, 59);
+        cal2.set(Calendar.SECOND, 59);
+
+        Date date1 = cal1.getTime();
+        Date date2 = cal2.getTime();
+
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault()); // Quoted "Z" to indicate UTC, no timezone offset
+        df.setTimeZone(tz);
+
+        String dateFrom = df.format(date1);
+        String dateTo = df.format(date2);
+
+        return String.format("and(ge(created_at,%s),le(created_at,%s))", dateFrom, dateTo);
+        //return "and(ge(created_at,2017-06-08T00:00:00Z),le(created_at,2017-06-08T23:59:59Z))";
     }
 
 }

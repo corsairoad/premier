@@ -17,6 +17,7 @@ public class PrintClosingParam {
     private int numRegular;
     private int numExclusive;
     private int total;
+    private int totalReprint;
 
     public PrintClosingParam(Builder builder) {
         this.closingData = builder.closingData;
@@ -28,6 +29,7 @@ public class PrintClosingParam {
         this.numRegular = builder.numRegular;
         this.numExclusive = builder.numExclusive;
         this.total = builder.total;
+        this.totalReprint = builder.totalReprint;
     }
 
     public List<ClosingData.Data> getClosingData() {
@@ -36,6 +38,10 @@ public class PrintClosingParam {
 
     public void setClosingData(List<ClosingData.Data> closingData) {
         this.closingData = closingData;
+    }
+
+    public int getTotalReprint() {
+        return totalReprint;
     }
 
     public String getLobbyName() {
@@ -112,9 +118,15 @@ public class PrintClosingParam {
         private int numRegular;
         private int numExclusive;
         private int total;
+        private int totalReprint;
 
         public Builder setClosingData(List<ClosingData.Data> closingData) {
             this.closingData = closingData;
+            return this;
+        }
+
+        public Builder setTotalReprint(int totalReprint) {
+            this.totalReprint = totalReprint;
             return this;
         }
 

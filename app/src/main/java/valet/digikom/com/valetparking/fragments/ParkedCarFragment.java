@@ -198,7 +198,7 @@ public class ParkedCarFragment extends Fragment implements ListCheckinAdapter.On
     }
 
     @Override
-    public void onOptionReprintClicked(final String noTiket) {
+    public void onOptionReprintClicked(final String noTiket, final String platNo, final String appTime) {
         if (noTiket != null) {
             noTiket.trim();
             new Thread(new Runnable() {
@@ -220,12 +220,13 @@ public class ParkedCarFragment extends Fragment implements ListCheckinAdapter.On
                     switch (statusPrint) {
                         case ReprintDao.STATUS_PRINT_SUCCEED:
                             message = message + " Succeed";
-                            content = "Reprint succeed. You can only reprint once a time";
+                            content = "Reprint succeed. You can only reprint once at a time";
+                            reprintDao.postReprintData(noTiket, platNo, appTime);
                             reprintDao.removeReprintData(noTiket);
                             break;
                         case ReprintDao.STATUS_PRINT_FAILED:
                             message = message + " Failed";
-                            content = "Either you already reprinted or using different device";
+                            content = "Either you already reprinted the ticket or using different device";
                             break;
                         case ReprintDao.STATUS_PRINT_ERROR:
                             message = message + " Error";

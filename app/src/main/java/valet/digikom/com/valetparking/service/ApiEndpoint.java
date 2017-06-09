@@ -37,10 +37,13 @@ import valet.digikom.com.valetparking.domain.EntryCheckoutCont;
 import valet.digikom.com.valetparking.domain.FineFee;
 import valet.digikom.com.valetparking.domain.FinishCheckOut;
 import valet.digikom.com.valetparking.domain.FinishCheckoutResponse;
+import valet.digikom.com.valetparking.domain.GetReprintCheckinResponse;
 import valet.digikom.com.valetparking.domain.MembershipResponse;
 import valet.digikom.com.valetparking.domain.PatchMeBody;
 import valet.digikom.com.valetparking.domain.PatchMeResponse;
 import valet.digikom.com.valetparking.domain.PaymentMethod;
+import valet.digikom.com.valetparking.domain.PostReprintCheckin;
+import valet.digikom.com.valetparking.domain.PostReprintCheckinResponse;
 import valet.digikom.com.valetparking.domain.TokenResponse;
 import valet.digikom.com.valetparking.domain.ValetTypeJson;
 
@@ -145,4 +148,15 @@ public interface ApiEndpoint {
 
     @GET
     Call<EntryCheckinResponse> getVthdTransactionItem(@Url String url);
+
+    @POST("reprint_checkin")
+    Call<PostReprintCheckinResponse> postReprint(@Body PostReprintCheckin reprintCheckin);
+
+    @GET("reprint_checkin")
+    Call<GetReprintCheckinResponse> getReprintData(@Query("page[number]") int pageNumber, @Query("page[size]") int pageSize, @Query("filter") String filter);
+
+    //@GET("reprint_checkin")
+    //Call<GetReprintCheckinResponse> getReprintData(@Query("filter") String filter);
+
+
 }

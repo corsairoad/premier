@@ -100,6 +100,7 @@ public class ListCheckinAdapter extends RecyclerView.Adapter<ListCheckinAdapter.
                 onItemCheckinListener.onItemCheckinClick((int)getItemId(position));
             }
         });
+
         holder.textOptions.setVisibility(View.VISIBLE);
         holder.textOptions.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -111,13 +112,18 @@ public class ListCheckinAdapter extends RecyclerView.Adapter<ListCheckinAdapter.
                     public boolean onMenuItemClick(MenuItem item) {
                         switch (item.getItemId()) {
                             case R.id.reprint:
-                                reprintListener.onOptionReprintClicked(getNomorTiket(position));
+                                String noTiket = getNomorTiket(position);
+                                String platNo = getPlatNomor(position);
+                                int vthdId = getSyncedVthdId(position);
+
+                                reprintListener.onOptionReprintClicked(noTiket,platNo,null);
                                 //rePrintCurrentCheckin(getNomorTiket(position));
                                 break;
                         }
                         return false;
                     }
                 });
+
                 popupMenu.show();
             }
         });
@@ -149,10 +155,23 @@ public class ListCheckinAdapter extends RecyclerView.Adapter<ListCheckinAdapter.
         }
     }
 
-    private String getNomorTiket(int position) {
-        return responsesList.get(position).getData().getAttribute().getNoTiket().trim();
+    private EntryCheckinResponse getItem(int position) {
+        return responsesList.get(position);
     }
 
+    private String getNomorTiket(int position) {
+        return getItem(position).getData().getAttribute().getNoTiket().trim();
+    }
+
+    private String getPlatNomor(int position) {
+        return getItem(position).getData().getAttribute().getPlatNo();
+    }
+
+    private int getSyncedVthdId(int position) {
+        return getItem(position).getData().getAttribute().getId();
+    }
+
+    /*
     private void rePrintCurrentCheckin(String noTiket) {
         if (noTiket!=null) {
             ReprintDao reprintDao = ReprintDao.getInstance(context);
@@ -183,12 +202,13 @@ public class ListCheckinAdapter extends RecyclerView.Adapter<ListCheckinAdapter.
         }
 
     }
+    */
 
     public interface OnItemCheckinListener {
         void onItemCheckinClick(int id);
     }
 
     public interface OnOptionReprintListener {
-        void onOptionReprintClicked(String noTiket);
+        void onOptionReprintClicked(String noTiket, String platNo, String appTime);
     }
 }

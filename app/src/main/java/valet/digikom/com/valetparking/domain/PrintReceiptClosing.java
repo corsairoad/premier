@@ -171,6 +171,7 @@ public class PrintReceiptClosing extends PrintReceipt {
             sb.append("Total Qty Overnight: " + totalOverNight + "\n");
             sb.append("Total Tiket Batal  : " + totalVoid + "\n");
             sb.append("Total Tiket Hilang : " + lostTicket + "\n");
+            sb.append("Total Reprint Tiket: " + closingParam.getTotalReprint() + "\n");
             sb.append("Cash               : " + MakeCurrencyString.fromInt(sumCash.intValue()) + "\n");
             sb.append("Income             : " + MakeCurrencyString.fromInt(sumIncome.intValue()) + "\n");
 
