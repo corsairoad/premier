@@ -1,0 +1,304 @@
+<resources>
+    <string name="app_name">Admin Valet</string>
+
+    <string name="title_activity_splash">SplashActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="login">Login</string>
+    <string name="login_error">Login gagal, username atau password salah</string>
+    <string name="total_checkin">Total Checkin: </string>
+    <string name="change_password">Change Password</string>
+
+    <array name="location">
+        <item>Location 1</item>
+        <item>Location 2</item>
+        <item>Location 3</item>
+        <item>Location 4</item>
+        <item>Location 5</item>
+    </array>
+
+    <array name="location_values">
+        <item>loc-1</item>
+        <item>loc-2</item>
+        <item>loc-3</item>
+        <item>loc-4</item>
+        <item>loc-5</item>
+    </array>
+
+    <string name="default_location_value">Location is not defined</string>
+    <string name="title_pref_location">Select Location</string>
+    <string name="setting">Settings</string>
+    <string name="title_activity_main2">Premier Valet Parking</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="login_empty">User name or password incorrect.</string>
+    <string name="list_car_empty">No Transaction at this time.</string>
+    <string name="action_search">Search</string>
+    <string name="prev">Kembali</string>
+    <string name="next">Lanjut</string>
+    <string name="finish">Submit &amp; Print</string>
+
+    <string name="submit_confirm_message">Place the order with the deli? You will receive an email
+        confirmation.</string>
+    <string name="submit_confirm_button">Place order</string>
+
+    <string name="label_your_name">Name</string>
+    <string name="hint_your_name">e.g. Larry</string>
+    <string name="label_your_email">Email</string>
+    <string name="hint_your_email">Optional</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Registration</string>
+    <string name="drop_point">DROP POINT</string>
+    <string name="plat_no">License Plate</string>
+    <string name="car_type">Car Type</string>
+    <string name="color">Color</string>
+    <string name="merk_mobil">Car Brand</string>
+    <string name="checkin">CHECKIN</string>
+    <string name="defects">Defects</string>
+    <string name="stuff">Stuffs</string>
+    <string name="additional_info">Additional stuff</string>
+    <string name="sign">Please sign below..</string>
+    <string name="reset_signature">Clear</string>
+
+    <string-array name="car_type_array">
+        <item>Audi</item>
+        <item>BMW</item>
+        <item>Honda</item>
+        <item>Nissan</item>
+    </string-array>
+
+    <string-array name="car_defects">
+        <item>LEFT DEFECT</item>
+        <item>RIGHT DEFECT</item>
+        <item>FRONT DEFECT</item>
+        <item>REAR DEFECT</item>
+        <item>TOP DEFECT</item>
+        <item>BOTTOM DEFECT</item>
+    </string-array>
+
+    <string-array name="stuffs">
+        <item> Laptop </item>
+        <item> Tas </item>
+        <item> Ipad/ Tablet</item>
+        <item> Handphone </item>
+
+    </string-array>
+    <string name="title_activity_parked_car_detail">Call Car</string>
+    <string name="trans_code">TICKET NO.</string>
+    <string name="runner">RUNNER</string>
+    <string name="fee">FEE</string>
+    <string name="drop_to">DROP TO</string>
+    <string name="set_as_default">Set as default</string>
+    <string name="time_arrived">PICK TIME</string>
+    <string name="set">Set</string>
+    <string name="title_activity_checkout">Checkout</string>
+    <string name="drop_point_checkout">CHECK IN</string>
+    <string name="lost_ticket">LOST TICKET</string>
+    <string name="total_pay">TOTAL</string>
+    <string name="checkout">CHECKOUT</string>
+    <string name="ready">READY</string>
+    <string name="stay_overnight">OVERNIGHT</string>
+
+    <!-- printer activity strings -->
+
+    <string name="btn_discovery">Discovery</string>
+    <string name="title_target">Target</string>
+    <string name="title_printerseries">Printer Series</string>
+    <string name="title_lang">Lang</string>
+    <string name="btn_samplereceipt">Sample Receipt</string>
+    <string name="btn_samplecoupon">Sample Coupon</string>
+    <string name="btn_restart">Restart</string>
+    <string name="title_activity_discovery">DiscoveryActivity</string>
+    <string name="title_printerlist">Printer List</string>
+    <string name="default_target">TCP:192.168.192.168</string>
+    <string name="title_warnings">Printer Warnings</string>
+    <string name="print_job_id">ABC123</string>
+    <string name="title_err_code">Error Code</string>
+    <string name="title_err_method">Method</string>
+    <string name="title_msg_result">Result</string>
+    <string name="title_msg_description">Description</string>
+    <string name="printerseries_m10">TM-m10 Series</string>
+    <string name="printerseries_m30">TM-m30 Series</string>
+    <string name="printerseries_p20">TM-P20 Series</string>
+    <string name="printerseries_p60">TM-P60 Series</string>
+    <string name="printerseries_p60ii">TM-P60II Series</string>
+    <string name="printerseries_p80">TM-P80 Series</string>
+    <string name="printerseries_t20">TM-T20 Series</string>
+    <string name="printerseries_t60">TM-T60 Series</string>
+    <string name="printerseries_t70">TM-T70 Series</string>
+    <string name="printerseries_t81">TM-T81 Series</string>
+    <string name="printerseries_t82">TM-T82 Series</string>
+    <string name="printerseries_t83">TM-T83 Series</string>
+    <string name="printerseries_t88">TM-T88 Series</string>
+    <string name="printerseries_t90">TM-T90 Series</string>
+    <string name="printerseries_t90kp">TM-T90KP Series</string>
+    <string name="printerseries_u220">TM-U220 Series</string>
+    <string name="printerseries_u330">TM-U330 Series</string>
+    <string name="printerseries_l90">TM-L90 Series</string>
+    <string name="printerseries_h6000">TM-H6000 Series</string>
+    <string name="lang_ank">ANK</string>
+    <string name="lang_japanese">JAPANESE</string>
+    <string name="lang_chinese">CHINESE</string>
+    <string name="lang_taiwan">TAIWAN</string>
+    <string name="lang_korean">KOREAN</string>
+    <string name="lang_thai">THAI</string>
+    <string name="lang_southasia">SOUTH ASIA</string>
+
+    <string name="handlingmsg_warn_receipt_near_end">Roll paper is nearly end.\n</string>
+    <string name="handlingmsg_warn_battery_near_end">Battery level of printer is low.\n</string>
+    <string name="handlingmsg_err_no_response">Please check the connection of the printer and the mobile terminal.\nConnection get lost.\n</string>
+    <string name="handlingmsg_err_cover_open">Please close roll paper cover.\n</string>
+    <string name="handlingmsg_err_receipt_end">Please check roll paper.\n</string>
+    <string name="handlingmsg_err_paper_feed">Please release a paper feed switch.\n</string>
+    <string name="handlingmsg_err_autocutter">Please remove jammed paper and close roll paper cover.\nRemove any jammed paper or foreign substances in the printer, and then turn the printer off and turn the printer on again.\n</string>
+    <string name="handlingmsg_err_need_recover">Then, If the printer doesn\'t recover from error, please cycle the power switch.\n</string>
+    <string name="handlingmsg_err_unrecover">Please cycle the power switch of the printer.\nIf same errors occurred even power cycled, the printer may out of order.</string>
+    <string name="handlingmsg_err_overheat">Please wait until error LED of the printer turns off. \n</string>
+    <string name="handlingmsg_err_head">Print head of printer is hot.\n</string>
+    <string name="handlingmsg_err_motor">Motor Driver IC of printer is hot.\n</string>
+    <string name="handlingmsg_err_battery">Battery of printer is hot.\n</string>
+    <string name="handlingmsg_err_wrong_paper">Please set correct roll paper.\n</string>
+    <string name="handlingmsg_err_battery_real_end">Please connect AC adapter or change the battery.\nBattery of printer is almost empty.\n</string>
+    <string name="handlingmsg_err_offline">Printer is offline.\n</string>
+    <string name="setup_printer">Setup Printer</string>
+    <string name="discovery">Scan Printer</string>
+    <string name="cancel">Cancel</string>
+    <string name="submitprint"><![CDATA[Submit & Print]]></string>
+    <string name="done">Done</string>
+    <string name="logout">Logout</string>
+    <string name="find_car">Search Plate No</string>
+    <string name="direct_checkout">Direct Checkout</string>
+    <string name="membership">Mebership</string>
+    <string name="voucher">Voucher</string>
+    <string name="membership_id">Membership id</string>
+    <string name="input_voucher">Voucher code</string>
+    <string name="valet_type">VALET TYPE</string>
+    <string name="title_activity_preference">Settings</string>
+
+    <!-- Strings related to Settings -->
+
+    <!-- Example General settings -->
+    <string name="pref_header_general">General</string>
+
+    <string name="pref_title_social_recommendations">Enable social recommendations</string>
+    <string name="pref_description_social_recommendations">Recommendations for people to contact
+        based on your message history
+    </string>
+
+    <string name="pref_title_display_name">Display name</string>
+    <string name="pref_default_display_name">John Smith</string>
+
+    <string name="pref_title_add_friends_to_messages">Add friends to messages</string>
+    <string-array name="pref_example_list_titles">
+        <item>Always</item>
+        <item>When possible</item>
+        <item>Never</item>
+    </string-array>
+    <string-array name="pref_example_list_values">
+        <item>1</item>
+        <item>0</item>
+        <item>-1</item>
+    </string-array>
+
+    <!-- Example settings for Data & Sync -->
+    <string name="pref_header_data_sync">Data &amp; sync</string>
+
+    <string name="pref_title_sync_frequency">Sync frequency</string>
+    <string-array name="pref_sync_frequency_titles">
+        <item>15 minutes</item>
+        <item>30 minutes</item>
+        <item>1 hour</item>
+        <item>3 hours</item>
+        <item>6 hours</item>
+        <item>Never</item>
+    </string-array>
+    <string-array name="pref_sync_frequency_values">
+        <item>15</item>
+        <item>30</item>
+        <item>60</item>
+        <item>180</item>
+        <item>360</item>
+        <item>-1</item>
+    </string-array>
+
+    <string-array name="list_preference_entries">
+        <item>Entry 1</item>
+        <item>Entry 2</item>
+        <item>Entry 3</item>
+    </string-array>
+
+    <string-array name="list_preference_entry_values">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
+
+    <string-array name="multi_select_list_preference_default_value" />
+
+    <string name="pref_title_system_sync_settings">System sync settings</string>
+
+    <!-- Example settings for Notifications -->
+    <string name="pref_header_notifications">Notifications</string>
+
+    <string name="pref_title_new_message_notifications">New message notifications</string>
+
+    <string name="pref_title_ringtone">Ringtone</string>
+    <string name="pref_ringtone_silent">Silent</string>
+
+    <string name="pref_title_vibrate">Vibrate</string>
+    <string name="printer">Printer</string>
+    <string name="lobby">Lobby</string>
+
+    <string name="title_list_preference">Set Lobby</string>
+    <string name="pref_drop_point_key">drop_pint</string>
+    <string name="data_sync">Sync Data</string>
+    <string name="closing">Closing EOD</string>
+    <string name="closing_activity">Closing EOD</string>
+    <string name="from">From</string>
+    <string name="to">To</string>
+    <string name="closing_date">Closing Date</string>
+    <string name="valet_total">Valet Total</string>
+    <string name="regular">REGULAR</string>
+    <string name="exclusive">EXCLUSIVE</string>
+    <string name="total">TOTAL</string>
+    <string name="refresh">Refresh</string>
+    <string name="remark">Remark (Optional)</string>
+    <string name="site">Site</string>
+    <string name="save">Save</string>
+    <string name="cancel_ticket">CANCEL TICKET</string>
+    <string name="supervisor_username">Supervisor Username</string>
+    <string name="supervisor_password">Supervisor Password</string>
+
+    <!-- custom keyboard strings -->
+    <string name="simple_ime">Premier Keyboard</string>
+    <string name="subtype_en_US">Premier Keyboard</string>
+    <string name="old_password">Old Password</string>
+    <string name="new_password">New Password</string>
+    <string name="retype_new_password">Retype New Password</string>
+    <string name="payment_method">PAYMENT METHOD</string>
+    <string name="report">Report</string>
+    <string name="print_summary">Print Summary</string>
+    <string name="print_details">Print Details</string>
+    <string name="id_transaksi">ID TRANSAKSI</string>
+    <string name="username">Username</string>
+    <string name="reprint">Reprint Checkin</string>
+
+    <string-array name="array_report_type">
+        <item>PER LOBBY</item>
+        <item>PER SITE</item>
+        <item>PER SHIFT</item>
+    </string-array>
+
+    <string-array name="array_lobby_checkin">
+        <item>CURRENT LOBBY</item>
+        <item>ALL LOBBIES</item>
+    </string-array>
+
+
+</resources>

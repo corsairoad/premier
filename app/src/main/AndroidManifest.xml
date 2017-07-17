@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="valet.digikom.com.valetparking">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/logo_1"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme"
+        tools:replace="android:icon">
+
+        <activity android:name=".MainActivity" />
+
+        <activity
+            android:name=".SplashActivity"
+            android:windowSoftInputMode="adjustPan|stateVisible"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen">
+        </activity>
+
+        <!-- MAIN ACTIVITY, SEARCHABLE ACTIVITY AND SEARCHING ACTIVITY -->
+        <activity
+            android:name=".Main2Activity"
+            android:label="@string/app_name"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable" />
+            <!-- enable the search dialog to send searches to SearchableActivity -->
+            <meta-data
+                android:name="android.app.default_searchable"
+                android:value=".SearchableActivity" />
+        </activity>
+        <activity
+            android:name=".AddCarActivity"
+            android:label="@string/checkin"
+            android:parentActivityName=".Main2Activity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AddCarTheme"
+            android:windowSoftInputMode="adjustPan">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".AddCarActivity" />
+        </activity>
+        <activity
+            android:name=".ParkedCarDetailActivity"
+            android:label="@string/title_activity_parked_car_detail"
+            android:parentActivityName=".Main2Activity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="valet.digikom.com.valetparking.Main2Activity" />
+
+            <intent-filter>
+                <action android:name="DETAIL_FOR_CLOSING_ITEM"/>
+            </intent-filter>
+        </activity>
+
+        <receiver
+            android:name=".EntryCheckoutReceiver"
+            android:enabled="true" />
+        <receiver
+            android:name=".CheckoutReceiver"
+            android:enabled="true" />
+
+        <service android:name=".service.FailedTransactionService"
+            android:exported="false"/>
+
+        <service android:name=".service.ReadyCheckoutService"
+            android:exported="false"/>
+
+        <activity
+            android:name=".CheckoutActivity"
+            android:label="@string/title_activity_checkout"
+            android:parentActivityName=".Main2Activity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="valet.digikom.com.valetparking.Main2Activity" />
+        </activity>
+        <activity
+            android:name=".PrinterActivity"
+            android:label="@string/setup_printer"
+            android:parentActivityName=".PreferenceActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="valet.digikom.com.valetparking.PreferenceActivity" />
+
+            <intent-filter>
+                <action android:name="valet.digikom.com.valetparking.PrinterActivity" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".DiscoveryActivity"
+            android:label="@string/discovery"
+            android:screenOrientation="portrait" />
+        <activity android:name=".SearchableActivity" />
+
+        <provider
+            android:name=".util.ParkedCarProvider"
+            android:authorities="com.valet.premiere"
+            android:exported="false" />
+
+        <activity
+            android:name=".PreferenceActivity"
+            android:label="@string/title_activity_preference"
+            android:launchMode="singleTop"
+            android:parentActivityName=".Main2Activity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="valet.digikom.com.valetparking.Main2Activity" />
+
+            <intent-filter>
+                <action android:name="valet.digikom.com.valetparking.PreferenceActivity" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="valet.digikom.com.valetparking.PreferenceActivity.change.password"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".ClosingActivity"
+            android:label="@string/closing_activity"
+            android:parentActivityName=".Main2Activity"
+            android:launchMode="singleTask">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="valet.digikom.com.valetparking.Main2Activity" />
+        </activity>
+        <activity android:name=".WelcomeActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen"/>
+
+        <service android:name=".service.SimpeIME"
+            android:label="@string/simple_ime"
+            android:permission="android.permission.BIND_INPUT_METHOD">
+            <meta-data android:name="android.view.im" android:resource="@xml/method"/>
+            <intent-filter>
+                <action android:name="android.view.InputMethod" />
+            </intent-filter>
+        </service>
+
+        <service android:name=".service.DownloadCurrentLobbyService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="premier.valet.download.current.lobby"/>
+            </intent-filter>
+        </service>
+
+        <service android:name=".service.PostCheckoutService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="premier.valet.post.checkout.data"/>
+            </intent-filter>
+        </service>
+
+        <service android:name=".service.DownloadClosingDataService" android:exported="false">
+            <intent-filter>
+                <action android:name="premier.valet.download.closing.data"/>
+            </intent-filter>
+        </service>
+    </application>
+
+</manifest>

@@ -1,0 +1,87 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingTop="@dimen/activity_horizontal_margin"
+    tools:context="valet.digikom.com.valetparking.fragments.ReviewFragment">
+
+    <TextView
+        android:visibility="gone"
+        android:id="@+id/title_review"
+        android:textSize="30sp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/sign"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingBottom="14dp"/>
+
+    <android.support.v4.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:fadeScrollbars="false"
+        android:visibility="gone"
+
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:scrollbars="vertical"
+        android:layout_weight="3">
+
+        <include
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            layout="@layout/layout_overview_sample"/>
+
+
+    </android.support.v4.widget.NestedScrollView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/background_color_1"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:paddingLeft="@dimen/activity_vertical_margin"
+            android:textColor="@android:color/black"
+            android:textSize="16sp"
+            android:text="@string/sign"/>
+
+        <Button
+            android:id="@+id/test_json"
+            android:visibility="gone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Test Json"/>
+
+
+        <Button
+            android:id="@+id/btn_reset_sign"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:paddingRight="@dimen/activity_horizontal_margin"
+            android:text="@string/reset_signature"/>
+
+    </LinearLayout>
+
+    <!-- TODO: Update blank fragment layout -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <com.github.gcacace.signaturepad.views.SignaturePad
+            android:id="@+id/signature_pad"
+            android:layout_width="match_parent"
+            android:background="@color/bg_color_signature"
+            android:layout_height="match_parent"
+            app:penColor="@android:color/black" />
+
+    </LinearLayout>
+
+
+</LinearLayout>

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/location"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingTop="16dp">
+
+            <TextView
+                android:text="@string/site"
+                android:layout_width="0dp"
+                android:textSize="18sp"
+                android:textColor="@android:color/black"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:layout_height="match_parent" />
+
+            <Spinner
+                android:id="@+id/spinner_site"
+                android:layout_width="0dp"
+                android:layout_weight="3"
+                android:layout_height="match_parent"></Spinner>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingTop="16dp">
+
+            <TextView
+                android:text="@string/lobby"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:textSize="18sp"
+                android:gravity="center_vertical"
+                android:textColor="@android:color/black"
+                android:layout_height="match_parent" />
+
+            <Spinner
+                android:id="@+id/spinner_lobby"
+                android:layout_width="0dp"
+                android:layout_weight="3"
+                android:layout_height="wrap_content"></Spinner>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/btn_save"
+        android:text="@string/save"
+        android:layout_width="match_parent"
+        android:visibility="invisible"
+        android:layout_height="wrap_content"
+        android:background="@drawable/buttonshape"
+        android:layout_alignParentBottom="true"/>
+</RelativeLayout>
