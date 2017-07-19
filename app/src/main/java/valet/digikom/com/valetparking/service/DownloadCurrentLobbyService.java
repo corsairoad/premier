@@ -12,6 +12,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import valet.digikom.com.valetparking.dao.EntryDao;
+import valet.digikom.com.valetparking.dao.FinishCheckoutDao;
 import valet.digikom.com.valetparking.dao.TokenDao;
 import valet.digikom.com.valetparking.domain.CheckinList;
 import valet.digikom.com.valetparking.domain.EntryCheckinResponse;
@@ -43,7 +44,11 @@ public class DownloadCurrentLobbyService extends IntentService {
                         @Override
                         public void onResponse(Call<CheckinList> call, Response<CheckinList> response) {
                             if (response != null && response.body() != null) {
-                                EntryDao.getInstance(DownloadCurrentLobbyService.this).insertListCheckin(response.body().getCheckinResponseList());
+                                List<EntryCheckinResponse.Data> downloadedCheckinList = response.body().getCheckinResponseList();
+                                EntryDao.getInstance(DownloadCurrentLobbyService.this).insertListCheckin(downloadedCheckinList);
+
+                                //Update fakeVthdId to remoteVthdId in post checkout table that remains fakeVthdId
+                                FinishCheckoutDao.getInstance(DownloadCurrentLobbyService.this).updateCheckoutVthdId(downloadedCheckinList);
 
                                 Intent RTReturn = new Intent(ParkedCarFragment.RECEIVE_CURRENT_LOBBY_DATA);
                                 LocalBroadcastManager.getInstance(DownloadCurrentLobbyService.this).sendBroadcast(RTReturn);

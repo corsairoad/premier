@@ -60,12 +60,12 @@ public class EntryDao {
         //int fakeVthdId = response.getData().getAttribute().getLastTicketCounter(); // fakeVthdid is lastticketcounter
 
         ContentValues cv = new ContentValues();
-        cv.put(EntryCheckinResponse.Table.COL_RESPONSE_ID, id);
+        cv.put(EntryCheckinResponse.Table.COL_RESPONSE_ID, id); // fakevthdid
         cv.put(EntryCheckinResponse.Table.COL_JSON_RESPONSE, jsonResponse);
         cv.put(EntryCheckinResponse.Table.COL_PLAT_NO, platNo);
-        cv.put(EntryCheckinResponse.Table.COL_NO_TRANS, noTrans);
-        cv.put(EntryCheckinResponse.Table.COL_REMOTE_VTHD_ID, id);
-        cv.put(EntryCheckinResponse.Table.COL_TICKET_SEQUENCE, noTrans);
+        cv.put(EntryCheckinResponse.Table.COL_NO_TRANS, noTrans); // no tiket
+        cv.put(EntryCheckinResponse.Table.COL_REMOTE_VTHD_ID, id); // fakevthdid
+        cv.put(EntryCheckinResponse.Table.COL_TICKET_SEQUENCE, noTrans); // no tiket
         cv.put(EntryCheckinResponse.Table.COL_IS_CHECKOUT, 0);
         cv.put(EntryCheckinResponse.Table.COL_IS_UPLOADED, flagUpload);
 
@@ -200,7 +200,6 @@ public class EntryDao {
                 responseList.add(checkinResponse);
             }while (c.moveToNext());
         }
-
 
         return responseList;
     }

@@ -280,15 +280,28 @@ public class FinishCheckoutDao implements ProcessRequest {
     }
 
 
-    public int updateCheckoutVthdId(String noTiket, int id) {
+    public int updateCheckoutVthdId(String noTiket, int remoteVthdId) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         String whereClause = FinishCheckOut.Table.COL_NO_TIKET + " = ?";
         String[] args = new String[] {noTiket};
 
         ContentValues cv = new ContentValues();
-        cv.put(FinishCheckOut.Table.COL_DATA_ID, id);
+        cv.put(FinishCheckOut.Table.COL_DATA_ID, remoteVthdId);
 
         return db.update(FinishCheckOut.Table.TABLE_NAME,cv,whereClause,args);
+    }
+
+    // Invoked in DownloadCurrentLobbyService
+    public void updateCheckoutVthdId(List<EntryCheckinResponse.Data> downloadedCheckinList) {
+        if(!downloadedCheckinList.isEmpty()) {
+            for (EntryCheckinResponse.Data e : downloadedCheckinList) {
+                String noTiket = e.getAttribute().getNoTiket().trim();
+                int remoteVthdId = e.getAttribute().getId();
+                if (isCheckoutPending(noTiket)) {
+                    updateCheckoutVthdId(noTiket, remoteVthdId);
+                }
+            }
+        }
     }
 
     public int deleteDatabyRemoteId(int remoteVthdId) {
@@ -318,6 +331,19 @@ public class FinishCheckoutDao implements ProcessRequest {
         if (c.moveToFirst()) {
             return true;
         }
+        return false;
+    }
+
+    public boolean isCheckoutPending(String noTiket) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        String whereClause = FinishCheckOut.Table.COL_NO_TIKET + " = ? AND " + FinishCheckOut.Table.COL_STATUS + " = " + STATUS_PENDING;
+
+        Cursor c = db.query(FinishCheckOut.Table.TABLE_NAME, null, whereClause, new String[]{noTiket},null,null,null);
+
+        if (c.moveToFirst()) {
+            return true;
+        }
+
         return false;
     }
 

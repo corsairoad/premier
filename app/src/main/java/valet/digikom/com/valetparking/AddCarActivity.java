@@ -42,8 +42,10 @@ import valet.digikom.com.valetparking.util.CheckinCheckoutAlarm;
 import valet.digikom.com.valetparking.util.MyPrinterException;
 import valet.digikom.com.valetparking.util.PrefManager;
 
-public class AddCarActivity extends FragmentActivity implements StepOneFragmet.OnRegsitrationValid, StepTwoFragment.OnDefectSelectedListener,
-                StepThreeFragment.OnStuffSelectedListener, DefectFragment.OnDefectDrawingListener, View.OnClickListener, StepOneFragmet.OnValetTypeSelectedListener, SignDialogFragment.OnDialogSignListener {
+public class AddCarActivity extends FragmentActivity implements StepOneFragmet.OnRegsitrationValid,
+        StepTwoFragment.OnDefectSelectedListener, StepThreeFragment.OnStuffSelectedListener,
+        DefectFragment.OnDefectDrawingListener, View.OnClickListener,
+        StepOneFragmet.OnValetTypeSelectedListener, SignDialogFragment.OnDialogSignListener {
 
     public static final String KEY_DIALOG_SIGN = "sign";
     private Button btnSubmit;
@@ -71,7 +73,7 @@ public class AddCarActivity extends FragmentActivity implements StepOneFragmet.O
         btnSubmit.setOnClickListener(this);
 
         FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentRegFirst = (StepOneFragmet) fragmentManager.findFragmentById(R.id.step_one_fragment);
+        fragmentRegFirst = (StepOneFragmet) fragmentManager.findFragmentById(R.id.step_one_fragment); // for car details (license plate, valet type, car type, and color)
         fragmentDefect = (DefectFragment) fragmentManager.findFragmentById(R.id.defect_fragment);
         fragmentStuff = (StepThreeFragment) fragmentManager.findFragmentById(R.id.stuff_fragment);
         fragmentReview = (ReviewFragment) fragmentManager.findFragmentById(R.id.review_fragment);
@@ -265,6 +267,7 @@ public class AddCarActivity extends FragmentActivity implements StepOneFragmet.O
         int lastTicketCounter = builder.getLastTicketCounter(this);
         String noTiket = builder.generateTicketNo(this, lastTicketCounter);
         int fakeVthdId = builder.generateId();
+
         // ------------ create checkin data and save to local db ------------------
         EntryCheckinResponse entryCheckinResponse = new EntryCheckinResponse();
         EntryCheckinResponse.Data data = new EntryCheckinResponse.Data();
@@ -336,6 +339,10 @@ public class AddCarActivity extends FragmentActivity implements StepOneFragmet.O
         finish();
     }
 
+
+    /*
+        For debugging
+     */
     private void debugJsonCheckin(EntryCheckinContainer entryCheckinContainer) {
         Gson gson = new Gson();
         String jsonEntryCheckin = gson.toJson(entryCheckinContainer);
@@ -344,6 +351,9 @@ public class AddCarActivity extends FragmentActivity implements StepOneFragmet.O
 
     }
 
+    /*
+        For debugging
+     */
     private void exportToFile(String json) {
         try {
             File myFile = new File("/sdcard/mysdfile.txt");
