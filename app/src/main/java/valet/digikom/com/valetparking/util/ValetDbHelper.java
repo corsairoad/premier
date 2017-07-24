@@ -1,9 +1,11 @@
 package valet.digikom.com.valetparking.util;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import valet.digikom.com.valetparking.SplashActivity;
 import valet.digikom.com.valetparking.dao.EntryDao;
 import valet.digikom.com.valetparking.dao.ReprintDao;
 import valet.digikom.com.valetparking.domain.AdditionalItems;
@@ -30,7 +32,7 @@ public class ValetDbHelper extends SQLiteOpenHelper {
 
     private Context context;
     private static final String DB_NAME  = "valetdb";
-    private static final int DB_VERSION = 2;
+    private static final int DB_VERSION = 4;
     private static ValetDbHelper dbHelper;
 
 
@@ -93,4 +95,5 @@ public class ValetDbHelper extends SQLiteOpenHelper {
     public Context getContext() {
         return this.context;
     }
+
 }

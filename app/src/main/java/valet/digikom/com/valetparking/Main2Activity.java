@@ -47,17 +47,17 @@ public class Main2Activity extends AppCompatActivity
     public static final String ACTION_DOWNLOAD_CHECKIN = "com.valet.download.data.checkin";
     public static final String ACTION_REPORT = "com.valet.report";
 
-    ViewPager viewPager;
-    ParkedCarPagerAdapter pagerAdapter;
-    TabLayout tabLayout;
-    TextView txtUserName;
-    NavigationView navView;
-    View headerView;
-    Button btnLogout;
-    TextView txtCountParkedCar;
-    TextView txtCountCalledCar;
-    PrefManager prefManager;
-    MaterialDialog materialDialog;
+    private ViewPager viewPager;
+    private ParkedCarPagerAdapter pagerAdapter;
+    private TabLayout tabLayout;
+    private TextView txtUserName;
+    private NavigationView navView;
+    private View headerView;
+    private Button btnLogout;
+    private TextView txtCountParkedCar;
+    private TextView txtCountCalledCar;
+    private PrefManager prefManager;
+    private MaterialDialog materialDialog;
 
     private CheckinCheckoutAlarm checkinCheckoutAlarm;
     private DownloadCheckinAlarm downloadCheckinAlarm;
@@ -85,8 +85,6 @@ public class Main2Activity extends AppCompatActivity
             startActivity(new Intent(this, SplashActivity.class));
             finish();
         }
-
-        setTitle();
 
         setDefaultKeyMode(DEFAULT_KEYS_SEARCH_LOCAL);
 
@@ -122,7 +120,7 @@ public class Main2Activity extends AppCompatActivity
 
         handleIntent(getIntent());
 
-        startCheckoutEntryAlarm();
+        // startCheckoutEntryAlarm();
     }
 
     @Override
@@ -130,6 +128,7 @@ public class Main2Activity extends AppCompatActivity
         super.onResume();
         checkPrinter();
         startAllServices();
+        setTitle();
     }
 
     private void setTitle() {
@@ -146,10 +145,12 @@ public class Main2Activity extends AppCompatActivity
                     public void run() {
                         if (idDropPoint != null) {
                             DropPointMaster dropPointMaster = dropDao.getDropPointById(Integer.parseInt(idDropPoint));
-                            if (dropPointMaster != null) {
+                            if (dropPointMaster.getAttrib() != null) {
                                 String dropName = dropPointMaster.getAttrib().getDropName();
                                 String title = dropName + " " + getCurrentDate();
                                 getSupportActionBar().setTitle(title);
+                            } else {
+                                logout();
                             }
                         }
                     }
@@ -304,12 +305,7 @@ public class Main2Activity extends AppCompatActivity
                 .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
                     @Override
                     public void onClick(SweetAlertDialog sweetAlertDialog) {
-                        PrefManager prefManager = PrefManager.getInstance(Main2Activity.this);
-                        prefManager.resetDefaultDropPoint();
-                        prefManager.logoutUser();
-                        prefManager.setPrinterMacAddress(null);
-                        stopAllService();
-                        goToSplash();
+                    logout();
                     }
                 })
                 .setCancelText("Cancel")
@@ -321,6 +317,15 @@ public class Main2Activity extends AppCompatActivity
                 })
                 .showCancelButton(true)
                 .show();
+    }
+
+    private void logout() {
+        PrefManager prefManager = PrefManager.getInstance(Main2Activity.this);
+        prefManager.resetDefaultDropPoint();
+        prefManager.logoutUser();
+        prefManager.setPrinterMacAddress(null);
+        stopAllService();
+        goToSplash();
     }
 
     private void goToSplash() {
