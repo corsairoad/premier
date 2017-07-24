@@ -49,6 +49,7 @@ public class PostCheckoutService extends IntentService {
             }else {
                 Log.d(TAG, "data checkout empty");
             }
+
         }
     }
 

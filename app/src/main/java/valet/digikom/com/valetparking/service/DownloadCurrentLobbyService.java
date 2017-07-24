@@ -45,13 +45,16 @@ public class DownloadCurrentLobbyService extends IntentService {
                         public void onResponse(Call<CheckinList> call, Response<CheckinList> response) {
                             if (response != null && response.body() != null) {
                                 List<EntryCheckinResponse.Data> downloadedCheckinList = response.body().getCheckinResponseList();
-                                EntryDao.getInstance(DownloadCurrentLobbyService.this).insertListCheckin(downloadedCheckinList);
 
-                                //Update fakeVthdId to remoteVthdId in post checkout table that remains fakeVthdId
-                                FinishCheckoutDao.getInstance(DownloadCurrentLobbyService.this).updateCheckoutVthdId(downloadedCheckinList);
+                                EntryDao.getInstance(DownloadCurrentLobbyService.this)
+                                        .insertListCheckin(downloadedCheckinList);
 
                                 Intent RTReturn = new Intent(ParkedCarFragment.RECEIVE_CURRENT_LOBBY_DATA);
                                 LocalBroadcastManager.getInstance(DownloadCurrentLobbyService.this).sendBroadcast(RTReturn);
+
+                                //Update fakeVthdId to remoteVthdId in post checkout table that remains fakeVthdId
+                                FinishCheckoutDao.getInstance(DownloadCurrentLobbyService.this)
+                                        .updateCheckoutVthdId(downloadedCheckinList);
                             }
                         }
 

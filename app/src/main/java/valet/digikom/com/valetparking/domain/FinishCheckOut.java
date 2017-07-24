@@ -451,11 +451,13 @@ public class FinishCheckOut {
         public static final String COL_DATA_ID = "data_id";
         public static final String COL_NO_TIKET = "no_tiket";
         public static final String COL_STATUS = "status";
+        public static final String COL_ID_STILL_FAKE = "is_still_fake";
 
         public static final String CREATE = "CREATE TABLE " + TABLE_NAME + "( " + COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 COL_JSON_DATA + " TEXT, " +
                 COL_DATA_ID + " INTEGER, " +
                 COL_NO_TIKET + " TEXT, " +
-                COL_STATUS + " INTEGER DEFAULT 0);";
+                COL_STATUS + " INTEGER DEFAULT 0, " +
+                COL_ID_STILL_FAKE + " INTEGER DEFAULT 0);";
     }
 }

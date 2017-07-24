@@ -110,9 +110,12 @@ public class FailedTransactionService extends IntentService {
                                 int updateSuccess = EntryDao.getInstance(FailedTransactionService.this)
                                         .updateRemoteAndTicketSequenceId(String.valueOf(fakeVthdId), remoteVthdId, tiketSeq);
 
+                                /*
                                 // update vthd id in checkout data if exist
                                 int updateIdDataCheckout = FinishCheckoutDao.getInstance(FailedTransactionService.this)
                                         .updateCheckoutVthdId(noTiket, remoteVthdId);
+                                */
+
 
                                 // remove checkin data from db if succeed
                                 /*EntryCheckinContainerDao containerDao = EntryCheckinContainerDao.getInstance(FailedTransactionService.this);

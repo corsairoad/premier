@@ -279,9 +279,9 @@ public class ParkedCarFragment extends Fragment implements ListCheckinAdapter.On
                 }else{
                     clearData();
                     responseList.addAll(entryCheckinResponses);
-                    adapter.notifyDataSetChanged();
                 }
 
+                adapter.notifyDataSetChanged();
                 textEmpty.setVisibility(View.GONE);
                 Log.d("Download", "Checkin List updated");
                 //textTotalCheckin.setText(getResources().getString(R.string.total_checkin) + " " + entryCheckinResponses.size());
@@ -290,6 +290,8 @@ public class ParkedCarFragment extends Fragment implements ListCheckinAdapter.On
                 //textTotalCheckin.setVisibility(View.INVISIBLE);
                 textEmpty.setVisibility(View.VISIBLE);
                 listener.setCountParkedCar(0);
+                responseList.clear();
+                adapter.notifyDataSetChanged();
             }
         }
     }

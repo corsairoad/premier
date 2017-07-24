@@ -59,6 +59,7 @@ public class FinishCheckoutDao implements ProcessRequest {
 
     public static final int STATUS_SYNCED = 1;
     public static final int STATUS_PENDING = 0;
+    public static final int FAKE_UPDATED_TO_REMOTE_ID = 1;
 
     private FinishCheckoutDao(Context context) {
         this.context = context;
@@ -293,12 +294,16 @@ public class FinishCheckoutDao implements ProcessRequest {
 
     // Invoked in DownloadCurrentLobbyService
     public void updateCheckoutVthdId(List<EntryCheckinResponse.Data> downloadedCheckinList) {
-        if(!downloadedCheckinList.isEmpty()) {
+        if(downloadedCheckinList != null &&!downloadedCheckinList.isEmpty()) {
             for (EntryCheckinResponse.Data e : downloadedCheckinList) {
                 String noTiket = e.getAttribute().getNoTiket().trim();
                 int remoteVthdId = e.getAttribute().getId();
                 if (isCheckoutPending(noTiket)) {
-                    updateCheckoutVthdId(noTiket, remoteVthdId);
+                    int row = updateCheckoutVthdId(noTiket, remoteVthdId);
+                    if (row > 0) {
+                        updateColIsIdStillFake(noTiket, FAKE_UPDATED_TO_REMOTE_ID);
+                    }
+
                 }
             }
         }
@@ -320,7 +325,7 @@ public class FinishCheckoutDao implements ProcessRequest {
         ContentValues cv = new ContentValues();
         cv.put(FinishCheckOut.Table.COL_STATUS, status);
 
-        return db.update(FinishCheckOut.Table.TABLE_NAME,cv,whereClause, args);
+        return db.update(FinishCheckOut.Table.TABLE_NAME,cv, whereClause, args);
     }
 
     public boolean isAlreadyCheckout(String noTiket) {
@@ -328,23 +333,30 @@ public class FinishCheckoutDao implements ProcessRequest {
         String whereClause = FinishCheckOut.Table.COL_NO_TIKET + " = ?";
 
         Cursor c = db.query(FinishCheckOut.Table.TABLE_NAME,null,whereClause,new String[]{noTiket},null,null,null);
-        if (c.moveToFirst()) {
-            return true;
-        }
-        return false;
+        return c.moveToFirst();
     }
 
     public boolean isCheckoutPending(String noTiket) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
-        String whereClause = FinishCheckOut.Table.COL_NO_TIKET + " = ? AND " + FinishCheckOut.Table.COL_STATUS + " = " + STATUS_PENDING;
+        String whereClause = FinishCheckOut.Table.COL_NO_TIKET + " = ? AND " +
+                FinishCheckOut.Table.COL_STATUS + " = " + STATUS_PENDING +
+                " AND " + FinishCheckOut.Table.COL_ID_STILL_FAKE + " = 0";
 
         Cursor c = db.query(FinishCheckOut.Table.TABLE_NAME, null, whereClause, new String[]{noTiket},null,null,null);
 
-        if (c.moveToFirst()) {
-            return true;
-        }
+        return c.moveToFirst();
 
-        return false;
+    }
+
+    private void updateColIsIdStillFake (String noTicket, int value) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        String where = FinishCheckOut.Table.COL_NO_TIKET + " = ?";
+
+        ContentValues values = new ContentValues();
+        values.put(FinishCheckOut.Table.COL_ID_STILL_FAKE, value);
+
+        db.update(FinishCheckOut.Table.TABLE_NAME, values, where , new String[]{noTicket});
+
     }
 
     private String toJson(FinishCheckOut dataCheckout) {
