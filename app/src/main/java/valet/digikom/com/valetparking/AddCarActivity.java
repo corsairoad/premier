@@ -333,7 +333,6 @@ public class AddCarActivity extends FragmentActivity implements StepOneFragmet.O
 
     private void goToMain() {
         Intent intent = new Intent(this, Main2Activity.class);
-        //intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.setAction(Main2Activity.ACTION_DOWNLOAD_CHECKIN);
         startActivity(intent);
         finish();

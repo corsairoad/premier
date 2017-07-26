@@ -131,7 +131,7 @@ public class FailedTransactionService extends IntentService {
                                 Intent RTReturn = new Intent(ParkedCarFragment.RECEIVE_CURRENT_LOBBY_DATA);
                                 LocalBroadcastManager.getInstance(FailedTransactionService.this).sendBroadcast(RTReturn);
 
-                                startDownloadCurrentLobbyService();
+                                //startDownloadCurrentLobbyService();
 
                                 Log.d("Post Checkin", noTiket + " successfully posted");
 

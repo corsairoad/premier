@@ -93,7 +93,7 @@ public class ParkedCarFragment extends Fragment implements ListCheckinAdapter.On
         @Override
         public void onReceive(Context context, Intent intent) {
             if(intent.getAction().equals(RECEIVE_CURRENT_LOBBY_DATA)) {
-                Log.d("Download", "Broadcast receiver data current lobby called");
+                Log.d("Download", "Load current lobby data receiver called");
                 new LoadCheckinTask().execute();
             }
         }
@@ -171,7 +171,8 @@ public class ParkedCarFragment extends Fragment implements ListCheckinAdapter.On
         //manageSpinnerValetType(i);;
         PrefManager.getInstance(getContext()).saveLobbyType(i);
         if (ApiClient.isNetworkAvailable(getContext())) {
-            downloadCheckinList(i);
+            //downloadCheckinList(i);
+            manageSpinnerValetType(i);
         }else {
             Toast.makeText(getContext(), "Download failed, please check your internet connection", Toast.LENGTH_SHORT).show();
         }
@@ -193,7 +194,7 @@ public class ParkedCarFragment extends Fragment implements ListCheckinAdapter.On
     private void clearData() {
         if (adapter != null) {
             responseList.clear();
-            adapter.notifyDataSetChanged();
+            //adapter.notifyDataSetChanged();
         }
     }
 
@@ -274,14 +275,16 @@ public class ParkedCarFragment extends Fragment implements ListCheckinAdapter.On
                 //clearData();
                 //responseList.addAll(entryCheckinResponses);
                 //adapter.notifyDataSetChanged();
+
                 if (isNewExist(entryCheckinResponses)){
                     adapter.addOneByOne(entryCheckinResponses); // trial
                 }else{
                     clearData();
                     responseList.addAll(entryCheckinResponses);
+                    //adapter.notifyItemRangeChanged(0, responseList.size());
+                    adapter.notifyDataSetChanged();
                 }
 
-                adapter.notifyDataSetChanged();
                 textEmpty.setVisibility(View.GONE);
                 Log.d("Download", "Checkin List updated");
                 //textTotalCheckin.setText(getResources().getString(R.string.total_checkin) + " " + entryCheckinResponses.size());
@@ -331,6 +334,7 @@ public class ParkedCarFragment extends Fragment implements ListCheckinAdapter.On
                             if (!checkinList.isEmpty()) {
                                 try {
                                     entryDao.insertListCheckin(checkinList);
+                                    new LoadCheckinTask().execute();
                                 }catch (Exception e) {
                                     e.printStackTrace();
                                 }
@@ -338,7 +342,7 @@ public class ParkedCarFragment extends Fragment implements ListCheckinAdapter.On
                                 //Toast.makeText(getContext(), "Data Empty", Toast.LENGTH_SHORT).show();
                             }
                         }
-                        new LoadCheckinTask().execute();
+
                     }
 
                     @Override

@@ -9,10 +9,13 @@ import android.util.Log;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import valet.digikom.com.valetparking.domain.EntryCheckin;
 import valet.digikom.com.valetparking.domain.EntryCheckinResponse;
+import valet.digikom.com.valetparking.util.CheckinComparator;
 import valet.digikom.com.valetparking.util.ValetDbHelper;
 
 /**
@@ -107,10 +110,12 @@ public class EntryDao {
     }
 
     public void insertListCheckin(List<EntryCheckinResponse.Data> checkinList) {
-        int rows = removeUploadSuccess();
-        FinishCheckoutDao finishCheckoutDao = FinishCheckoutDao.getInstance(dbHelper.getContext());
 
-        filterUnsyncedData(checkinList);
+        int removedRows = removeUploadSuccess();
+
+        filterUnsyncedData(checkinList); // remove unsynced data with synced one
+
+        FinishCheckoutDao finishCheckoutDao = FinishCheckoutDao.getInstance(dbHelper.getContext());
 
         if (!checkinList.isEmpty()) {
             for (EntryCheckinResponse.Data e : checkinList) {
@@ -126,6 +131,7 @@ public class EntryDao {
                 }
             }
         }
+
     }
 
     private void filterUnsyncedData(List<EntryCheckinResponse.Data> checkinList) {
@@ -137,7 +143,7 @@ public class EntryDao {
             for (EntryCheckinResponse dataLocal : unSyncedResponses) {
                 String noTiketLokal = dataLocal.getData().getAttribute().getNoTiket().trim().toLowerCase();
                 String platNoLokal = dataLocal.getData().getAttribute().getPlatNo().trim().toLowerCase();
-                if (noTiketDownload.equals(noTiketLokal) && platNoDownload.equals(platNoLokal)) {
+                if (noTiketDownload.equalsIgnoreCase(noTiketLokal) && platNoDownload.equalsIgnoreCase(platNoLokal)) {
                     int removeStatus = removeByPlatNo(dataLocal.getData().getAttribute().getPlatNo());
                     Log.d("remove status", "" + removeStatus);
                 }
@@ -153,10 +159,39 @@ public class EntryDao {
         return db.delete(EntryCheckinResponse.Table.TABLE_NAME,where, args);
     }
 
-    private int removeUploadSuccess() {
+    private void removeUploadSuccess(List<EntryCheckinResponse.Data> checkinList) {
+        String sql = EntryCheckinResponse.Table.COL_IS_UPLOADED + " = ?";
+        String argsValue = String.valueOf(EntryCheckinResponse.FLAG_UPLOAD_SUCCESS);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        Cursor c = db.query(EntryCheckinResponse.Table.TABLE_NAME,null,sql,new String[]{argsValue},null,null,null);
+
+        if (c.moveToFirst()) {
+            do {
+                String noTicket = c.getString(c.getColumnIndex(EntryCheckinResponse.Table.COL_NO_TRANS));
+                for (EntryCheckinResponse.Data data : checkinList) {
+                    if (noTicket != null && data.getAttribute().getNoTiket() != null) {
+                        if (noTicket.equalsIgnoreCase(data.getAttribute().getNoTiket()));
+                        removeUploadSuccessByTicketNo(noTicket);
+                    }
+                }
+
+            }while (c.moveToNext());
+        }
+    }
+
+
+    private int removeUploadSuccess(){
         String sql = EntryCheckinResponse.Table.COL_IS_UPLOADED + " = " + EntryCheckinResponse.FLAG_UPLOAD_SUCCESS;
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         return db.delete(EntryCheckinResponse.Table.TABLE_NAME, sql, new String[] {});
+    }
+
+    private int removeUploadSuccessByTicketNo(String noTicket) {
+        String sql = EntryCheckinResponse.Table.COL_IS_UPLOADED + " = ? AND " +  EntryCheckinResponse.Table.COL_NO_TRANS + " = ?";
+        String flagUploadSuccess = String.valueOf(EntryCheckinResponse.FLAG_UPLOAD_SUCCESS);
+
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        return db.delete(EntryCheckinResponse.Table.TABLE_NAME, sql, new String[]{flagUploadSuccess, noTicket});
     }
 
     public int getRemoteVthdIdByFakeId(int id) {
@@ -172,6 +207,7 @@ public class EntryDao {
 
         return remoteId;
     }
+
 
     public String getTicketSequence(int id) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
@@ -190,7 +226,7 @@ public class EntryDao {
     public List<EntryCheckinResponse> fetchAllCheckinResponse() {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         // Cursor c = db.query(EntryCheckinResponse.Table.TABLE_NAME,null, EntryCheckinResponse.Table.COL_IS_CHECKOUT + "=? AND " + EntryCheckinResponse.Table.COL_IS_CALLED + "=0",new String[]{"0"},null,null,EntryCheckinResponse.Table.COL_RESPONSE_ID + " DESC");
-        Cursor c = db.query(EntryCheckinResponse.Table.TABLE_NAME,null, EntryCheckinResponse.Table.COL_IS_CHECKOUT + "= ? AND " + EntryCheckinResponse.Table.COL_IS_READY_CHECKOUT + "=0",new String[]{"0"},null,null,EntryCheckinResponse.Table.COL_ID + " DESC");
+        Cursor c = db.query(EntryCheckinResponse.Table.TABLE_NAME,null, EntryCheckinResponse.Table.COL_IS_CHECKOUT + "= ? AND " + EntryCheckinResponse.Table.COL_IS_READY_CHECKOUT + "= 0",new String[]{"0"},null,null,EntryCheckinResponse.Table.COL_ID + " DESC");
         List<EntryCheckinResponse> responseList = new ArrayList<>();
 
         if (c.moveToFirst()) {
@@ -201,6 +237,7 @@ public class EntryDao {
             }while (c.moveToNext());
         }
 
+        Collections.sort(responseList, new CheckinComparator()); // sorting based on checkintime descending
         return responseList;
     }
 

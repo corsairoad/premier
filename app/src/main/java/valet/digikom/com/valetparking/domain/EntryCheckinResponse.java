@@ -2,6 +2,8 @@ package valet.digikom.com.valetparking.domain;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.Comparator;
+
 /**
  * Created by dev on 1/13/17.
  */
@@ -341,4 +343,7 @@ public class EntryCheckinResponse {
                 COL_TICKET_SEQUENCE + " TEXT);";
     }
 
+
 }
+
+

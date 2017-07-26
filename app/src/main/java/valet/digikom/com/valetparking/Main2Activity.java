@@ -106,6 +106,7 @@ public class Main2Activity extends AppCompatActivity
             public void onClick(View view) {
                 Intent intent = new Intent(Main2Activity.this, AddCarActivity.class);
                 startActivity(intent);
+                //finish();
             }
         });
 

@@ -208,7 +208,7 @@ public class ListCheckinAdapter extends RecyclerView.Adapter<ListCheckinAdapter.
         for (EntryCheckinResponse e : checkinResponses) {
             responsesList.add(e);
         }
-        notifyItemRangeChanged(0, checkinResponses.size());
+        notifyDataSetChanged();
 
     }
         public interface OnItemCheckinListener {

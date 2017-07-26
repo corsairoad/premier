@@ -95,7 +95,7 @@ public class PrintReceiptClosing extends PrintReceipt {
 
 
             if (flagPrint == ClosingActivity.PRINT_DETAILS || flagPrint == ClosingActivity.PRINT_CLOSING) {
-                sb.append("Tiket        ID.Trans. No.Plat    In    Out    Status\n");
+                sb.append("Tiket         ID.Trans. No.Plat    In    Out    Status\n");
                 sb.append("--------------------------------------------------------\n");
 
                 sbSample.append(sb.toString());
@@ -153,7 +153,9 @@ public class PrintReceiptClosing extends PrintReceipt {
                     checkoutTime = "";
                 }
 
-                sb.append(transactNo + "\t   " + remoteId + "\t" + noPol + "\t"  + checkinTime + " " + checkoutTime + "  " + status + "\n");
+                //sb.append(transactNo + "\t   " + remoteId + "\t" + noPol + "\t"  + checkinTime + " " + checkoutTime + "  " + status + "\n");
+                String format = String.format("%1$-14s %2$-9s %3$-9s %4$-5s %5$-5s %6$-8s\n", transactNo, remoteId, noPol, checkinTime, checkoutTime, status);
+                sb.append(format);
                 i++;
             }
 
