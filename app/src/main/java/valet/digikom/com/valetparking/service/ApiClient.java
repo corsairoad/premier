@@ -62,9 +62,9 @@ public class ApiClient {
             });
         }
 
-        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
-        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
-        httpClient.interceptors().add(logging);
+        //HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+        //logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+        //httpClient.interceptors().add(logging);
 
         OkHttpClient client = httpClient.build();
         Retrofit retrofit = builder.client(client).build();
