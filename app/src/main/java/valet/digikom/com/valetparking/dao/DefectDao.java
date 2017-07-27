@@ -39,8 +39,8 @@ public class DefectDao implements ProcessRequest {
     }
 
     private void downloadDefects(String token)  {
-        ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class, token);
-        Call<DefectResponse> call = apiEndpoint.getDefects();
+        ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class, null);
+        Call<DefectResponse> call = apiEndpoint.getDefects(token);
         call.enqueue(new Callback<DefectResponse>() {
             @Override
             public void onResponse(Call<DefectResponse> call, Response<DefectResponse> response) {

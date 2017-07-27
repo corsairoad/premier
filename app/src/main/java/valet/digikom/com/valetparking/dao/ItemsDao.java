@@ -40,8 +40,8 @@ public class ItemsDao implements ProcessRequest{
     }
 
     private void downloadItems(String token) {
-        ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class, token);
-        Call<AdditionalItemsResponse> call = apiEndpoint.getItems(100);
+        ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class, null);
+        Call<AdditionalItemsResponse> call = apiEndpoint.getItems(100, token);
         call.enqueue(new Callback<AdditionalItemsResponse>() {
             @Override
             public void onResponse(Call<AdditionalItemsResponse> call, Response<AdditionalItemsResponse> response) {

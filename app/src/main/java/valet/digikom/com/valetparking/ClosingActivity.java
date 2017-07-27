@@ -478,8 +478,8 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
             TokenDao.getToken(new ProcessRequest() {
                 @Override
                 public void process(String token) {
-                    ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class, token);
-                    Call<EntryCheckinResponse> call = apiEndpoint.getVthdTransactionItem(data.getLinks().getSelf().getHref());
+                    ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class, null);
+                    Call<EntryCheckinResponse> call = apiEndpoint.getVthdTransactionItem(data.getLinks().getSelf().getHref(), token);
                     call.enqueue(new Callback<EntryCheckinResponse>() {
                         @Override
                         public void onResponse(Call<EntryCheckinResponse> call, Response<EntryCheckinResponse> response) {
@@ -567,16 +567,16 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
         TokenDao.getToken(new ProcessRequest() {
             @Override
             public void process(String token) {
-                ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class, token);
-               call = apiEndpoint.getClosingData(currentPage, DATA_PER_PAGE);
+                ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class, null);
+               call = apiEndpoint.getClosingData(currentPage, DATA_PER_PAGE, token);
 
                 if (flag != null) {
                     switch (flag) {
                         case DOWNLOAD_PER_SHIFT:
-                            call = apiEndpoint.getClosingDataShift(currentPage, DATA_PER_PAGE);
+                            call = apiEndpoint.getClosingDataShift(currentPage, DATA_PER_PAGE, token);
                             break;
                         case DOWNLOAD_PER_SITE:
-                            call = apiEndpoint.getClosingDataSite(currentPage, DATA_PER_PAGE);
+                            call = apiEndpoint.getClosingDataSite(currentPage, DATA_PER_PAGE, token);
                             break;
                         default:
                             break;
@@ -627,15 +627,15 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
                 @Override
                 public void process(String token) {
                     String flag = strings[0];
-                    ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class, token);
-                    Call<ClosingData> call = apiEndpoint.getClosingData(currentPage, DATA_PER_PAGE);
+                    ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class, null);
+                    Call<ClosingData> call = apiEndpoint.getClosingData(currentPage, DATA_PER_PAGE, token);
                     if (flag != null) {
                         switch (flag) {
                             case DOWNLOAD_PER_SHIFT:
-                                call = apiEndpoint.getClosingDataShift(currentPage, DATA_PER_PAGE);
+                                call = apiEndpoint.getClosingDataShift(currentPage, DATA_PER_PAGE, token);
                                 break;
                             case DOWNLOAD_PER_SITE:
-                                call = apiEndpoint.getClosingDataSite(currentPage, DATA_PER_PAGE);
+                                call = apiEndpoint.getClosingDataSite(currentPage, DATA_PER_PAGE, token);
                                 break;
                             default:
                                 break;
@@ -812,8 +812,8 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
         TokenDao.getToken(new ProcessRequest() {
             @Override
             public void process(String token) {
-                ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class, token);
-                Call<GetReprintCheckinResponse> call = apiEndpoint.getReprintData(1,100,getReprintDataFilterParam());
+                ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class, null);
+                Call<GetReprintCheckinResponse> call = apiEndpoint.getReprintData(1,100,getReprintDataFilterParam(), token);
                 //Call<GetReprintCheckinResponse> call = apiEndpoint.getReprintData(getReprintDataFilterParam());
                 call.enqueue(new Callback<GetReprintCheckinResponse>() {
                     @Override

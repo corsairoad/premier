@@ -22,10 +22,16 @@ import valet.digikom.com.valetparking.util.PrefManager;
 
 public class TokenDao {
 
+    private static final String BEARER = "Bearer ";
+
     public static void getToken(final ProcessRequest request, Context context){
         final PrefManager prefManager = PrefManager.getInstance(context);
         String token = prefManager.getToken();
         if (token != null) {
+            if (!token.contains(BEARER)){
+                token = BEARER + token;
+                prefManager.saveToken(token);
+            }
             request.process(token);
         }else {
             AuthResDao authResDao = AuthResDao.getInstance(context);
@@ -36,7 +42,7 @@ public class TokenDao {
                 public void onResponse(Call<TokenResponse> call, Response<TokenResponse> response)  {
                     if ((response != null) && (response.body() != null)) {
                         Token token = response.body().getToken();
-                        String v = token.getToken();
+                        String v = BEARER + token.getToken();
                         prefManager.saveToken(v);
                         request.process(v);
                         Log.d("Token Auth", v);

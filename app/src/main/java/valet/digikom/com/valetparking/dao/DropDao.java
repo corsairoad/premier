@@ -38,8 +38,8 @@ public class DropDao implements ProcessRequest {
     }
 
     private void downloadDropPoints(String token){
-        ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class, token);
-        Call<DropPointMasterResponse> call = apiEndpoint.getDropPoints();
+        ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class, null);
+        Call<DropPointMasterResponse> call = apiEndpoint.getDropPoints(token);
         call.enqueue(new Callback<DropPointMasterResponse>() {
             @Override
             public void onResponse(Call<DropPointMasterResponse> call, Response<DropPointMasterResponse> response) {

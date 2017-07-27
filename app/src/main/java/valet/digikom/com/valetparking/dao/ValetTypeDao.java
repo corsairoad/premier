@@ -47,8 +47,8 @@ public class ValetTypeDao implements ProcessRequest {
 
     @Override
     public void process(String token) {
-        ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class, token);
-        Call<ValetTypeJson> call = apiEndpoint.getValetType();
+        ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class, null);
+        Call<ValetTypeJson> call = apiEndpoint.getValetType(token);
         call.enqueue(new Callback<ValetTypeJson>() {
             @Override
             public void onResponse(Call<ValetTypeJson> call, Response<ValetTypeJson> response) {

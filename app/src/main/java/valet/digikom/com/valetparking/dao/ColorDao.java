@@ -40,8 +40,8 @@ public class ColorDao implements ProcessRequest {
     }
 
     private void downloadColorMaster(String token) {
-        ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class, token);
-        Call<ColorMasterResponse> call = apiEndpoint.getColors(100);
+        ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class, null);
+        Call<ColorMasterResponse> call = apiEndpoint.getColors(100, token);
         call.enqueue(new Callback<ColorMasterResponse>() {
             @Override
             public void onResponse(Call<ColorMasterResponse> call, Response<ColorMasterResponse> response) {

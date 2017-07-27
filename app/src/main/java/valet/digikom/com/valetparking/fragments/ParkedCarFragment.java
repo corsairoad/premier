@@ -317,11 +317,11 @@ public class ParkedCarFragment extends Fragment implements ListCheckinAdapter.On
                     Toast.makeText(getContext(), "Downloading data..", Toast.LENGTH_SHORT).show();
                 }
 
-                ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class, token);
-                Call<CheckinList> call = apiEndpoint.getCurrentCheckinList(500);
+                ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class, null);
+                Call<CheckinList> call = apiEndpoint.getCurrentCheckinList(500, token);
 
                 if (index == 1) {
-                    call = apiEndpoint.getCheckinList(999);
+                    call = apiEndpoint.getCheckinList(999, token);
                 }
 
                 call.enqueue(new Callback<CheckinList>() {

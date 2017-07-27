@@ -70,8 +70,8 @@ public class CarDao implements ProcessRequest {
     }
 
     private void downloadCarMaster(String token) {
-        ApiEndpoint endpoint = ApiClient.createService(ApiEndpoint.class, token);
-        Call<CarMasterResponse> call = endpoint.getCars(200);
+        ApiEndpoint endpoint = ApiClient.createService(ApiEndpoint.class, null);
+        Call<CarMasterResponse> call = endpoint.getCars(200, token);
         call.enqueue(new Callback<CarMasterResponse>() {
             @Override
             public void onResponse(Call<CarMasterResponse> call, Response<CarMasterResponse> response) {

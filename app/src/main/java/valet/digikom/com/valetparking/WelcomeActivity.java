@@ -144,8 +144,8 @@ public class WelcomeActivity extends AppCompatActivity {
                 data.setRoleOpt(role);
                 patchMeBody.setData(data);
 
-                ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class, token);
-                Call<PatchMeResponse> call = apiEndpoint.patchMe(patchMeBody);
+                ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class, null);
+                Call<PatchMeResponse> call = apiEndpoint.patchMe(patchMeBody, token);
                 call.enqueue(new Callback<PatchMeResponse>() {
                     @Override
                     public void onResponse(Call<PatchMeResponse> call, Response<PatchMeResponse> response) {
@@ -161,8 +161,8 @@ public class WelcomeActivity extends AppCompatActivity {
                             TokenDao.getToken(new ProcessRequest() {
                                 @Override
                                 public void process(String token) {
-                                    ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class, token);
-                                    Call<DropPointMasterResponse> call = apiEndpoint.getDropPoints();
+                                    ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class, null);
+                                    Call<DropPointMasterResponse> call = apiEndpoint.getDropPoints(token);
                                     call.enqueue(new Callback<DropPointMasterResponse>() {
                                         @Override
                                         public void onResponse(Call<DropPointMasterResponse> call, Response<DropPointMasterResponse> response) {

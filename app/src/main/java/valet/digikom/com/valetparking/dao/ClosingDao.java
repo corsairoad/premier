@@ -53,8 +53,8 @@ public class ClosingDao{
         TokenDao.getToken(new ProcessRequest() {
             @Override
             public void process(String token) {
-                ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class, token);
-                Call<ClosingResponse> call = apiEndpoint.close(closingBody);
+                ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class, null);
+                Call<ClosingResponse> call = apiEndpoint.close(closingBody, token);
                 call.enqueue(new Callback<ClosingResponse>() {
                     @Override
                     public void onResponse(Call<ClosingResponse> call, Response<ClosingResponse> response) {

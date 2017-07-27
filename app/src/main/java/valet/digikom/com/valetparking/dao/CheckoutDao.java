@@ -67,8 +67,8 @@ public class CheckoutDao implements ProcessRequest {
     }
 
     private void downloadCheckouts(String token) {
-        ApiEndpoint endpoint = ApiClient.createService(ApiEndpoint.class, token);
-        Call<EntryCheckoutCont> call = endpoint.getCheckouts(50);
+        ApiEndpoint endpoint = ApiClient.createService(ApiEndpoint.class, null);
+        Call<EntryCheckoutCont> call = endpoint.getCheckouts(50, token);
         call.enqueue(new Callback<EntryCheckoutCont>() {
             @Override
             public void onResponse(Call<EntryCheckoutCont> call, Response<EntryCheckoutCont> response) {

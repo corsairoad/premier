@@ -66,8 +66,8 @@ public class FineFeeDao implements ProcessRequest {
     }
 
     private void downloadFineFee(String token) {
-        ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class,token);
-        Call<FineFee> call = apiEndpoint.getFineFees();
+        ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class);
+        Call<FineFee> call = apiEndpoint.getFineFees(token);
         call.enqueue(new Callback<FineFee>() {
             @Override
             public void onResponse(Call<FineFee> call, Response<FineFee> response) {

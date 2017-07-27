@@ -161,8 +161,8 @@ public class PreferenceActivity extends AppCompatPreferenceActivity {
                         TokenDao.getToken(new ProcessRequest() {
                             @Override
                             public void process(String token) {
-                                ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class, token);
-                                Call<ChangePasswordResponse> call = apiEndpoint.changePassWord(changePassword);
+                                ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class, null);
+                                Call<ChangePasswordResponse> call = apiEndpoint.changePassWord(changePassword, token);
                                 call.enqueue(new Callback<ChangePasswordResponse>() {
                                     @Override
                                     public void onResponse(Call<ChangePasswordResponse> call, Response<ChangePasswordResponse> response) {

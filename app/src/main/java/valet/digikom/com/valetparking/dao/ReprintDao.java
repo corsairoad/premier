@@ -147,8 +147,8 @@ public class ReprintDao{
                 String json = new Gson().toJson(postReprintCheckin);
                 Log.d("REPRINT", "DATA: " + json);
 
-                ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class, token);
-                Call<PostReprintCheckinResponse> call = apiEndpoint.postReprint(postReprintCheckin);
+                ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class, null);
+                Call<PostReprintCheckinResponse> call = apiEndpoint.postReprint(postReprintCheckin, token);
                 call.enqueue(new Callback<PostReprintCheckinResponse>() {
                     @Override
                     public void onResponse(Call<PostReprintCheckinResponse> call, Response<PostReprintCheckinResponse> response) {

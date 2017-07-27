@@ -40,8 +40,8 @@ public class DownloadCurrentLobbyService extends IntentService {
             TokenDao.getToken(new ProcessRequest() {
                 @Override
                 public void process(String token) {
-                    ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class, token);
-                    Call<CheckinList> call = apiEndpoint.getCurrentCheckinList(500);
+                    ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class, null);
+                    Call<CheckinList> call = apiEndpoint.getCurrentCheckinList(500, token);
                     call.enqueue(new Callback<CheckinList>() {
                         @Override
                         public void onResponse(Call<CheckinList> call, Response<CheckinList> response) {

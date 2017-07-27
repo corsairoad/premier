@@ -41,8 +41,8 @@ public class PaymentDao implements ProcessRequest {
 
     @Override
     public void process(String token) {
-        ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class, token);
-        Call<PaymentMethod> call = apiEndpoint.getPaymentMethods();
+        ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class, null);
+        Call<PaymentMethod> call = apiEndpoint.getPaymentMethods(token);
         call.enqueue(new Callback<PaymentMethod>() {
             @Override
             public void onResponse(Call<PaymentMethod> call, Response<PaymentMethod> response) {

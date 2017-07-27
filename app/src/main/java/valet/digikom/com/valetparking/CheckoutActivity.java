@@ -191,8 +191,8 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
         TokenDao.getToken(new ProcessRequest() {
             @Override
             public void process(String token) {
-               ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class, token);
-                Call<MembershipResponse> call = apiEndpoint.getMemberships();
+               ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class, null);
+                Call<MembershipResponse> call = apiEndpoint.getMemberships(token);
                 call.enqueue(new Callback<MembershipResponse>() {
                     @Override
                     public void onResponse(Call<MembershipResponse> call, Response<MembershipResponse> response) {

@@ -65,8 +65,8 @@ public class PrintCheckin implements ReceiveListener {
         TokenDao.getToken(new ProcessRequest() {
             @Override
             public void process(String token) {
-                ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class, token);
-                Call<Disclaimer> call = apiEndpoint.getDisclaimer();
+                ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class, null);
+                Call<Disclaimer> call = apiEndpoint.getDisclaimer(token);
                 call.enqueue(new Callback<Disclaimer>() {
                     @Override
                     public void onResponse(Call<Disclaimer> call, Response<Disclaimer> response) {

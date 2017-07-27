@@ -109,12 +109,13 @@ public class AuthResDao {
                 if (response != null && response.body() != null) {
                     AuthResponse.Data.Role role = response.body().getData().getRole();
                     AuthResponse.Meta meta = response.body().getMeta();
+                    String token = meta.getToken();
                     if (role.getUserLevel().toLowerCase().contains("supervisor")) {
                         CancelBody cancelBody = new CancelBody.Builder()
                                 .setCancelInfo(cancelInfo)
                                 .build();
-                        ApiEndpoint endpoint = ApiClient.createService(ApiEndpoint.class, meta.getToken());
-                        Call<CancelResponse> call1 = endpoint.cancelTicket(id,cancelBody);
+                        ApiEndpoint endpoint = ApiClient.createService(ApiEndpoint.class, null);
+                        Call<CancelResponse> call1 = endpoint.cancelTicket(id,cancelBody, token);
                         call1.enqueue(new Callback<CancelResponse>() {
                             @Override
                             public void onResponse(Call<CancelResponse> call, Response<CancelResponse> response) {

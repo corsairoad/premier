@@ -39,15 +39,15 @@ public class DownloadClosingDataService extends IntentService {
             @Override
             public void process(String token) {
 
-                ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class, token);
-                Call<ClosingData> call = apiEndpoint.getClosingData(currentPage, DATA_PER_PAGE);
+                ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class, null);
+                Call<ClosingData> call = apiEndpoint.getClosingData(currentPage, DATA_PER_PAGE, token);
                 if (flag != null) {
                     switch (flag) {
                         case ClosingActivity.DOWNLOAD_PER_SHIFT:
-                            call = apiEndpoint.getClosingDataShift(currentPage, DATA_PER_PAGE);
+                            call = apiEndpoint.getClosingDataShift(currentPage, DATA_PER_PAGE, token);
                             break;
                         case ClosingActivity.DOWNLOAD_PER_SITE:
-                            call = apiEndpoint.getClosingDataSite(currentPage, DATA_PER_PAGE);
+                            call = apiEndpoint.getClosingDataSite(currentPage, DATA_PER_PAGE, token);
                             break;
                         default:
                             break;

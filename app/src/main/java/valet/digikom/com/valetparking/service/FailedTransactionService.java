@@ -89,8 +89,8 @@ public class FailedTransactionService extends IntentService {
         TokenDao.getToken(new ProcessRequest() {
             @Override
             public void process(String token) {
-                ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class, token);
-                Call<EntryCheckinResponse> call = apiEndpoint.postCheckin(entryCheckinContainer);
+                ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class, null);
+                Call<EntryCheckinResponse> call = apiEndpoint.postCheckin(entryCheckinContainer, token);
                 call.enqueue(new Callback<EntryCheckinResponse>() {
                     @Override
                     public void onResponse(Call<EntryCheckinResponse> call, Response<EntryCheckinResponse> response) {

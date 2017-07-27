@@ -39,8 +39,8 @@ public class BankDao implements ProcessRequest {
 
     @Override
     public void process(String token) {
-        ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class, token);
-        Call<Bank> call = apiEndpoint.getBanks();
+        ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class, null);
+        Call<Bank> call = apiEndpoint.getBanks(token);
         call.enqueue(new Callback<Bank>() {
             @Override
             public void onResponse(Call<Bank> call, Response<Bank> response) {

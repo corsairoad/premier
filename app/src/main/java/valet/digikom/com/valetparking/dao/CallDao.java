@@ -55,12 +55,12 @@ public class CallDao implements ProcessRequest {
 
 
     private void callCar(String token) {
-        ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class, token);
+        ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class, null);
 
         Gson gson = new Gson();
         String jsonBody = gson.toJson(addCarCallBody);
 
-        Call<AddCarCallResponse> call = apiEndpoint.postCallCar(id,addCarCallBody);
+        Call<AddCarCallResponse> call = apiEndpoint.postCallCar(id,addCarCallBody, token);
         call.enqueue(new Callback<AddCarCallResponse>() {
             @Override
             public void onResponse(Call<AddCarCallResponse> call, Response<AddCarCallResponse> response) {

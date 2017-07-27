@@ -62,8 +62,8 @@ public class PostCheckoutService extends IntentService {
             TokenDao.getToken(new ProcessRequest() {
                 @Override
                 public void process(String token) {
-                    ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class, token);
-                    Call<FinishCheckoutResponse> call = apiEndpoint.submitCheckout(remoteVthdId,finishCheckOut);
+                    ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class, null);
+                    Call<FinishCheckoutResponse> call = apiEndpoint.submitCheckout(remoteVthdId,finishCheckOut, token);
                     call.enqueue(new Callback<FinishCheckoutResponse>() {
                         @Override
                         public void onResponse(Call<FinishCheckoutResponse> call, Response<FinishCheckoutResponse> response) {
