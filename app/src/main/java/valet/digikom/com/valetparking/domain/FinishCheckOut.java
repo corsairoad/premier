@@ -82,6 +82,10 @@ public class FinishCheckOut {
             public void setPaymentId(String paymentId) {
                 this.paymentId = paymentId;
             }
+
+            public String getCheckoutTime() {
+                return checkoutTime;
+            }
         }
 
         public static class RelationShip {

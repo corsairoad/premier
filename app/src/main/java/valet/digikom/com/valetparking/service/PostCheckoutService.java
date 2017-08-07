@@ -30,7 +30,9 @@ public class PostCheckoutService extends IntentService {
 
     private static final String TAG = PostCheckoutService.class.getSimpleName();
     public static final String ACTION = "premier.valet.post.checkout.data";
-    FinishCheckoutDao checkoutDao;
+
+    private FinishCheckoutDao checkoutDao;
+    private Call<FinishCheckoutResponse> call;
 
     public PostCheckoutService() {
         super(TAG);
@@ -39,7 +41,7 @@ public class PostCheckoutService extends IntentService {
 
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
-        if (intent.getAction().equals(ACTION)) {
+        if (ACTION.equalsIgnoreCase(intent.getAction())) {
             Log.d(TAG, "Post Checkout service called");
             List<CheckoutData> checkoutDataList = checkoutDao.getCheckoutData();
             if (!checkoutDataList.isEmpty()) {
@@ -53,6 +55,14 @@ public class PostCheckoutService extends IntentService {
         }
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (call != null) {
+            //call.cancel();
+        }
+    }
+
     private void post(CheckoutData data) {
         final int remoteVthdId = data.getRemoteVthdId();
         final FinishCheckOut finishCheckOut = toObject(data.getJsonData());
@@ -63,7 +73,7 @@ public class PostCheckoutService extends IntentService {
                 @Override
                 public void process(String token) {
                     ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class, null);
-                    Call<FinishCheckoutResponse> call = apiEndpoint.submitCheckout(remoteVthdId,finishCheckOut, token);
+                    call = apiEndpoint.submitCheckout(remoteVthdId,finishCheckOut, token);
                     call.enqueue(new Callback<FinishCheckoutResponse>() {
                         @Override
                         public void onResponse(Call<FinishCheckoutResponse> call, Response<FinishCheckoutResponse> response) {

@@ -393,7 +393,7 @@ public class EntryCheckin {
             String p = platNo;
 
             if (Character.isDigit(p.trim().charAt(0))) {
-                platNo = "B " + platNo;
+                platNo = "B" + platNo;
             }
             this.platNo = platNo;
             attrib.setPlatNo(platNo);

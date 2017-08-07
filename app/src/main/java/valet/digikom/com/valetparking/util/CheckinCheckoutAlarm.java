@@ -31,7 +31,7 @@ public class CheckinCheckoutAlarm {
     }
 
     public void startAlarm() {
-        alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 5 * 60 * 1000, pendingIntent);
+        alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 3 * 60 * 1000, pendingIntent);
     }
 
     public void cancelAlarm() {

@@ -21,6 +21,7 @@ import retrofit2.Response;
 import valet.digikom.com.valetparking.adapter.DropPointAdapter;
 import valet.digikom.com.valetparking.adapter.SpinnerSiteAdapter;
 import valet.digikom.com.valetparking.dao.DropDao;
+import valet.digikom.com.valetparking.dao.EntryDao;
 import valet.digikom.com.valetparking.dao.TokenDao;
 import valet.digikom.com.valetparking.domain.AuthResponse;
 import valet.digikom.com.valetparking.domain.DropPointMaster;
@@ -64,24 +65,31 @@ public class WelcomeActivity extends AppCompatActivity {
             public void onClick(View view) {
 
                 if (ApiClient.isNetworkAvailable(WelcomeActivity.this)) {
+
+                    patch(dropPointMaster.getAttrib().getDropId());
+
+                    // delete checkin list in local db if current lobby id different from last logged in lobby id
+                    // so the data from different lobby won't show up in parked cars fragment
+                    checkIfLoginfromDifferentLobby(dropPointMaster.getAttrib().getDropId(), prefManager.getIdDefaultDropPoint());
+
                     prefManager.setIdSite(mRoleOption.getSiteId());
                     prefManager.setSiteName(mRoleOption.getSiteName());
                     prefManager.setDefaultDropPoint(dropPointMaster.getAttrib().getDropId());
                     prefManager.setDefaultDropPointName(dropPointMaster.getAttrib().getDropName());
-                    patch(dropPointMaster.getAttrib().getDropId());
+
                     goToMain();
-                }else {
+                } else {
                     Toast.makeText(WelcomeActivity.this,"Oops, you are not connected to internet. Please try again later", Toast.LENGTH_SHORT).show();
                 }
 
             }
         });
 
-
         AuthResponse authResponse = prefManager.getAuthResponse();
         if (authResponse != null) {
             roleOptions = authResponse.getData().getRoleOptions();
         }
+
         spinnerSiteAdapter = new SpinnerSiteAdapter(this, roleOptions);
         spSites.setAdapter(spinnerSiteAdapter);
         spSites.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -123,9 +131,19 @@ public class WelcomeActivity extends AppCompatActivity {
         });
     }
 
+    private void checkIfLoginfromDifferentLobby(int newLobby, String previousLobby) {
+        if (previousLobby == null) {
+            return;
+        }
+
+        if (!String.valueOf(newLobby).equalsIgnoreCase(previousLobby)) {
+            EntryDao.getInstance(this).removeAllCheckinList();
+        }
+    }
+
     private void goToMain() {
         Intent intent = new Intent(this, Main2Activity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.setAction(Main2Activity.ACTION_DOWNLOAD_CHECKIN);
         startActivity(intent);
         finish();

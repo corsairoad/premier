@@ -83,7 +83,7 @@ public class AddCarActivity extends FragmentActivity implements StepOneFragmet.O
     }
 
     private void submitCheckin(final EntryCheckinContainer checkinContainer, final EntryCheckin.Builder builder) {
-        processFailedCheckin(builder, checkinContainer);
+        processFailedCheckin(checkinContainer, builder);
         //goToMain();
 
         /*
@@ -217,8 +217,8 @@ public class AddCarActivity extends FragmentActivity implements StepOneFragmet.O
         new Thread(new Runnable() {
             @Override
             public void run() {
-                submitCheckin(fragmentReview.getEntryCheckinContainer(), fragmentReview.getBuilder());
-                //processFailedCheckin(fragmentReview.getBuilder(),fragmentReview.getEntryCheckinContainer());
+                //submitCheckin(fragmentReview.getEntryCheckinContainer(), fragmentReview.getBuilder());
+                processFailedCheckin(fragmentReview.getEntryCheckinContainer(),fragmentReview.getBuilder());
                 //goToMain();
             }
         }).start();
@@ -262,7 +262,7 @@ public class AddCarActivity extends FragmentActivity implements StepOneFragmet.O
         }
     }
 
-    private void processFailedCheckin(EntryCheckin.Builder builder, EntryCheckinContainer checkinContainer) {
+    private void processFailedCheckin(EntryCheckinContainer checkinContainer, EntryCheckin.Builder builder) {
         PrefManager prefManager = PrefManager.getInstance(this);
         int lastTicketCounter = builder.getLastTicketCounter(this);
         String noTiket = builder.generateTicketNo(this, lastTicketCounter);
@@ -308,11 +308,11 @@ public class AddCarActivity extends FragmentActivity implements StepOneFragmet.O
         entryCheckin.getAttrib().setAppId(prefManager.getAppId());
         entryCheckin.getAttrib().setLastTicketCounter(lastTicketCounter);
 
-        print(entryCheckinResponse);
-        saveReprintData(entryCheckinResponse,noTiket.trim());
-
         entryDao.insertEntryResponse(entryCheckinResponse, EntryCheckinResponse.FLAG_UPLOAD_PENDING);
         entryCheckinContainerDao.insert(checkinContainer);
+
+        saveReprintData(entryCheckinResponse,noTiket.trim());
+        print(entryCheckinResponse);
 
         goToMain();
     }

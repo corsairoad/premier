@@ -44,6 +44,16 @@
             android:id="@+id/report"
             android:icon="@drawable/ic_description_black_24dp"
             android:title="@string/report" />
+
+        <item
+            android:id="@+id/menu_sync_data"
+            android:icon="@drawable/ic_action_sync"
+            android:title="@string/data_sync"/>
+
+        <item
+            android:id="@+id/menu_imei"
+            android:icon="@drawable/ic_action_phone"
+            android:title="@string/id_device" />
     </group>
 
     <item android:title="Communicate" android:visible="false">

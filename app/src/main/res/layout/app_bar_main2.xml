@@ -39,6 +39,40 @@
     <!--
     <include layout="@layout/content_main2" />
        -->
+
+    <RelativeLayout
+        android:layout_width="match_parent" android:layout_height="match_parent" >
+
+        <ProgressBar
+            android:id="@+id/myProgress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:visibility="gone"/>
+
+        <TextView
+            android:id="@+id/myTextProgress"
+            android:layout_below="@id/myProgress"
+            android:layout_centerHorizontal="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="@dimen/activity_vertical_margin"
+            android:background="@android:color/transparent"
+            android:visibility="gone"/>
+
+        <Button
+            android:id="@+id/cancel_logout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Cancel logout"
+            android:layout_below="@id/myTextProgress"
+            android:layout_centerHorizontal="true"
+            android:paddingTop="@dimen/activity_horizontal_margin"
+            android:visibility="gone"/>
+
+    </RelativeLayout>
+
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab_entry"
         android:layout_width="wrap_content"

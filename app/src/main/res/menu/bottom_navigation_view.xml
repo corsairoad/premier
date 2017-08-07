@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/btn_sync_checkin"
+        android:title="Checkin"
+        android:enabled="true"
+        android:icon="@drawable/ic_playlist_add"
+        app:showAsAction="ifRoom"/>
+
+    <item android:id="@+id/btn_sync_checkout"
+        android:enabled="true"
+        android:title="Checkout"
+        android:icon="@drawable/ic_playlist_play"
+        app:showAsAction="ifRoom"/>
+
+</menu>

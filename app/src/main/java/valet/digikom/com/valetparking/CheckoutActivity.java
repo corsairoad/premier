@@ -311,6 +311,7 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
     @Override
     public void onClick(View view) {
         checkPrinter();
+        //showConfirmDialog();
     }
 
     private void checkPrinter() {
@@ -717,7 +718,7 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
 
             try {
                 finishCheckoutDao.print(idValetHeader);
-                finishCheckoutDao.saveDataCheckout(idValetHeader, finishCheckoutDao.getFinishCheckOut(), noTiket.trim());
+                finishCheckoutDao.saveDataCheckout(remoteValetHeader, finishCheckoutDao.getFinishCheckOut(), noTiket.trim());
                 finishCheckoutDao.setCheckoutCar(idValetHeader);
                 ReprintDao.getInstance(CheckoutActivity.this).removeReprintData(noTiket);
             }catch (Exception e) {

@@ -32,7 +32,7 @@ public class DownloadCheckinAlarm {
     }
 
     public void startAlarm() {
-        alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP,System.currentTimeMillis(), 1 * 60 * 1000, pendingIntent);
+        alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP,System.currentTimeMillis(), 5 * 60 * 1000, pendingIntent);
     }
 
     public void cancelAlarm() {

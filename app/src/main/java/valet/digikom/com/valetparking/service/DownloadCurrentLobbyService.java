@@ -51,12 +51,11 @@ public class DownloadCurrentLobbyService extends IntentService {
                                 EntryDao.getInstance(DownloadCurrentLobbyService.this)
                                         .insertListCheckin(downloadedCheckinList);
 
-                                Intent RTReturn = new Intent(ParkedCarFragment.RECEIVE_CURRENT_LOBBY_DATA);
-                                LocalBroadcastManager.getInstance(DownloadCurrentLobbyService.this).sendBroadcast(RTReturn);
-
                                 //Update fakeVthdId to remoteVthdId in post checkout table that remains fakeVthdId
                                 FinishCheckoutDao.getInstance(DownloadCurrentLobbyService.this)
                                         .updateCheckoutVthdId(downloadedCheckinList);
+
+                                reloadParkedCarsList();
                             }
                         }
 
@@ -67,6 +66,19 @@ public class DownloadCurrentLobbyService extends IntentService {
                     });
                 }
             }, this);
+
+            startDownloadCheckoutService();
         }
+    }
+
+    private void startDownloadCheckoutService() {
+        Intent intent = new Intent(this, DownloadCheckoutService.class);
+        intent.setAction(DownloadCheckoutService.ACTION);
+        startService(intent);
+    }
+
+    private void reloadParkedCarsList() {
+        Intent RTReturn = new Intent(ParkedCarFragment.RECEIVE_CURRENT_LOBBY_DATA);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(RTReturn);
     }
 }

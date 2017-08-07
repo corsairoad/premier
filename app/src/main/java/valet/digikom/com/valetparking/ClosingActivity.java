@@ -28,9 +28,11 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.daimajia.numberprogressbar.NumberProgressBar;
 import com.epson.epos2.Epos2Exception;
 import com.epson.eposprint.EposException;
+import com.google.gson.Gson;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -51,6 +53,7 @@ import valet.digikom.com.valetparking.dao.TokenDao;
 import valet.digikom.com.valetparking.domain.ClosingData;
 import valet.digikom.com.valetparking.domain.EntryCheckinResponse;
 import valet.digikom.com.valetparking.domain.GetReprintCheckinResponse;
+import valet.digikom.com.valetparking.domain.LoginError403;
 import valet.digikom.com.valetparking.domain.PrintClosingParam;
 import valet.digikom.com.valetparking.domain.PrintReceiptClosing;
 import valet.digikom.com.valetparking.service.ApiClient;
@@ -591,7 +594,14 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
                             updateListClosing(response.body().getDataList());
                         }else {
                             progressBar.setVisibility(View.GONE);
-                            Toast.makeText(ClosingActivity.this, "Can not download closing data. Please try again later", Toast.LENGTH_SHORT).show();
+                            try {
+                                String errorBody = response.errorBody().string();
+                                LoginError403 error403 = new Gson().fromJson(errorBody, LoginError403.class);
+                                processFailedResponse(error403);
+                                //Toast.makeText(ClosingActivity.this, "Can not download closing data. Error code: " + code, Toast.LENGTH_SHORT).show();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
                         }
                     }
 
@@ -610,6 +620,23 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
                 });
             }
         }, ClosingActivity.this);
+    }
+
+    private void processFailedResponse(LoginError403 error403) {
+        if (error403 != null) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this)
+                    .setTitle("Cannot download closing data")
+                    .setMessage(error403.toString())
+                    .setIcon(R.drawable.ic_error_outline)
+                    .setPositiveButton("Oke", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            finish();
+                            dialog.dismiss();
+                        }
+                    });
+            builder.show();
+        }
     }
 
     private class DownloadClosingDataTask extends AsyncTask<String, Void, List<ClosingData.Data>> {

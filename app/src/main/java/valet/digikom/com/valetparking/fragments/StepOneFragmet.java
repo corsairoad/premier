@@ -1,12 +1,14 @@
 package valet.digikom.com.valetparking.fragments;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.text.InputFilter;
 import android.text.Spanned;
 import android.text.TextUtils;
@@ -41,6 +43,7 @@ import valet.digikom.com.valetparking.adapter.ListValetTypeAdapter;
 import valet.digikom.com.valetparking.dao.CarDao;
 import valet.digikom.com.valetparking.dao.ColorDao;
 import valet.digikom.com.valetparking.dao.DropDao;
+import valet.digikom.com.valetparking.dao.EntryDao;
 import valet.digikom.com.valetparking.dao.TokenDao;
 import valet.digikom.com.valetparking.dao.ValetTypeDao;
 import valet.digikom.com.valetparking.domain.CarMaster;
@@ -51,6 +54,7 @@ import valet.digikom.com.valetparking.service.ApiClient;
 import valet.digikom.com.valetparking.service.ApiEndpoint;
 import valet.digikom.com.valetparking.service.ProcessRequest;
 import valet.digikom.com.valetparking.util.ChangeBgColorListener;
+import valet.digikom.com.valetparking.util.LicensePlateRegexInputFilter;
 import valet.digikom.com.valetparking.util.PrefManager;
 import valet.digikom.com.valetparking.util.ValetDbHelper;
 
@@ -131,7 +135,7 @@ public class StepOneFragmet extends Fragment implements View.OnClickListener, Ch
         inputDropPoint.setFilters(filters);
         inputPlatNo = (EditText) view.findViewById(R.id.input_plat_no);
         inputPlatNo.requestFocus();
-        inputPlatNo.setFilters(new InputFilter[] {new InputFilter.AllCaps()});
+        inputPlatNo.setFilters(new InputFilter[] {new InputFilter.AllCaps(), new LicensePlateRegexInputFilter(), new InputFilter.LengthFilter(15)});
         inputCartype = (EditText) view.findViewById(R.id.input_car_type);
         inputCartype.setFilters(filters);
         inputMerk = (EditText) view.findViewById(R.id.input_merk_mobil);
@@ -268,14 +272,58 @@ public class StepOneFragmet extends Fragment implements View.OnClickListener, Ch
             if (editText != null){
                 String val = editText.getText().toString();
                 allValid = !TextUtils.isEmpty(val) && allValid;
+                int id = editText.getId();
+
                 if (TextUtils.isEmpty(val)) {
                     editText.setError("This field can't be empty");
                 }else {
                     editText.setError(null);
                 }
+
+                if (id == R.id.input_plat_no) {
+                    allValid = !checkIfAlreadyCheckedIn(val, editText) && checkLength(val,editText);
+                }
             }
         }
         return allValid;
+    }
+
+    private boolean checkLength(String val, EditText editText) {
+        if (val.length() > 15) {
+            editText.setError("License plate too long");
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext())
+                    .setTitle("License plate too long")
+                    .setMessage("Maximum license plate length is 15 characters")
+                    .setIcon(R.drawable.ic_error_outline)
+                    .setPositiveButton("Oke", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+            builder.show();
+            return false;
+        }
+        return true;
+    }
+
+    private boolean checkIfAlreadyCheckedIn(String platNo, EditText editText) {
+        if (EntryDao.getInstance(getContext()).isAlreadyCheckedIn(platNo)) {
+            editText.setError("This car is already checked in");
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext())
+                    .setTitle("Duplicate license plate")
+                    .setMessage("This car is already checked in")
+                    .setIcon(R.drawable.ic_error_outline)
+                    .setPositiveButton("Oke", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+            builder.show();
+            return true;
+        }
+        return false;
     }
 
     public void setCheckIn() {

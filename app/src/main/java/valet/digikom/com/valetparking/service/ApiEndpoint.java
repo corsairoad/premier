@@ -1,7 +1,10 @@
 package valet.digikom.com.valetparking.service;
 
+import com.google.gson.JsonElement;
+
 import java.util.List;
 
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.Field;
@@ -63,7 +66,14 @@ public interface ApiEndpoint {
 
     @FormUrlEncoded
     @POST("authenticate")
-    Call<AuthResponse> login(@Field("email") String email, @Field("password") String password);
+    Call<JsonElement> login(@Field("email") String email, @Field("password") String password);
+
+    @FormUrlEncoded
+    @POST("authenticate")
+    Call<AuthResponse> loginSpv(@Field("email") String email, @Field("password") String password);
+
+    @GET("signout")
+    Call<ResponseBody> logout(@Header("Authorization") String token);
 
     @GET("additional_item_site_detail")
     Call<AdditionalItemsResponse> getItems(@Query("page[size]") int pageSize, @Header("Authorization") String token);
@@ -156,6 +166,9 @@ public interface ApiEndpoint {
     @GET("reprint_checkin")
     Call<GetReprintCheckinResponse> getReprintData(@Query("page[number]") int pageNumber, @Query("page[size]") int pageSize,
                                                    @Query("filter") String filter, @Header("Authorization") String token);
+
+    @GET("ad_checkout_finish_fine")
+    Call<ClosingData> getCheckoutDataFromServer(@Query("page[size]")int pageSize, @Query("filter") String filter, @Header("Authorization") String token);
 
     //@GET("reprint_checkin")
     //Call<GetReprintCheckinResponse> getReprintData(@Query("filter") String filter);

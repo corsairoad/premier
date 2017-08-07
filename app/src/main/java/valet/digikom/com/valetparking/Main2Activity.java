@@ -1,8 +1,11 @@
 package valet.digikom.com.valetparking;
 
 import android.app.SearchManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
@@ -10,10 +13,12 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
@@ -21,23 +26,39 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import cn.pedant.SweetAlert.SweetAlertDialog;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import valet.digikom.com.valetparking.adapter.ParkedCarPagerAdapter;
+import valet.digikom.com.valetparking.dao.AuthResDao;
 import valet.digikom.com.valetparking.dao.DropDao;
+import valet.digikom.com.valetparking.dao.TokenDao;
 import valet.digikom.com.valetparking.domain.DropPointMaster;
 import valet.digikom.com.valetparking.domain.EntryCheckoutCont;
 import valet.digikom.com.valetparking.fragments.CalledCarFragment;
 import valet.digikom.com.valetparking.fragments.ParkedCarFragment;
+import valet.digikom.com.valetparking.service.ApiClient;
+import valet.digikom.com.valetparking.service.ApiEndpoint;
 import valet.digikom.com.valetparking.service.FailedTransactionService;
+import valet.digikom.com.valetparking.service.PostCheckoutService;
+import valet.digikom.com.valetparking.service.ProcessRequest;
 import valet.digikom.com.valetparking.util.CheckinCheckoutAlarm;
 import valet.digikom.com.valetparking.util.CheckoutReadyAlarm;
 import valet.digikom.com.valetparking.util.DownloadCheckinAlarm;
 import valet.digikom.com.valetparking.util.PrefManager;
+import valet.digikom.com.valetparking.util.Syncing;
+import valet.digikom.com.valetparking.util.SyncingCheckin;
+import valet.digikom.com.valetparking.util.SyncingCheckout;
 import valet.digikom.com.valetparking.util.ValetDbHelper;
 
 public class Main2Activity extends AppCompatActivity
@@ -58,11 +79,17 @@ public class Main2Activity extends AppCompatActivity
     private TextView txtCountCalledCar;
     private PrefManager prefManager;
     private MaterialDialog materialDialog;
+    private DrawerLayout drawer;
+    private ProgressBar syncProgress;
+    private TextView textProgress;
+    private Button btnCancelLogout;
 
     private CheckinCheckoutAlarm checkinCheckoutAlarm;
     private DownloadCheckinAlarm downloadCheckinAlarm;
-
     private String idDropPoint;
+
+
+    private BroadcastReceiver syncReceiver;
 
 
     @Override
@@ -79,6 +106,8 @@ public class Main2Activity extends AppCompatActivity
 
         prefManager = PrefManager.getInstance(this);
 
+        initSyncReceiver();
+
         // back to login
         if (prefManager.getAuthResponse() == null || prefManager.getIdSite() == 0) {
             prefManager.saveAuthResponse(null);
@@ -88,6 +117,9 @@ public class Main2Activity extends AppCompatActivity
 
         setDefaultKeyMode(DEFAULT_KEYS_SEARCH_LOCAL);
 
+        syncProgress = (ProgressBar) findViewById(R.id.myProgress);
+        textProgress = (TextView) findViewById(R.id.myTextProgress);
+        btnCancelLogout = (Button) findViewById(R.id.cancel_logout);
         tabLayout = (TabLayout) findViewById(R.id.tabs);
         viewPager = (ViewPager) findViewById(R.id.viewpager);
         btnLogout = (Button) findViewById(R.id.btn_logout);
@@ -97,6 +129,7 @@ public class Main2Activity extends AppCompatActivity
         txtUserName = (TextView) headerView.findViewById(R.id.text_user_name);
         setUserName();
 
+        enableProgressBar(false);
         // set up pager parked car and called cars
         setupPagers();
 
@@ -110,7 +143,7 @@ public class Main2Activity extends AppCompatActivity
             }
         });
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
@@ -124,12 +157,70 @@ public class Main2Activity extends AppCompatActivity
         // startCheckoutEntryAlarm();
     }
 
+    private void initSyncReceiver() {
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(SyncingCheckin.ACTION);
+        filter.addAction(SyncingCheckin.ACTION_ERROR_RESPONSE);
+        filter.addAction(SyncingCheckout.ACTION);
+        filter.addAction(SyncingCheckout.ACTION_LOGOUT);
+        filter.addAction(SyncingCheckout.ACTION_LOGOUT_ERROR_RESPONSE);
+
+        syncReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                switch (intent.getAction()) {
+                    case SyncingCheckin.ACTION:
+                        setProgressMessage(intent.getStringExtra(SyncingCheckin.EXTRA));
+                        break;
+                    case SyncingCheckout.ACTION:
+                        setProgressMessage(intent.getStringExtra(SyncingCheckout.EXTRA));
+                        break;
+                    case SyncingCheckout.ACTION_LOGOUT:
+                        logout();
+                        break;
+                    case SyncingCheckin.ACTION_ERROR_RESPONSE:
+                    case SyncingCheckout.ACTION_LOGOUT_ERROR_RESPONSE:
+                        showErrorSync(intent.getStringExtra(SyncingCheckin.EXTRA));
+                        break;
+                }
+            }
+        };
+        LocalBroadcastManager.getInstance(this).registerReceiver(syncReceiver,filter);
+    }
+
+    private void showErrorSync(String stringExtra) {
+        startAllServices();
+        enableProgressBar(false);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this)
+                .setTitle("Sync data error")
+                .setMessage(stringExtra)
+                .setPositiveButton("Oke", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+        builder.show();
+    }
+
+    private void setProgressMessage(String stringExtra) {
+        textProgress.setText(stringExtra);
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
         checkPrinter();
         startAllServices();
         setTitle();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (syncReceiver != null) {
+            LocalBroadcastManager.getInstance(this).unregisterReceiver(syncReceiver);
+        }
     }
 
     private void setTitle() {
@@ -212,7 +303,21 @@ public class Main2Activity extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
+            AlertDialog.Builder builder = new AlertDialog.Builder(this)
+                    .setMessage("Do you want to quit admin valet?")
+                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            finish();
+                        }
+                    })
+                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+            builder.show();
         }
     }
 
@@ -252,7 +357,7 @@ public class Main2Activity extends AppCompatActivity
             if(parkedCarFragment != null) {
                 parkedCarFragment.downloadCheckinList(indexLobbyType);
             }
-            //postCheckinData();
+            postCheckinData();
             return true;
         }
 
@@ -278,11 +383,17 @@ public class Main2Activity extends AppCompatActivity
             case R.id.report:
                 intent.setAction(ACTION_REPORT);
                 break;
+            case R.id.menu_imei:
+                drawer.closeDrawer(GravityCompat.START);
+                showImei();
+                return true;
+            case R.id.menu_sync_data:
+                intent = new Intent(this, SyncingActivity.class);
+                break;
             default:
                 break;
         }
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         
         startActivity(intent);
@@ -290,12 +401,37 @@ public class Main2Activity extends AppCompatActivity
         return true;
     }
 
+    private void showImei() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this)
+                .setTitle("Id Device")
+                .setMessage(PrefManager.getInstance(this).getRemoteDeviceId())
+                .setPositiveButton("Oke", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                       dialog.dismiss();
+                    }
+                });
+
+        builder.show();
+    }
+
 
     @Override
     public void onClick(View view) {
-        if (view == btnLogout) {
-            showLogoutDialog();
+        int id = view.getId();
+        switch (id){
+            case R.id.btn_logout:
+                showLogoutDialog();
+                break;
+            case R.id.cancel_logout:
+                cancelLogout();
+                break;
         }
+    }
+
+    private void cancelLogout() {
+        stopService(new Intent(this, SyncingCheckin.class));
+        stopService(new Intent(this, SyncingCheckout.class));
     }
 
     private void showLogoutDialog() {
@@ -306,7 +442,10 @@ public class Main2Activity extends AppCompatActivity
                 .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
                     @Override
                     public void onClick(SweetAlertDialog sweetAlertDialog) {
-                    logout();
+                        drawer.closeDrawer(GravityCompat.START);
+                        syncAllUnsyncData();
+                        //logout();
+                        sweetAlertDialog.dismiss();
                     }
                 })
                 .setCancelText("Cancel")
@@ -316,17 +455,65 @@ public class Main2Activity extends AppCompatActivity
                         sweetAlertDialog.cancel();
                     }
                 })
+
                 .showCancelButton(true)
                 .show();
     }
 
-    private void logout() {
-        PrefManager prefManager = PrefManager.getInstance(Main2Activity.this);
-        prefManager.resetDefaultDropPoint();
-        prefManager.logoutUser();
-        prefManager.setPrinterMacAddress(null);
+    private void syncAllUnsyncData() {
+        if (!ApiClient.isNetworkAvailable(this)) {
+            Toast.makeText(this, "Logout failed, please check your internet connection", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         stopAllService();
-        goToSplash();
+        stopServiceDirecly();
+        enableProgressBar(true);
+
+        syncCheckin();
+    }
+
+    private void logout() {
+        //Toast.makeText(this, "Logging out, please wait", Toast.LENGTH_LONG).show();
+
+        //prefManager.resetDefaultDropPoint();
+        TokenDao.getToken(new ProcessRequest() {
+            @Override
+            public void process(String token) {
+                ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class, null);
+                Call<ResponseBody> call = apiEndpoint.logout(token);
+                call.enqueue(new Callback<ResponseBody>() {
+                    @Override
+                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                        int code = response.code();
+                        if (code == AuthResDao.HTTP_STATUS_LOGOUT_SUKSES) {
+                            PrefManager prefManager = PrefManager.getInstance(Main2Activity.this);
+                            prefManager.logoutUser();
+                            prefManager.setPrinterMacAddress(null);
+                            stopAllService();
+                            goToSplash();
+
+                        } else if (code == AuthResDao.HTTP_STATUS_LOGOUT_INVALID){
+                            Toast.makeText(Main2Activity.this, "Logout failed, invalid token", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(Main2Activity.this, "Logout failed, error response occured", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+                        Toast.makeText(Main2Activity.this, "Logout failed, cannot connect to server", Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+            }
+        },this);
+    }
+
+    private void syncCheckin() {
+        Intent intent = new Intent(this, SyncingCheckin.class);
+        intent.setAction(SyncingCheckin.ACTION);
+        startService(intent);
     }
 
     private void goToSplash() {
@@ -412,14 +599,14 @@ public class Main2Activity extends AppCompatActivity
     private void startAllServices() {
         checkinCheckoutAlarm.startAlarm();
         downloadCheckinAlarm.startAlarm();
-
+        //startServiceDirectly();
         //startCheckoutEntryAlarm();
-
     }
 
     private void stopAllService() {
         checkinCheckoutAlarm.cancelAlarm();
         downloadCheckinAlarm.cancelAlarm();
+        //stopServiceDirecly();
     }
 
     private void startCheckoutEntryAlarm() {
@@ -438,6 +625,27 @@ public class Main2Activity extends AppCompatActivity
         alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 10000, alarmIntent);
         //alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, System.currentTimeMillis(),8000,alarmIntent);
         */
+    }
+
+    private void enableProgressBar(boolean enable) {
+        if (enable) {
+            syncProgress.setVisibility(View.VISIBLE);
+            textProgress.setVisibility(View.VISIBLE);
+            btnCancelLogout.setVisibility(View.VISIBLE);
+        }else {
+            syncProgress.setVisibility(View.GONE);
+            textProgress.setVisibility(View.GONE);
+            btnCancelLogout.setVisibility(View.GONE);
+        }
+    }
+
+    private void stopServiceDirecly() {
+        stopService(new Intent(this, FailedTransactionService.class));
+        stopService(new Intent(this, PostCheckoutService.class));
+    }
+
+    private void startServiceDirectly() {
+        startService(new Intent(this, FailedTransactionService.class));
     }
 
 }

@@ -181,6 +181,7 @@ public class ParkedCarFragment extends Fragment implements ListCheckinAdapter.On
     private void manageSpinnerValetType(int i) {
         if (countSpinner >= 1) {
             clearData();
+            listener.setCountParkedCar(0);
             PrefManager.getInstance(getContext()).saveLobbyType(i);
             if (ApiClient.isNetworkAvailable(getContext())) {
                 downloadCheckinList(i);
@@ -192,10 +193,14 @@ public class ParkedCarFragment extends Fragment implements ListCheckinAdapter.On
     }
 
     private void clearData() {
+        EntryDao.getInstance(getContext()).removeUploadSuccess();
+        //new LoadCheckinTask().execute();
+
         if (adapter != null) {
             responseList.clear();
-            //adapter.notifyDataSetChanged();
+            adapter.notifyDataSetChanged();
         }
+
     }
 
     @Override
@@ -271,6 +276,7 @@ public class ParkedCarFragment extends Fragment implements ListCheckinAdapter.On
         @Override
         protected void onPostExecute(List<EntryCheckinResponse> entryCheckinResponses) {
             super.onPostExecute(entryCheckinResponses);
+            spLobbyCheckin.setEnabled(true);
             if (entryCheckinResponses != null && !entryCheckinResponses.isEmpty()) {
                 //clearData();
                 //responseList.addAll(entryCheckinResponses);
@@ -279,7 +285,7 @@ public class ParkedCarFragment extends Fragment implements ListCheckinAdapter.On
                 if (isNewExist(entryCheckinResponses)){
                     adapter.addOneByOne(entryCheckinResponses); // trial
                 }else{
-                    clearData();
+                    responseList.clear();
                     responseList.addAll(entryCheckinResponses);
                     //adapter.notifyItemRangeChanged(0, responseList.size());
                     adapter.notifyDataSetChanged();
@@ -313,15 +319,17 @@ public class ParkedCarFragment extends Fragment implements ListCheckinAdapter.On
             @Override
             public void process(String token) {
 
+                spLobbyCheckin.setEnabled(false);
+
                 if (getContext() != null) {
-                    Toast.makeText(getContext(), "Downloading data..", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Synchronizing data...", Toast.LENGTH_SHORT).show();
                 }
 
                 ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class, null);
                 Call<CheckinList> call = apiEndpoint.getCurrentCheckinList(500, token);
 
                 if (index == 1) {
-                    call = apiEndpoint.getCheckinList(999, token);
+                    call = apiEndpoint.getCheckinList(700, token);
                 }
 
                 call.enqueue(new Callback<CheckinList>() {
@@ -339,6 +347,7 @@ public class ParkedCarFragment extends Fragment implements ListCheckinAdapter.On
                                     e.printStackTrace();
                                 }
                             }else {
+                                spLobbyCheckin.setEnabled(true);
                                 //Toast.makeText(getContext(), "Data Empty", Toast.LENGTH_SHORT).show();
                             }
                         }

@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.google.gson.Gson;
@@ -11,8 +12,10 @@ import com.google.gson.Gson;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
+import valet.digikom.com.valetparking.domain.ClosingData;
 import valet.digikom.com.valetparking.domain.EntryCheckin;
 import valet.digikom.com.valetparking.domain.EntryCheckinResponse;
 import valet.digikom.com.valetparking.util.CheckinComparator;
@@ -111,9 +114,15 @@ public class EntryDao {
 
     public void insertListCheckin(List<EntryCheckinResponse.Data> checkinList) {
 
-        int removedRows = removeUploadSuccess();
-
+        //int removedRows = removeUploadSuccess();
+        //removeUploadSuccess(checkinList);
         filterUnsyncedData(checkinList); // remove unsynced data with synced one
+
+        checkinList = getNewListCheckin(checkinList);
+
+        if (checkinList == null) {
+            return;
+        }
 
         FinishCheckoutDao finishCheckoutDao = FinishCheckoutDao.getInstance(dbHelper.getContext());
 
@@ -122,7 +131,7 @@ public class EntryDao {
                 if (e != null) {
                     //removeEntryById(e.getAttribute().getId());
                     int remoteVthdId = e.getAttribute().getId();
-                    String noTiket = e.getAttribute().getNoTiket().trim();
+                    String noTiket = e.getAttribute().getNoTiket().trim().replace(" ","");
                     if (!finishCheckoutDao.isAlreadyCheckout(noTiket)) {
                         EntryCheckinResponse entryCheckinResponse = new EntryCheckinResponse();
                         entryCheckinResponse.setData(e);
@@ -180,7 +189,7 @@ public class EntryDao {
     }
 
 
-    private int removeUploadSuccess(){
+    public int removeUploadSuccess(){
         String sql = EntryCheckinResponse.Table.COL_IS_UPLOADED + " = " + EntryCheckinResponse.FLAG_UPLOAD_SUCCESS;
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         return db.delete(EntryCheckinResponse.Table.TABLE_NAME, sql, new String[] {});
@@ -226,7 +235,9 @@ public class EntryDao {
     public List<EntryCheckinResponse> fetchAllCheckinResponse() {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         // Cursor c = db.query(EntryCheckinResponse.Table.TABLE_NAME,null, EntryCheckinResponse.Table.COL_IS_CHECKOUT + "=? AND " + EntryCheckinResponse.Table.COL_IS_CALLED + "=0",new String[]{"0"},null,null,EntryCheckinResponse.Table.COL_RESPONSE_ID + " DESC");
-        Cursor c = db.query(EntryCheckinResponse.Table.TABLE_NAME,null, EntryCheckinResponse.Table.COL_IS_CHECKOUT + "= ? AND " + EntryCheckinResponse.Table.COL_IS_READY_CHECKOUT + "= 0",new String[]{"0"},null,null,EntryCheckinResponse.Table.COL_ID + " DESC");
+        //Cursor c = db.query(EntryCheckinResponse.Table.TABLE_NAME,null, EntryCheckinResponse.Table.COL_IS_CHECKOUT + " = ? AND " + EntryCheckinResponse.Table.COL_IS_READY_CHECKOUT + " = ?",new String[]{"0","0"},null,null,EntryCheckinResponse.Table.COL_ID + " DESC");
+        Cursor c = db.query(EntryCheckinResponse.Table.TABLE_NAME,null, EntryCheckinResponse.Table.COL_IS_CHECKOUT + " = ?",new String[]{"0"},null,null,EntryCheckinResponse.Table.COL_ID + " DESC");
+
         List<EntryCheckinResponse> responseList = new ArrayList<>();
 
         if (c.moveToFirst()) {
@@ -262,15 +273,46 @@ public class EntryDao {
 
     public Cursor getAllParkedCars() {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
-        return db.query(EntryCheckinResponse.Table.TABLE_NAME,null, EntryCheckinResponse.Table.COL_IS_CHECKOUT + "=? AND " + EntryCheckinResponse.Table.COL_IS_READY_CHECKOUT + "=0",new String[]{"0"},null,null,EntryCheckinResponse.Table.COL_RESPONSE_ID + " DESC");
+        return db.query(EntryCheckinResponse.Table.TABLE_NAME,null, EntryCheckinResponse.Table.COL_IS_CHECKOUT + "= ? AND " + EntryCheckinResponse.Table.COL_IS_READY_CHECKOUT + " = ?",new String[]{"0", "0"},null,null,EntryCheckinResponse.Table.COL_RESPONSE_ID + " DESC");
     }
 
     public Cursor getParkedCarsByPlatNo(String platNo) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         String[] args = new String[] {platNo};
         return db.query(EntryCheckinResponse.Table.TABLE_NAME,null, EntryCheckinResponse.Table.COL_PLAT_NO + " LIKE '?' AND "
-                 + EntryCheckinResponse.Table.COL_IS_CHECKOUT + "=0 AND "
+                 + EntryCheckinResponse.Table.COL_IS_CHECKOUT + "= 0 AND "
                 + EntryCheckinResponse.Table.COL_IS_READY_CHECKOUT + "=0", args,null,null,EntryCheckinResponse.Table.COL_RESPONSE_ID + " DESC");
+    }
+
+    public boolean isAlreadyCheckedIn(String platNo) {
+
+        Cursor c = getAllParkedCars();
+
+        if (Character.isDigit(platNo.trim().charAt(0))) {
+            platNo = "B" + platNo;
+        }
+
+        String plat = platNo.replace(" ", "");
+
+        if (c.moveToFirst()) {
+            do {
+                String existingPlatNo = c.getString(c.getColumnIndex(EntryCheckinResponse.Table.COL_PLAT_NO));
+                String trimmedPlat = existingPlatNo.replace(" ","");
+                if (plat.equalsIgnoreCase(trimmedPlat)) {
+                    c.close();
+                    return true;
+                }
+            }while (c.moveToNext());
+        }
+        c.close();
+
+        return false;
+    }
+
+    public int removeAllCheckinList() {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        return db.delete(EntryCheckinResponse.Table.TABLE_NAME, null, new String[]{});
+
     }
 
     public EntryCheckinResponse getEntryByIdResponse(int id) {
@@ -342,6 +384,104 @@ public class EntryDao {
     public void deleteUncheckedOutEntry() {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         db.execSQL("DELETE FROM " + EntryCheckinResponse.Table.TABLE_NAME + " WHERE " + EntryCheckinResponse.Table.COL_IS_CHECKOUT + " != 0");
+    }
+
+    public String getPlatNoByTicketNo(String ticketNo) {
+        List<EntryCheckinResponse> checkedOutCars = fetchAllCheckedoutCars();
+        Iterator<EntryCheckinResponse> i = checkedOutCars.iterator();
+        String platNo = "";
+
+        while (i.hasNext()) {
+            EntryCheckinResponse e = i.next();
+            String checkinTiket = e.getData().getAttribute().getNoTiket();
+            if (TextUtils.equals(checkinTiket, ticketNo)) {
+                platNo = e.getData().getAttribute().getPlatNo();
+                break;
+            }
+        }
+        return platNo;
+    }
+
+    public List<EntryCheckinResponse> fetchAllCheckedoutCars() {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        // Cursor c = db.query(EntryCheckinResponse.Table.TABLE_NAME,null, EntryCheckinResponse.Table.COL_IS_CHECKOUT + "=? AND " + EntryCheckinResponse.Table.COL_IS_CALLED + "=0",new String[]{"0"},null,null,EntryCheckinResponse.Table.COL_RESPONSE_ID + " DESC");
+        Cursor c = db.query(EntryCheckinResponse.Table.TABLE_NAME,null, EntryCheckinResponse.Table.COL_IS_CHECKOUT + " != ? ",new String[]{"0"},null,null,EntryCheckinResponse.Table.COL_ID + " DESC");
+        List<EntryCheckinResponse> responseList = new ArrayList<>();
+
+        if (c.moveToFirst()) {
+            do {
+                String jsonResponse = c.getString(c.getColumnIndex(EntryCheckinResponse.Table.COL_JSON_RESPONSE));
+                EntryCheckinResponse checkinResponse = gson.fromJson(jsonResponse, EntryCheckinResponse.class);
+                responseList.add(checkinResponse);
+            }while (c.moveToNext());
+        }
+
+        Collections.sort(responseList, new CheckinComparator()); // sorting based on checkintime descending
+        return responseList;
+    }
+
+    public void setCheckoutCar(List<ClosingData.Data> dataCheckouts){
+        List<EntryCheckinResponse> checkins = fetchAllCheckinResponse();
+
+        if (!checkins.isEmpty()) {
+            Iterator<ClosingData.Data> iCheckouts = dataCheckouts.iterator();
+            Iterator<EntryCheckinResponse> iCheckins = checkins.iterator();
+
+            while (iCheckouts.hasNext()) {
+                ClosingData.Data checkout = iCheckouts.next();
+                String checkoutTicket = checkout.getAttributes().getNoTiket().replace(" ","");
+                while (iCheckins.hasNext()) {
+                    EntryCheckinResponse checkin = iCheckins.next();
+
+                    String checkinTicket = checkin.getData().getAttribute().getNoTiket().replace(" ","");
+
+                    if (checkinTicket.equalsIgnoreCase(checkoutTicket)) {
+                        //String platNo = checkin.getData().getAttribute().getPlatNo();
+                        int vthdId = checkin.getData().getAttribute().getId();
+                        setCheckout(vthdId);
+                    }
+                }
+                iCheckins = checkins.iterator();
+            }
+        }
+    }
+
+    private void setCheckout(int vthdId) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        String[] args = new String[] {String.valueOf(vthdId)};
+        ContentValues cv = new ContentValues();
+        cv.put(EntryCheckinResponse.Table.COL_IS_CHECKOUT, 1);
+        int udpatSukes = db.update(EntryCheckinResponse.Table.TABLE_NAME,cv, EntryCheckinResponse.Table.COL_RESPONSE_ID + " = ?", args);
+        Log.d("Update to checkout", "update to checkout from download checkout service: " + udpatSukes);
+    }
+
+    public List<EntryCheckinResponse.Data> getNewListCheckin(List<EntryCheckinResponse.Data> checkinList) {
+        List<EntryCheckinResponse.Data> newCheckinList = checkinList;
+        List<EntryCheckinResponse> checkins = fetchAllCheckinResponse();
+
+        if (checkins.size() >= newCheckinList.size()){
+            return null;
+        }
+
+        Iterator<EntryCheckinResponse.Data> iDownloadedCheckinList = newCheckinList.iterator();
+        Iterator<EntryCheckinResponse> iCurrentCheckinList = checkins.iterator();
+
+        while (iDownloadedCheckinList.hasNext()) {
+            EntryCheckinResponse.Data downloadedCheckinData = iDownloadedCheckinList.next();
+            String downloadedTicket = downloadedCheckinData.getAttribute().getNoTiket().trim();
+            while (iCurrentCheckinList.hasNext()) {
+                EntryCheckinResponse.Data currentCheckinData = iCurrentCheckinList.next().getData();
+                String currentTicket = currentCheckinData.getAttribute().getNoTiket().trim();
+                if (downloadedTicket.equalsIgnoreCase(currentTicket)) {
+                    iDownloadedCheckinList.remove();
+                }
+            }
+
+            iCurrentCheckinList = checkins.iterator();
+
+        }
+
+        return newCheckinList;
     }
 
 }

@@ -4,7 +4,7 @@
     android:layout_gravity="center"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="@dimen/activity_horizontal_margin"
+    android:layout_marginBottom="2dp"
     android:clickable="true"
     app:cardCornerRadius="0dp">
 

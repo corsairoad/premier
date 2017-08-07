@@ -104,6 +104,7 @@
     <string name="checkout">CHECKOUT</string>
     <string name="ready">READY</string>
     <string name="stay_overnight">OVERNIGHT</string>
+    <string name="download_master_data">Download Master Data</string>
 
     <!-- printer activity strings -->
 
@@ -257,7 +258,7 @@
 
     <string name="title_list_preference">Set Lobby</string>
     <string name="pref_drop_point_key">drop_pint</string>
-    <string name="data_sync">Sync Data</string>
+    <string name="data_sync">Unsynchronized Data</string>
     <string name="closing">Closing EOD</string>
     <string name="closing_activity">Closing EOD</string>
     <string name="from">From</string>
@@ -288,6 +289,7 @@
     <string name="id_transaksi">ID TRANSAKSI</string>
     <string name="username">Username</string>
     <string name="reprint">Reprint Checkin</string>
+    <string name="id_device">Id device</string>
 
     <string-array name="array_report_type">
         <item>PER LOBBY</item>

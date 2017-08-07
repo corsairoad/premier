@@ -245,6 +245,7 @@ public class FinishCheckoutDao implements ProcessRequest {
         Log.d("Update to checkout", "" + udpatSukes);
 
     }
+
     public long saveDataCheckout(int remoteVthdId, FinishCheckOut finishCheckOut, String noTiket) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         String json = toJson(finishCheckOut);
@@ -260,7 +261,7 @@ public class FinishCheckoutDao implements ProcessRequest {
     public List<CheckoutData> getCheckoutData() {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         List<CheckoutData> checkoutDataList = new ArrayList<>();
-        String whereClause = FinishCheckOut.Table.COL_STATUS + "=?";
+        String whereClause = FinishCheckOut.Table.COL_STATUS + " = ? ";
         String[] args = new String[]{String.valueOf(STATUS_PENDING)};
 
         //Cursor c = db.rawQuery("SELECT * FROM " + FinishCheckOut.Table.TABLE_NAME, new String[] {});
@@ -288,6 +289,7 @@ public class FinishCheckoutDao implements ProcessRequest {
 
         ContentValues cv = new ContentValues();
         cv.put(FinishCheckOut.Table.COL_DATA_ID, remoteVthdId);
+        cv.put(FinishCheckOut.Table.COL_ID_STILL_FAKE, FAKE_UPDATED_TO_REMOTE_ID);
 
         return db.update(FinishCheckOut.Table.TABLE_NAME,cv,whereClause,args);
     }

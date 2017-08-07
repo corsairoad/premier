@@ -31,7 +31,10 @@ import valet.digikom.com.valetparking.util.PrefManager;
  */
 
 public class FailedTransactionService extends IntentService {
+
     public static final String TAG = FailedTransactionService.class.getSimpleName();
+
+    Call<EntryCheckinResponse> call;
 
     public FailedTransactionService() {
         super(TAG);
@@ -39,7 +42,7 @@ public class FailedTransactionService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-
+        Log.d(TAG, "post checkin service called");
         if (ApiClient.isNetworkAvailable(this)){
             EntryCheckinContainerDao containerDao = EntryCheckinContainerDao.getInstance(this);
             List<EntryCheckinContainer> containers = containerDao.fetchAll();
@@ -54,6 +57,14 @@ public class FailedTransactionService extends IntentService {
             startPostCheckoutService();
 
             Log.d(TAG, "STARTED");
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if(call != null) {
+            //call.cancel();
         }
     }
 
@@ -89,14 +100,18 @@ public class FailedTransactionService extends IntentService {
         TokenDao.getToken(new ProcessRequest() {
             @Override
             public void process(String token) {
+
+                // for debugging
+                //convertToJson(entryCheckinContainer);
+
                 ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class, null);
-                Call<EntryCheckinResponse> call = apiEndpoint.postCheckin(entryCheckinContainer, token);
+                call = apiEndpoint.postCheckin(entryCheckinContainer, token);
                 call.enqueue(new Callback<EntryCheckinResponse>() {
                     @Override
                     public void onResponse(Call<EntryCheckinResponse> call, Response<EntryCheckinResponse> response) {
                         if (response != null && response.body() != null) {
                             //int fakeVthdId = entryCheckinContainer.getEntryCheckin().getAttrib().getLastTicketCounter(); // fake vthd id diambil dari last ticket counter
-                            String noTiket = response.body().getData().getAttribute().getNoTiket().trim();
+                            String noTiket = response.body().getData().getAttribute().getNoTiket().trim().replace(" ", "");
                             int remoteVthdId = response.body().getData().getAttribute().getId();
                             String tiketSeq = response.body().getData().getAttribute().getIdTransaksi();
                             try{
@@ -110,11 +125,10 @@ public class FailedTransactionService extends IntentService {
                                 int updateSuccess = EntryDao.getInstance(FailedTransactionService.this)
                                         .updateRemoteAndTicketSequenceId(String.valueOf(fakeVthdId), remoteVthdId, tiketSeq);
 
-                                /*
+
                                 // update vthd id in checkout data if exist
                                 int updateIdDataCheckout = FinishCheckoutDao.getInstance(FailedTransactionService.this)
                                         .updateCheckoutVthdId(noTiket, remoteVthdId);
-                                */
 
 
                                 // remove checkin data from db if succeed
@@ -128,8 +142,7 @@ public class FailedTransactionService extends IntentService {
                                         .deleteCheckinDataByTicketNo(noTiket);
 
                                 // reload checkin list
-                                Intent RTReturn = new Intent(ParkedCarFragment.RECEIVE_CURRENT_LOBBY_DATA);
-                                LocalBroadcastManager.getInstance(FailedTransactionService.this).sendBroadcast(RTReturn);
+                                reloadCheckinList();
 
                                 //startDownloadCurrentLobbyService();
 
@@ -146,8 +159,7 @@ public class FailedTransactionService extends IntentService {
                                 EntryDao.getInstance(FailedTransactionService.this)
                                         .updateRemoteAndTicketSecByTicketNo(noTiket, remoteVthdId, tiketSeq);
 
-                                Intent RTReturn = new Intent(ParkedCarFragment.RECEIVE_CURRENT_LOBBY_DATA);
-                                LocalBroadcastManager.getInstance(FailedTransactionService.this).sendBroadcast(RTReturn);
+                                reloadCheckinList();
 
                                 startDownloadCurrentLobbyService();
                             }
@@ -161,5 +173,16 @@ public class FailedTransactionService extends IntentService {
                 });
             }
         }, this);
+    }
+
+    private void convertToJson(EntryCheckinContainer entryCheckinContainer){
+        Gson gson = new Gson();
+        String json = gson.toJson(entryCheckinContainer);
+        Log.d("Post Checkin json", json);
+    }
+
+    private void reloadCheckinList() {
+        Intent RTReturn = new Intent(ParkedCarFragment.RECEIVE_CURRENT_LOBBY_DATA);
+        LocalBroadcastManager.getInstance(FailedTransactionService.this).sendBroadcast(RTReturn);
     }
 }
