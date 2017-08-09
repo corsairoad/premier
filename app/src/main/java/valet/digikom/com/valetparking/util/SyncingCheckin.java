@@ -3,6 +3,8 @@ package valet.digikom.com.valetparking.util;
 import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
@@ -71,8 +73,7 @@ public class SyncingCheckin extends IntentService {
         totalcheckinToPost = checkins.size();
         sendMessage(ACTION,"Posting data checkin 0/" + totalcheckinToPost);
 
-        for (EntryCheckinContainer checkin : checkins) {
-
+        for (final EntryCheckinContainer checkin : checkins) {
             postCheckin(checkin,count);
             count++;
         }
@@ -124,36 +125,41 @@ public class SyncingCheckin extends IntentService {
                         EntryCheckinContainerDao.getInstance(SyncingCheckin.this)
                                 .deleteCheckinDataByTicketNo(noTiket);
 
-                        reloadCheckinList();
-
                         sendMessage(ACTION,"Posting data checkin " + count + "/" + totalcheckinToPost);
+
+                        reloadCheckinList();
+                        reloadCheckinList();
+                        reloadCheckinList();
 
                         if (count == totalcheckinToPost) {
                             startSyncChekoutService();
                         }
 
                     } else {
-                        int code = httpResponse.code();
-                        String message = "Login " + httpResponse.message();
-                        sendMessage(ACTION_ERROR_RESPONSE, message + " " + code);
-                        stopSelf();
+                        //int code = httpResponse.code();
+                        //String message = "Login " + httpResponse.message();
+                        //sendMessage(ACTION_ERROR_RESPONSE, message + " " + code);
+                        //stopSelf();
                     }
 
                 } catch (IOException e) {
+                    PrefManager.getInstance(SyncingCheckin.this).setLoggingOut(false);
                     e.printStackTrace();
                 } catch (NumberFormatException e) {
                     // remove checkin data from db
                     if (noTiket != null && remoteVthdId >0 && tiketSeq != null) {
                         Log.d("Post Checkin from error", noTiket + " successfully posted");
+
+
                         EntryCheckinContainerDao.getInstance(SyncingCheckin.this)
                                 .deleteCheckinDataByTicketNo(noTiket);
 
                         // update vthd id in checkout data if exist
-                        FinishCheckoutDao.getInstance(SyncingCheckin.this)
+                        int updtateCheckoutVthdId = FinishCheckoutDao.getInstance(SyncingCheckin.this)
                                 .updateCheckoutVthdId(noTiket, remoteVthdId);
 
                         // update synced checkin item in checkin list
-                        EntryDao.getInstance(SyncingCheckin.this)
+                        int updateRemoteTicketSeq = EntryDao.getInstance(SyncingCheckin.this)
                                 .updateRemoteAndTicketSecByTicketNo(noTiket, remoteVthdId, tiketSeq);
 
                         reloadCheckinList();
@@ -182,4 +188,3 @@ public class SyncingCheckin extends IntentService {
         startService(intent);
     }
 }
-

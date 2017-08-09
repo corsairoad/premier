@@ -725,7 +725,6 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
                 e.printStackTrace();
             }
 
-
             return null;
         }
 

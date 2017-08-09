@@ -13,12 +13,14 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import valet.digikom.com.valetparking.dao.EntryCheckinContainerDao;
 import valet.digikom.com.valetparking.dao.EntryDao;
 import valet.digikom.com.valetparking.dao.FinishCheckoutDao;
 import valet.digikom.com.valetparking.dao.TokenDao;
 import valet.digikom.com.valetparking.domain.CheckinList;
 import valet.digikom.com.valetparking.domain.EntryCheckinResponse;
 import valet.digikom.com.valetparking.fragments.ParkedCarFragment;
+import valet.digikom.com.valetparking.util.SyncingCheckin;
 
 /**
  * Created by DIGIKOM-EX4 on 3/21/2017.

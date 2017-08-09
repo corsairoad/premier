@@ -82,7 +82,10 @@ public class EntryCheckinContainerDao {
         if (c.moveToFirst()) {
             do {
                 String json = c.getString(c.getColumnIndex(EntryCheckinContainer.Table.COL_JSON_DATA));
+                String fakeId = c.getString(c.getColumnIndex(EntryCheckinContainer.Table.COL_FAKE_VTHD_ID));
+
                 EntryCheckinContainer container = gson.fromJson(json, EntryCheckinContainer.class);
+                container.getEntryCheckin().setId(fakeId);
 
                 containers.add(container);
             }while (c.moveToNext());

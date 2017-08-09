@@ -44,6 +44,13 @@ public class FailedTransactionService extends IntentService {
     protected void onHandleIntent(Intent intent) {
         Log.d(TAG, "post checkin service called");
         if (ApiClient.isNetworkAvailable(this)){
+
+            if (PrefManager.getInstance(this).isLoggingOut()) {
+                Log.d(TAG, "post checkin checkout service canceled because app is logging out");
+                stopSelf();
+                return;
+            }
+
             EntryCheckinContainerDao containerDao = EntryCheckinContainerDao.getInstance(this);
             List<EntryCheckinContainer> containers = containerDao.fetchAll();
 

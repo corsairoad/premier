@@ -26,6 +26,7 @@ public class PrefManager {
     public static final String KEY_LAST_PRINTED_TICKET_COUNTER = "last_printed_ticket_counter";
     public static final String KEY_LOBBY_TYPE = "key_lobby_type";
     public static final String KEY_TOKEN = "key_token";
+    public static final String KEY_LOGGINGOUT = "key_logging_out";
 
     private Context context;
     private static PrefManager prefManager;
@@ -206,5 +207,13 @@ public class PrefManager {
         return  sharedPreferences.getInt(KEY_ID_SITE, 0);
     }
 
+    public boolean isLoggingOut(){
+        return sharedPreferences.getBoolean(KEY_LOGGINGOUT, false);
+    }
+
+    public void setLoggingOut(boolean loggingOut) {
+        editor.putBoolean(KEY_LOGGINGOUT, loggingOut);
+        editor.commit();
+    }
 
 }

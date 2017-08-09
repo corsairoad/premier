@@ -120,9 +120,11 @@ public class SyncingCheckout extends IntentService {
                         String message = "Logout " + httpResponse.message();
                         sendMessage(ACTION_LOGOUT_ERROR_RESPONSE, message + " " + code);
                         stopSelf();
+                        PrefManager.getInstance(SyncingCheckout.this).setLoggingOut(false);
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
+                    PrefManager.getInstance(SyncingCheckout.this).setLoggingOut(false);
                 }
             }
         }, this);

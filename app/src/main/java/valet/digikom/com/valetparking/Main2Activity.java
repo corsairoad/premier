@@ -120,6 +120,7 @@ public class Main2Activity extends AppCompatActivity
         syncProgress = (ProgressBar) findViewById(R.id.myProgress);
         textProgress = (TextView) findViewById(R.id.myTextProgress);
         btnCancelLogout = (Button) findViewById(R.id.cancel_logout);
+        btnCancelLogout.setOnClickListener(this);
         tabLayout = (TabLayout) findViewById(R.id.tabs);
         viewPager = (ViewPager) findViewById(R.id.viewpager);
         btnLogout = (Button) findViewById(R.id.btn_logout);
@@ -152,7 +153,6 @@ public class Main2Activity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        handleIntent(getIntent());
 
         // startCheckoutEntryAlarm();
     }
@@ -213,6 +213,7 @@ public class Main2Activity extends AppCompatActivity
         checkPrinter();
         startAllServices();
         setTitle();
+        handleIntent(getIntent());
     }
 
     @Override
@@ -352,16 +353,25 @@ public class Main2Activity extends AppCompatActivity
 
         // checking ready checkout car
         if (id == R.id.action_refresh) {
-            int indexLobbyType = prefManager.getLobbyType();
-            ParkedCarFragment parkedCarFragment = (ParkedCarFragment) pagerAdapter.getItem(0);
-            if(parkedCarFragment != null) {
-                parkedCarFragment.downloadCheckinList(indexLobbyType);
-            }
-            postCheckinData();
+            refresh();
             return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void refresh() {
+        prefManager.setLoggingOut(false);
+
+        int indexLobbyType = prefManager.getLobbyType();
+        ParkedCarFragment parkedCarFragment = (ParkedCarFragment) pagerAdapter.getItem(0);
+
+        if(parkedCarFragment != null) {
+            parkedCarFragment.downloadCheckinList(indexLobbyType);
+        }
+
+        postCheckinData();
+
     }
 
     private void postCheckinData(){
@@ -421,6 +431,7 @@ public class Main2Activity extends AppCompatActivity
         int id = view.getId();
         switch (id){
             case R.id.btn_logout:
+                drawer.closeDrawer(GravityCompat.START);
                 showLogoutDialog();
                 break;
             case R.id.cancel_logout:
@@ -432,6 +443,8 @@ public class Main2Activity extends AppCompatActivity
     private void cancelLogout() {
         stopService(new Intent(this, SyncingCheckin.class));
         stopService(new Intent(this, SyncingCheckout.class));
+        enableProgressBar(false);
+        prefManager.setLoggingOut(false);
     }
 
     private void showLogoutDialog() {
@@ -443,6 +456,7 @@ public class Main2Activity extends AppCompatActivity
                     @Override
                     public void onClick(SweetAlertDialog sweetAlertDialog) {
                         drawer.closeDrawer(GravityCompat.START);
+
                         syncAllUnsyncData();
                         //logout();
                         sweetAlertDialog.dismiss();
@@ -466,8 +480,10 @@ public class Main2Activity extends AppCompatActivity
             return;
         }
 
-        stopAllService();
-        stopServiceDirecly();
+        prefManager.setLoggingOut(true);
+
+        stopAllService(); // stop alarm
+        stopServiceDirecly(); // stop service
         enableProgressBar(true);
 
         syncCheckin();
@@ -489,13 +505,16 @@ public class Main2Activity extends AppCompatActivity
                         if (code == AuthResDao.HTTP_STATUS_LOGOUT_SUKSES) {
                             PrefManager prefManager = PrefManager.getInstance(Main2Activity.this);
                             prefManager.logoutUser();
+                            prefManager.setLoggingOut(false);
                             prefManager.setPrinterMacAddress(null);
                             stopAllService();
                             goToSplash();
 
                         } else if (code == AuthResDao.HTTP_STATUS_LOGOUT_INVALID){
-                            Toast.makeText(Main2Activity.this, "Logout failed, invalid token", Toast.LENGTH_SHORT).show();
+                            prefManager.setLoggingOut(false);
+                            //Toast.makeText(Main2Activity.this, "Logout failed, invalid token", Toast.LENGTH_SHORT).show();
                         } else {
+                            prefManager.setLoggingOut(false);
                             Toast.makeText(Main2Activity.this, "Logout failed, error response occured", Toast.LENGTH_SHORT).show();
                         }
                     }
@@ -543,13 +562,10 @@ public class Main2Activity extends AppCompatActivity
             Uri uri = intent.getData();
             String queryId = uri.getLastPathSegment();
             startParkDetailActivity(queryId);
-        }
-        /*
-        else if (ACTION_DOWNLOAD_CHECKIN.equals(intent.getAction())) {
-            ParkedCarFragment parkedCarFragment = (ParkedCarFragment) pagerAdapter.getItem(0);
-            parkedCarFragment.downloadCheckinList();
-        }
-        */
+        } //else if (ACTION_DOWNLOAD_CHECKIN.equals(intent.getAction())) {
+            //refresh();
+        //}
+
     }
 
     private void startParkDetailActivity(String idResponse) {
