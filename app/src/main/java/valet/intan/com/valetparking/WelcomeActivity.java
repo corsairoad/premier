@@ -65,9 +65,8 @@ public class WelcomeActivity extends AppCompatActivity {
 
                     patch(dropPointMaster.getAttrib().getDropId());
 
-                    // delete checkin list in local db if current lobby id different from last logged in lobby id
-                    // so the data from different lobby won't show up in parked cars fragment
-                    checkIfLoginfromDifferentLobby(dropPointMaster.getAttrib().getDropId(), prefManager.getIdDefaultDropPoint());
+                    //checkIfLoginfromDifferentLobby(dropPointMaster.getAttrib().getDropId(), prefManager.getIdDefaultDropPoint());
+                    removeAllCheckinList();
 
                     prefManager.setIdSite(mRoleOption.getSiteId());
                     prefManager.setSiteName(mRoleOption.getSiteName());
@@ -128,6 +127,8 @@ public class WelcomeActivity extends AppCompatActivity {
         });
     }
 
+    // delete checkin list in local db if current lobby id different from last logged in lobby id
+    // so the data from different lobby won't show up in parked cars fragment
     private void checkIfLoginfromDifferentLobby(int newLobby, String previousLobby) {
         if (previousLobby == null) {
             return;
@@ -136,6 +137,10 @@ public class WelcomeActivity extends AppCompatActivity {
         if (!String.valueOf(newLobby).equalsIgnoreCase(previousLobby)) {
             EntryDao.getInstance(this).removeAllCheckinList();
         }
+    }
+
+    private void removeAllCheckinList() {
+        EntryDao.getInstance(this).removeAllCheckinList();
     }
 
     private void goToMain() {

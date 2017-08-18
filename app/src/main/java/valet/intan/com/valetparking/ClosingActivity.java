@@ -1,10 +1,14 @@
 package valet.intan.com.valetparking;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -57,6 +61,9 @@ import valet.intan.com.valetparking.service.ApiClient;
 import valet.intan.com.valetparking.service.ApiEndpoint;
 import valet.intan.com.valetparking.service.ProcessRequest;
 import valet.intan.com.valetparking.util.PrefManager;
+import valet.intan.com.valetparking.util.SyncCustomDialog;
+import valet.intan.com.valetparking.util.SyncingCheckin;
+import valet.intan.com.valetparking.util.SyncingCheckout;
 
 public class ClosingActivity extends AppCompatActivity implements View.OnClickListener, ListClosingAdapter.OnClosingItemClickListener, AdapterView.OnItemSelectedListener {
 
@@ -72,25 +79,26 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
     public static final int PRINT_SUMMARY = 1;
     public static final int PRINT_DETAILS = 2;
 
-    EditText inputDateFrom;
-    EditText inputDateUntil;
-    EditText inputRemark;
-    Button btnSetFrom;
-    Button btnSetUntil;
-    List<ClosingData.Data> closingData = new ArrayList<>();
-    ListClosingAdapter closingAdapter;
-    RecyclerView listClosingView;
-    TextView textRegular;
-    TextView textExclusive;
-    TextView textTotal;
-    MaterialProgressBar progressBar;
-    Button btnClosing;
-    Button btnPrintDetails;
-    Button btnPrintSummary;
-    LinearLayout layoutPrintSummary;
-    Spinner spReport;
-    Toolbar toolbar;
-    NumberProgressBar numberProgressBar;
+    private EditText inputDateFrom;
+    private EditText inputDateUntil;
+    private EditText inputRemark;
+    private Button btnSetFrom;
+    private Button btnSetUntil;
+    private List<ClosingData.Data> closingData = new ArrayList<>();
+    private ListClosingAdapter closingAdapter;
+    private RecyclerView listClosingView;
+    private TextView textRegular;
+    private TextView textExclusive;
+    private TextView textTotal;
+    private MaterialProgressBar progressBar;
+    private Button btnClosing;
+    private Button btnPrintDetails;
+    private Button btnPrintSummary;
+    private LinearLayout layoutPrintSummary;
+    private Spinner spReport;
+    private Toolbar toolbar;
+    private NumberProgressBar numberProgressBar;
+    private SyncCustomDialog syncDialog;
 
     int mYear;
     int mMonth;
@@ -120,6 +128,7 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
     private DownloadClosingDataTask downloadClosingDataTask;
     private Call<ClosingData> call;
     private List<GetReprintCheckinResponse.Data> listDataReprint = new ArrayList<>();
+    private BroadcastReceiver syncReceiver;
 
     public static final String EXTRA_CLOSING = ClosingActivity.class.getSimpleName();
 
@@ -195,6 +204,7 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
         spReportAdapter.setDropDownViewResource(R.layout.text_dropdown_item_spinner_report);
         spReport.setAdapter(spReportAdapter);
         spReport.setOnItemSelectedListener(this);
+        spReport.setOnItemSelectedListener(this);
 
         btnSetFrom.setOnClickListener(this);
         btnSetUntil.setOnClickListener(this);
@@ -210,15 +220,76 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
         startDate = inputDateFrom.getText().toString();
         endDate = inputDateUntil.getText().toString();
 
+        setupSyncReceiver();
+
         //downloadData(DOWNLOAD_PER_LOBBY);
         if (ApiClient.isNetworkAvailable(this)){
-            downloadClosingData(DOWNLOAD_PER_LOBBY);
-        }else {
+            syncPendingData();
+            //downloadClosingData(DOWNLOAD_PER_LOBBY);
+        } else {
             numberProgressBar.setVisibility(View.GONE);
             progressBar.setVisibility(View.GONE);
             showDialogNoInternet();
         }
 
+    }
+
+    private void setupSyncReceiver() {
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(SyncingCheckin.ACTION);
+        filter.addAction(SyncingCheckin.ACTION_ERROR_RESPONSE);
+        filter.addAction(SyncingCheckout.ACTION);
+        filter.addAction(SyncingCheckout.ACTION_CLOSING);
+
+        syncReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                switch (intent.getAction()){
+                    case SyncingCheckin.ACTION:
+                        setProgressMessage(intent.getStringExtra(SyncingCheckin.EXTRA));
+                        break;
+                    case SyncingCheckout.ACTION:
+                        setProgressMessage(intent.getStringExtra(SyncingCheckout.EXTRA));
+                        break;
+                    case SyncingCheckout.ACTION_CLOSING:
+                        downloadClosingData(DOWNLOAD_PER_LOBBY);
+                        break;
+                    case SyncingCheckin.ACTION_ERROR_RESPONSE:
+                        showErrorSync(intent.getStringExtra(SyncingCheckin.EXTRA));
+                        break;
+                }
+            }
+        };
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(syncReceiver,filter);
+    }
+
+    private void setProgressMessage(String stringExtra) {
+        if (syncDialog != null) {
+            syncDialog.setMessage(stringExtra);
+        }
+    }
+
+    private void showErrorSync(String message) {
+        if (syncDialog != null) {
+            syncDialog.setErrorMessage(message);
+        }
+    }
+
+    private void syncPendingData() {
+        setupSyncDialog();
+
+        Intent intent = new Intent(this, SyncingCheckin.class);
+        intent.setAction(SyncingCheckin.ACTION);
+        intent.putExtra(EXTRA_CLOSING, true);
+        startService(intent);
+    }
+
+    private void setupSyncDialog() {
+        syncDialog = new SyncCustomDialog(this);
+        syncDialog.setTitle("Checking pending data...");
+        //syncDialog.setCancelable(false);
+        syncDialog.show();
     }
 
     private void showDialogNoInternet() {
@@ -565,6 +636,10 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     private void downloadClosingData(final String flag) {
+        progressBar.setVisibility(View.VISIBLE);
+        numberProgressBar.setVisibility(View.VISIBLE);
+        syncDialog.dismiss();
+
         TokenDao.getToken(new ProcessRequest() {
             @Override
             public void process(String token) {

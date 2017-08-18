@@ -360,6 +360,8 @@ public class Main2Activity extends AppCompatActivity
     }
 
     private void refresh() {
+        TokenDao.refreshToken(this); // Getting new token
+
         prefManager.setLoggingOut(false);
 
         int indexLobbyType = prefManager.getLobbyType();

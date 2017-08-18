@@ -248,7 +248,8 @@
                     android:layout_above="@+id/number_progress_bar"
                     android:layout_centerInParent="true"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"/>
 
                 <com.daimajia.numberprogressbar.NumberProgressBar
                     android:id="@+id/number_progress_bar"
@@ -258,7 +259,7 @@
                     android:layout_height="wrap_content"
                     style="@style/NumberProgressBar_Beauty_Red"
                     android:layout_centerInParent="true"
-                    />
+                    android:visibility="gone"/>
 
                 <android.support.v7.widget.RecyclerView
                     android:id="@+id/list_closing_view"
