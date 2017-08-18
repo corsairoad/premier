@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:paddingTop="@dimen/activity_horizontal_margin"
-    tools:context="valet.digikom.com.valetparking.fragments.ReviewFragment">
+    tools:context="valet.intan.com.valetparking.fragments.ReviewFragment">
 
     <TextView
         android:visibility="gone"

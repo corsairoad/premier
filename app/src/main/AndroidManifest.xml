@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="valet.digikom.com.valetparking">
+    package="valet.intan.com.valetparking">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
     <application
@@ -64,7 +65,7 @@
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="valet.digikom.com.valetparking.Main2Activity" />
+                android:value=".Main2Activity" />
 
             <intent-filter>
                 <action android:name="DETAIL_FOR_CLOSING_ITEM" />
@@ -92,7 +93,7 @@
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="valet.digikom.com.valetparking.Main2Activity" />
+                android:value=".Main2Activity" />
         </activity>
         <activity
             android:name=".PrinterActivity"
@@ -100,7 +101,7 @@
             android:parentActivityName=".PreferenceActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="valet.digikom.com.valetparking.PreferenceActivity" />
+                android:value=".PreferenceActivity" />
 
             <intent-filter>
                 <action android:name="valet.digikom.com.valetparking.PrinterActivity" />
@@ -126,7 +127,7 @@
             android:parentActivityName=".Main2Activity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="valet.digikom.com.valetparking.Main2Activity" />
+                android:value=".Main2Activity" />
 
             <intent-filter>
                 <action android:name="valet.digikom.com.valetparking.PreferenceActivity" />
@@ -146,7 +147,7 @@
             android:parentActivityName=".Main2Activity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="valet.digikom.com.valetparking.Main2Activity" />
+                android:value=".Main2Activity" />
         </activity>
         <activity
             android:name=".WelcomeActivity"

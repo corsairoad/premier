@@ -42,7 +42,7 @@
 
                 <fragment
                     android:id="@+id/step_one_fragment"
-                    android:name="valet.digikom.com.valetparking.fragments.StepOneFragmet"
+                    android:name="valet.intan.com.valetparking.fragments.StepOneFragmet"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="4" />
@@ -52,7 +52,7 @@
                     android:layout_width="0dp"
                     android:layout_weight="2"
                     android:layout_height="match_parent"
-                    android:name="valet.digikom.com.valetparking.fragments.StepThreeFragment"/>
+                    android:name="valet.intan.com.valetparking.fragments.StepThreeFragment"/>
 
 
             </LinearLayout>
@@ -69,13 +69,13 @@
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:layout_height="match_parent"
-                    android:name="valet.digikom.com.valetparking.fragments.DefectFragment"/>
+                    android:name="valet.intan.com.valetparking.fragments.DefectFragment"/>
 
                 <fragment
                     android:id="@+id/review_fragment"
                     android:layout_width="0dp"
                     android:layout_weight="0"
-                    android:name="valet.digikom.com.valetparking.fragments.ReviewFragment"
+                    android:name="valet.intan.com.valetparking.fragments.ReviewFragment"
                     android:layout_height="match_parent"/>
 
             </LinearLayout>

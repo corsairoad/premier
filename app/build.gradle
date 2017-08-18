@@ -4,11 +4,11 @@ android {
     compileSdkVersion 25
     buildToolsVersion '25.0.0'
     defaultConfig {
-        applicationId "valet.digikom.com.valetparking"
+        applicationId "valet.intan.com.valetparking"
         minSdkVersion 16
         targetSdkVersion 24
-        versionCode 422
-        versionName "4.2.2[RELEASE]"
+        versionCode 435
+        versionName "4.3.5[RELEASE]"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
     }
@@ -33,7 +33,6 @@ dependencies {
     compile 'com.android.support:support-v4:25.1.1'
     compile 'com.android.support:design:25.1.1'
     compile 'com.github.2359media:EasyAndroidAnimations:0.8'
-    compile 'com.google.firebase:firebase-auth:10.0.1'
     compile 'de.hdodenhof:circleimageview:2.1.0'
     compile 'com.github.TechFreak:WizardPager:1.0.3'
     compile 'com.orhanobut:dialogplus:1.11@aar'
@@ -59,4 +58,3 @@ dependencies {
     testCompile 'junit:junit:4.12'
 }
 
-apply plugin: 'com.google.gms.google-services'
