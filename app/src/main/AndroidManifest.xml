@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="valet.digikom.com.valetparking">
+    package="valet.intan.com.valetparking">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
     <application
@@ -16,14 +17,11 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:replace="android:icon">
-
         <activity android:name=".MainActivity" />
-
         <activity
             android:name=".SplashActivity"
-            android:windowSoftInputMode="adjustPan|stateVisible"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen">
-        </activity>
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen"
+            android:windowSoftInputMode="adjustPan|stateVisible"></activity>
 
         <!-- MAIN ACTIVITY, SEARCHABLE ACTIVITY AND SEARCHING ACTIVITY -->
         <activity
@@ -37,8 +35,10 @@
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
             <meta-data
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
@@ -65,10 +65,10 @@
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="valet.digikom.com.valetparking.Main2Activity" />
+                android:value=".Main2Activity" />
 
             <intent-filter>
-                <action android:name="DETAIL_FOR_CLOSING_ITEM"/>
+                <action android:name="DETAIL_FOR_CLOSING_ITEM" />
             </intent-filter>
         </activity>
 
@@ -79,11 +79,12 @@
             android:name=".CheckoutReceiver"
             android:enabled="true" />
 
-        <service android:name=".service.FailedTransactionService"
-            android:exported="false"/>
-
-        <service android:name=".service.ReadyCheckoutService"
-            android:exported="false"/>
+        <service
+            android:name=".service.FailedTransactionService"
+            android:exported="false" />
+        <service
+            android:name=".service.ReadyCheckoutService"
+            android:exported="false" />
 
         <activity
             android:name=".CheckoutActivity"
@@ -92,7 +93,7 @@
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="valet.digikom.com.valetparking.Main2Activity" />
+                android:value=".Main2Activity" />
         </activity>
         <activity
             android:name=".PrinterActivity"
@@ -100,7 +101,7 @@
             android:parentActivityName=".PreferenceActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="valet.digikom.com.valetparking.PreferenceActivity" />
+                android:value=".PreferenceActivity" />
 
             <intent-filter>
                 <action android:name="valet.digikom.com.valetparking.PrinterActivity" />
@@ -126,57 +127,94 @@
             android:parentActivityName=".Main2Activity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="valet.digikom.com.valetparking.Main2Activity" />
+                android:value=".Main2Activity" />
 
             <intent-filter>
                 <action android:name="valet.digikom.com.valetparking.PreferenceActivity" />
+
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
             <intent-filter>
-                <action android:name="valet.digikom.com.valetparking.PreferenceActivity.change.password"/>
-                <category android:name="android.intent.category.DEFAULT"/>
+                <action android:name="valet.digikom.com.valetparking.PreferenceActivity.change.password" />
+
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
         <activity
             android:name=".ClosingActivity"
             android:label="@string/closing_activity"
-            android:parentActivityName=".Main2Activity"
-            android:launchMode="singleTask">
+            android:launchMode="singleTask"
+            android:parentActivityName=".Main2Activity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="valet.digikom.com.valetparking.Main2Activity" />
+                android:value=".Main2Activity" />
         </activity>
-        <activity android:name=".WelcomeActivity"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen"/>
+        <activity
+            android:name=".WelcomeActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen" />
 
-        <service android:name=".service.SimpeIME"
+        <service
+            android:name=".service.SimpeIME"
             android:label="@string/simple_ime"
             android:permission="android.permission.BIND_INPUT_METHOD">
-            <meta-data android:name="android.view.im" android:resource="@xml/method"/>
+            <meta-data
+                android:name="android.view.im"
+                android:resource="@xml/method" />
+
             <intent-filter>
                 <action android:name="android.view.InputMethod" />
             </intent-filter>
         </service>
-
-        <service android:name=".service.DownloadCurrentLobbyService"
+        <service
+            android:name=".service.DownloadCurrentLobbyService"
             android:exported="false">
             <intent-filter>
-                <action android:name="premier.valet.download.current.lobby"/>
+                <action android:name="premier.valet.download.current.lobby" />
             </intent-filter>
         </service>
-
-        <service android:name=".service.PostCheckoutService"
+        <service
+            android:name=".service.PostCheckoutService"
             android:exported="false">
             <intent-filter>
-                <action android:name="premier.valet.post.checkout.data"/>
+                <action android:name="premier.valet.post.checkout.data" />
+            </intent-filter>
+        </service>
+        <service
+            android:name=".service.DownloadClosingDataService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="premier.valet.download.closing.data" />
             </intent-filter>
         </service>
 
-        <service android:name=".service.DownloadClosingDataService" android:exported="false">
+        <service android:name=".service.DownloadCheckoutService"
+            android:exported="false">
             <intent-filter>
-                <action android:name="premier.valet.download.closing.data"/>
+                <action android:name="premier.valet.download.checkout.data.from.server"/>
             </intent-filter>
         </service>
+
+        <service android:name=".util.SyncingCheckin"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="premier.valet.post.checkin"/>
+            </intent-filter>
+        </service>
+        <service android:name=".util.SyncingCheckout"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="premier.valet.post.checkout"/>
+            </intent-filter>
+        </service>
+
+        <activity android:name=".SyncingActivity"
+            android:label="@string/data_sync"
+            android:parentActivityName=".Main2Activity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".Main2Activity">
+            </meta-data>
+        </activity>
     </application>
 
 </manifest>

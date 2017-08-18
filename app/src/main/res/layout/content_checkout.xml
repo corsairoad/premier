@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     android:orientation="vertical"
-    tools:context="valet.digikom.com.valetparking.CheckoutActivity"
+    tools:context="valet.intan.com.valetparking.CheckoutActivity"
     tools:showIn="@layout/activity_checkout">
 
     <android.support.v4.widget.NestedScrollView

@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     android:orientation="vertical"
-    tools:context="valet.digikom.com.valetparking.ParkedCarDetailActivity"
+    tools:context="valet.intan.com.valetparking.ParkedCarDetailActivity"
     tools:showIn="@layout/activity_parked_car_detail">
 
     <android.support.v4.widget.NestedScrollView
