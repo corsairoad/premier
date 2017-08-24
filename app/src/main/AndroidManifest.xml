@@ -7,8 +7,9 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
 
     <application
         android:allowBackup="true"
@@ -21,7 +22,7 @@
         <activity
             android:name=".SplashActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen"
-            android:windowSoftInputMode="adjustPan|stateVisible"></activity>
+            android:windowSoftInputMode="adjustPan|stateVisible" />
 
         <!-- MAIN ACTIVITY, SEARCHABLE ACTIVITY AND SEARCHING ACTIVITY -->
         <activity
@@ -186,35 +187,47 @@
                 <action android:name="premier.valet.download.closing.data" />
             </intent-filter>
         </service>
-
-        <service android:name=".service.DownloadCheckoutService"
+        <service
+            android:name=".service.DownloadCheckoutService"
             android:exported="false">
             <intent-filter>
-                <action android:name="premier.valet.download.checkout.data.from.server"/>
+                <action android:name="premier.valet.download.checkout.data.from.server" />
+            </intent-filter>
+        </service>
+        <service
+            android:name=".util.SyncingCheckin"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="premier.valet.post.checkin" />
+            </intent-filter>
+        </service>
+        <service
+            android:name=".util.SyncingCheckout"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="premier.valet.post.checkout" />
             </intent-filter>
         </service>
 
-        <service android:name=".util.SyncingCheckin"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="premier.valet.post.checkin"/>
-            </intent-filter>
-        </service>
-        <service android:name=".util.SyncingCheckout"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="premier.valet.post.checkout"/>
-            </intent-filter>
-        </service>
-
-        <activity android:name=".SyncingActivity"
+        <activity
+            android:name=".SyncingActivity"
             android:label="@string/data_sync"
             android:parentActivityName=".Main2Activity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".Main2Activity">
-            </meta-data>
+                android:value=".Main2Activity"></meta-data>
         </activity>
+
+        <service
+            android:name=".service.RefreshTokenService"
+            android:exported="false"></service>
+
+        <receiver android:name=".util.BootCompleteReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

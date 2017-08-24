@@ -10,7 +10,10 @@ import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -29,6 +32,7 @@ import valet.intan.com.valetparking.service.ApiClient;
 import valet.intan.com.valetparking.service.ApiEndpoint;
 import valet.intan.com.valetparking.service.ProcessRequest;
 import valet.intan.com.valetparking.util.PrefManager;
+import valet.intan.com.valetparking.util.RefreshTokenAlarm;
 import valet.intan.com.valetparking.util.ValetDbHelper;
 
 public class WelcomeActivity extends AppCompatActivity {
@@ -72,6 +76,10 @@ public class WelcomeActivity extends AppCompatActivity {
                     prefManager.setSiteName(mRoleOption.getSiteName());
                     prefManager.setDefaultDropPoint(dropPointMaster.getAttrib().getDropId());
                     prefManager.setDefaultDropPointName(dropPointMaster.getAttrib().getDropName());
+                    prefManager.setUserRoleId(mRoleOption.getUserRoleId());
+
+                    setLastLoginDate();
+                    setRefreshTokenAlarm();
 
                     goToMain();
                 } else {
@@ -127,6 +135,15 @@ public class WelcomeActivity extends AppCompatActivity {
         });
     }
 
+    private void setLastLoginDate() {
+        prefManager.setLastLoginDateToCurrentDate();
+    }
+
+    private void setRefreshTokenAlarm() {
+        RefreshTokenAlarm refreshTokenAlarm = RefreshTokenAlarm.getInstance(this);
+        refreshTokenAlarm.startAlarmIn5Days();
+    }
+
     // delete checkin list in local db if current lobby id different from last logged in lobby id
     // so the data from different lobby won't show up in parked cars fragment
     private void checkIfLoginfromDifferentLobby(int newLobby, String previousLobby) {
@@ -146,7 +163,7 @@ public class WelcomeActivity extends AppCompatActivity {
     private void goToMain() {
         Intent intent = new Intent(this, Main2Activity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.setAction(Main2Activity.ACTION_DOWNLOAD_CHECKIN);
+        intent.setAction(Main2Activity.ACTION_DOWNLOAD_CHECKINS);
         startActivity(intent);
         finish();
     }

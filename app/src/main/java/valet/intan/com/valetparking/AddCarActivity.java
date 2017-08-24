@@ -332,7 +332,7 @@ public class AddCarActivity extends FragmentActivity implements StepOneFragmet.O
 
     private void goToMain() {
         Intent intent = new Intent(this, Main2Activity.class);
-        intent.setAction(Main2Activity.ACTION_DOWNLOAD_CHECKIN);
+        //intent.setAction(Main2Activity.ACTION_DOWNLOAD_CHECKIN);
         startActivity(intent);
         finish();
     }

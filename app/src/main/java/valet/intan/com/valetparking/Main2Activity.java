@@ -49,6 +49,7 @@ import valet.intan.com.valetparking.fragments.CalledCarFragment;
 import valet.intan.com.valetparking.fragments.ParkedCarFragment;
 import valet.intan.com.valetparking.service.ApiClient;
 import valet.intan.com.valetparking.service.ApiEndpoint;
+import valet.intan.com.valetparking.service.DownloadCurrentLobbyService;
 import valet.intan.com.valetparking.service.FailedTransactionService;
 import valet.intan.com.valetparking.service.PostCheckoutService;
 import valet.intan.com.valetparking.service.ProcessRequest;
@@ -56,6 +57,7 @@ import valet.intan.com.valetparking.util.CheckinCheckoutAlarm;
 import valet.intan.com.valetparking.util.CheckoutReadyAlarm;
 import valet.intan.com.valetparking.util.DownloadCheckinAlarm;
 import valet.intan.com.valetparking.util.PrefManager;
+import valet.intan.com.valetparking.util.RefreshTokenAlarm;
 import valet.intan.com.valetparking.util.SyncingCheckin;
 import valet.intan.com.valetparking.util.SyncingCheckout;
 import valet.intan.com.valetparking.util.ValetDbHelper;
@@ -64,7 +66,7 @@ public class Main2Activity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener, ParkedCarFragment.CountParkedCarListener,
         CalledCarFragment.CountCalledCarListener{
 
-    public static final String ACTION_DOWNLOAD_CHECKIN = "com.valet.download.data.checkin";
+    public static final String ACTION_DOWNLOAD_CHECKINS = "com.valet.download.data.checkin";
     public static final String ACTION_REPORT = "com.valet.report";
 
     private ViewPager viewPager;
@@ -360,7 +362,7 @@ public class Main2Activity extends AppCompatActivity
     }
 
     private void refresh() {
-        TokenDao.refreshToken(this); // Getting new token
+        //TokenDao.refreshToken(this); // Getting new token
 
         prefManager.setLoggingOut(false);
 
@@ -523,7 +525,8 @@ public class Main2Activity extends AppCompatActivity
 
                     @Override
                     public void onFailure(Call<ResponseBody> call, Throwable t) {
-                        Toast.makeText(Main2Activity.this, "Logout failed, cannot connect to server. Please try again later.", Toast.LENGTH_SHORT).show();
+                        prefManager.setLoggingOut(false);
+                        Toast.makeText(Main2Activity.this, "Logout failed: " + t.getMessage() + ". Please try again later.", Toast.LENGTH_SHORT).show();
                         cancelLogout();
                     }
                 });
@@ -565,9 +568,9 @@ public class Main2Activity extends AppCompatActivity
             Uri uri = intent.getData();
             String queryId = uri.getLastPathSegment();
             startParkDetailActivity(queryId);
-        } //else if (ACTION_DOWNLOAD_CHECKIN.equals(intent.getAction())) {
-            //refresh();
-        //}
+        } else if (ACTION_DOWNLOAD_CHECKINS.equals(intent.getAction())) {
+            downloadCheckinList();
+        }
 
     }
 
@@ -625,6 +628,9 @@ public class Main2Activity extends AppCompatActivity
     private void stopAllService() {
         checkinCheckoutAlarm.cancelAlarm();
         downloadCheckinAlarm.cancelAlarm();
+
+        RefreshTokenAlarm refreshTokenAlarm = RefreshTokenAlarm.getInstance(this);
+        refreshTokenAlarm.cancelAlarm();
         //stopServiceDirecly();
     }
 
@@ -665,6 +671,12 @@ public class Main2Activity extends AppCompatActivity
 
     private void startServiceDirectly() {
         startService(new Intent(this, FailedTransactionService.class));
+    }
+
+    private void downloadCheckinList() {
+        Intent intent = new Intent(this, DownloadCurrentLobbyService.class);
+        intent.setAction(DownloadCurrentLobbyService.ACTION_DOWNLOAD);
+        startService(intent);
     }
 
 }

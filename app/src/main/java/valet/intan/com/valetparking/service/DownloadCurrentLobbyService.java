@@ -11,10 +11,12 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import valet.intan.com.valetparking.dao.EntryCheckinContainerDao;
 import valet.intan.com.valetparking.dao.EntryDao;
 import valet.intan.com.valetparking.dao.FinishCheckoutDao;
 import valet.intan.com.valetparking.dao.TokenDao;
 import valet.intan.com.valetparking.domain.CheckinList;
+import valet.intan.com.valetparking.domain.EntryCheckinContainer;
 import valet.intan.com.valetparking.domain.EntryCheckinResponse;
 import valet.intan.com.valetparking.fragments.ParkedCarFragment;
 
@@ -54,6 +56,15 @@ public class DownloadCurrentLobbyService extends IntentService {
                                         .updateCheckoutVthdId(downloadedCheckinList);
 
                                 reloadParkedCarsList();
+
+                                // delete checkin data to prevent double checkin.
+                                removeCheckinDataToPost(downloadedCheckinList);
+                            } else  {
+                                // 401 = token expired. then force logout
+                                int httpResponseCode = response.code();
+                                if (httpResponseCode == 401) {
+                                    RefreshTokenService.startActionRefreshToken(DownloadCurrentLobbyService.this);
+                                }
                             }
                         }
 
@@ -66,6 +77,14 @@ public class DownloadCurrentLobbyService extends IntentService {
             }, this);
 
             startDownloadCheckoutService();
+        }
+    }
+
+    private void removeCheckinDataToPost(List<EntryCheckinResponse.Data> downloadedCheckinList) {
+        EntryCheckinContainerDao checkinDao = EntryCheckinContainerDao.getInstance(this);
+        for (EntryCheckinResponse.Data data : downloadedCheckinList) {
+            String noTiket = data.getAttribute().getNoTiket();
+            checkinDao.deleteCheckinDataByTicketNo(noTiket);
         }
     }
 

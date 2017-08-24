@@ -35,6 +35,9 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
     private Button btnLogin;
     private ProgressBar progressBar;
     private TextView txtVersion;
+    private TextView txtForceLogout;
+
+    public static final String KEY_EXTRA_FORCE_LOGOUT = "com.valet.force.logout";
 
 
     @Override
@@ -57,7 +60,23 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
         btnLogin.setOnClickListener(this);
         progressBar = (ProgressBar) findViewById(R.id.progressbar);
         txtVersion = (TextView) findViewById(R.id.text_app_version);
+        txtForceLogout = (TextView) findViewById(R.id.text_notif);
         setTextVersion();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        handleIntent(getIntent());
+    }
+
+    private void handleIntent(Intent intent) {
+        if (intent != null) {
+            boolean isForcedLogout = intent.getBooleanExtra(KEY_EXTRA_FORCE_LOGOUT, false);
+            if (isForcedLogout) {
+                txtForceLogout.setVisibility(View.VISIBLE);
+            }
+        }
     }
 
     private void setTextVersion() {

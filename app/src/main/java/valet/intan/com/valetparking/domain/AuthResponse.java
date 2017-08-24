@@ -247,9 +247,36 @@ public class AuthResponse {
     public static class Meta {
         @SerializedName("token")
         private String token;
+        @SerializedName("token_lifetime")
+        private String expiredDate;
 
         public String getToken() {
             return token;
         }
+
+        public String getExpiredDate() {
+            return expiredDate;
+        }
     }
+
+    public class MetaContainer {
+
+        @SerializedName("data")
+        private Data data;
+
+        public Data getData() {
+            return data;
+        }
+
+        public class Data {
+            @SerializedName("meta")
+            private Meta meta;
+
+            public Meta getMeta() {
+                return meta;
+            }
+        }
+    }
+
+
 }
