@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -29,6 +30,8 @@ import valet.intan.com.valetparking.util.PrefManager;
 
 public class SplashActivity extends AppCompatActivity implements View.OnClickListener, AuthResDao.OnAuthListener {
 
+    public static final String KEY_EXTRA_FORCE_LOGOUT = "com.valet.force.logout";
+
     private LinearLayout linearLayout;
     private EditText inputEmail;
     private EditText inputPassword;
@@ -37,8 +40,8 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
     private TextView txtVersion;
     private TextView txtForceLogout;
 
-    public static final String KEY_EXTRA_FORCE_LOGOUT = "com.valet.force.logout";
-
+    private String email;
+    private String password;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,9 +52,6 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
             goToMain();
             return;
         }
-
-        requestPermissionForDevId();
-        //saveDeviceAndAppId();
 
         linearLayout = (LinearLayout) findViewById(R.id.container_input);
         inputEmail = (EditText) findViewById(R.id.input_email);
@@ -93,7 +93,9 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE)  != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_PHONE_STATE}, 2);
         }else {
-            saveDeviceAndAppId();
+            if (saveDeviceAndAppId()){
+                proceessToLogin();
+            }
         }
     }
 
@@ -102,27 +104,28 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
         switch (requestCode) {
             case 2:{
                 if (grantResults.length>0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    saveDeviceAndAppId();
+                    if (saveDeviceAndAppId()) {
+                        proceessToLogin();
+                    }
                 }
-                return;
+                break;
             }
         }
     }
 
-    private void saveDeviceAndAppId() {
+    private boolean saveDeviceAndAppId() {
         TelephonyManager telephonyManager = (android.telephony.TelephonyManager) getSystemService(TELEPHONY_SERVICE);
         String deviceId = telephonyManager.getDeviceId();
         String appId = UUID.randomUUID().toString();
 
         if (TextUtils.isEmpty(deviceId)) {
-            deviceId = String.valueOf(Calendar.getInstance().getTimeInMillis());
-        }
-
-        if (TextUtils.isEmpty(appId)) {
-            appId = String.valueOf(Calendar.getInstance().getTimeInMillis());
+            showErrorDialog("IMEI Problem", "Unable to get device IMEI, please check your internet connection");
+            progressBar.setVisibility(View.GONE);
+            return false;
         }
 
         PrefManager.getInstance(this).saveDeviceAndAppId(deviceId, appId);
+        return true;
     }
 
 
@@ -130,8 +133,8 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
     public void onClick(View view) {
         progressBar.setVisibility(View.VISIBLE);
 
-        final String email = inputEmail.getText().toString().trim();
-        final String password = inputPassword.getText().toString().trim();
+        email = inputEmail.getText().toString().trim();
+        password = inputPassword.getText().toString().trim();
 
         if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password)) {
             progressBar.setVisibility(View.GONE);
@@ -142,8 +145,9 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
         new Thread(new Runnable() {
             @Override
             public void run() {
-                AuthResDao authResDao = AuthResDao.getInstance(SplashActivity.this);
-                authResDao.login(email, password, SplashActivity.this);
+
+                requestPermissionForDevId();
+
             }
         }).run();
 
@@ -200,6 +204,25 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
         finish();
+    }
+
+    private void showErrorDialog(String title, String content) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(title);
+        builder.setMessage(content);
+        builder.setIcon(R.drawable.ic_error_outline);
+        builder.setPositiveButton("Oke", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        builder.show();
+    }
+
+    private void proceessToLogin() {
+        AuthResDao authResDao = AuthResDao.getInstance(SplashActivity.this);
+        authResDao.login(email, password, SplashActivity.this);
     }
 
 }

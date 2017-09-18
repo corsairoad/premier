@@ -84,9 +84,8 @@ public class AuthResDao {
         call.enqueue(new Callback<JsonElement>() {
             @Override
             public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
-                JsonElement jsonElemet = response.body();
-
                 int responseCode = response.code();
+                JsonElement jsonElemet = response.body();
                 Gson gson = new Gson();
                 switch (responseCode) {
                     case HTTP_STATUS_LOGIN_SUKSES:

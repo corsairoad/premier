@@ -142,9 +142,7 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
         //progressBar.setVisibility(View.VISIBLE);
 
         numberProgressBar = (NumberProgressBar) findViewById(R.id.number_progress_bar);
-
         numberProgressBar.setMax(100);
-
 
         textRegular = (TextView) findViewById(R.id.text_regular);
         textExclusive = (TextView) findViewById(R.id.text_exclusive);
@@ -165,6 +163,7 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
         listClosingView.setLayoutManager(layoutManager);
         closingAdapter = new ListClosingAdapter(this);
         listClosingView.setAdapter(closingAdapter);
+
         /*
         listClosingView.addOnScrollListener(new PaginationScrollListener((LinearLayoutManager) layoutManager) {
             @Override
@@ -666,7 +665,7 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
                         if (response != null && response.body() != null) {
                             calculateTotalPage(response.body());
                             updateListClosing(response.body().getDataList());
-                        }else {
+                        } else {
                             progressBar.setVisibility(View.GONE);
                             try {
                                 String errorBody = response.errorBody().string();

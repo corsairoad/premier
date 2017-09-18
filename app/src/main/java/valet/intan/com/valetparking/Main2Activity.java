@@ -22,6 +22,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -110,11 +111,8 @@ public class Main2Activity extends AppCompatActivity
         initSyncReceiver();
 
         // back to login
-        if (prefManager.getAuthResponse() == null || prefManager.getIdSite() == 0) {
-            prefManager.saveAuthResponse(null);
-            startActivity(new Intent(this, SplashActivity.class));
-            finish();
-        }
+        validateAuthentication();
+        validateSiteAndLobby();
 
         setDefaultKeyMode(DEFAULT_KEYS_SEARCH_LOCAL);
 
@@ -158,6 +156,22 @@ public class Main2Activity extends AppCompatActivity
         // startCheckoutEntryAlarm();
     }
 
+    private void validateAuthentication() {
+        if (prefManager.getAuthResponse() == null || prefManager.getIdSite() == 0) {
+            prefManager.saveAuthResponse(null);
+            startActivity(new Intent(this, SplashActivity.class));
+            finish();
+        }
+    }
+
+    private void validateSiteAndLobby() {
+        if (TextUtils.isEmpty(prefManager.getDefaultDropPointName())
+                || TextUtils.isEmpty(prefManager.getIdDefaultDropPoint())) {
+            startActivity(new Intent(this, SplashActivity.class));
+            finish();
+        }
+    }
+
     private void initSyncReceiver() {
         IntentFilter filter = new IntentFilter();
         filter.addAction(SyncingCheckin.ACTION);
@@ -180,7 +194,8 @@ public class Main2Activity extends AppCompatActivity
                         logout();
                         break;
                     case SyncingCheckin.ACTION_ERROR_RESPONSE:
-                    case SyncingCheckout.ACTION_LOGOUT_ERROR_RESPONSE:
+                        case SyncingCheckout.ACTION_LOGOUT_ERROR_RESPONSE:
+                        //logout();
                         showErrorSync(intent.getStringExtra(SyncingCheckin.EXTRA));
                         break;
                 }
@@ -508,6 +523,7 @@ public class Main2Activity extends AppCompatActivity
                         if (code == AuthResDao.HTTP_STATUS_LOGOUT_SUKSES) {
                             PrefManager prefManager = PrefManager.getInstance(Main2Activity.this);
                             prefManager.logoutUser();
+                            prefManager.resetDefaultDropPoint();
                             prefManager.setLoggingOut(false);
                             prefManager.setPrinterMacAddress(null);
                             stopAllService();

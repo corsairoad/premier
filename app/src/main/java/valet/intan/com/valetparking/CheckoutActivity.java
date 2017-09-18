@@ -151,6 +151,11 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
         spBank = (Spinner) findViewById(R.id.sp_bank);
         imgCar = (CircleImageView) findViewById(R.id.img_car);
 
+        if (!btnCheckout.isEnabled()) {
+            btnCheckout.setText("SAVE");
+            btnCheckout.setEnabled(true);
+        }
+
         if (getIntent() != null) {
             idValetHeader = getIntent().getIntExtra(EntryCheckoutCont.KEY_ENTRY_CHECKOUT,0);
             setRemoteValetHeader(idValetHeader);
@@ -599,7 +604,9 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
 
         if (inputPaymentToken.getVisibility() == View.VISIBLE) {
             if (TextUtils.isEmpty(inputPaymentToken.getText().toString())) {
+                inputPaymentToken.setError(inputPaymentToken.getHint() + " can't be blank.");
                 Toast.makeText(this, "Please fill " + inputPaymentToken.getHint(), Toast.LENGTH_SHORT).show();
+                return;
             }
         }
 

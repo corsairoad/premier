@@ -1,7 +1,9 @@
 package valet.intan.com.valetparking;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -64,26 +66,27 @@ public class WelcomeActivity extends AppCompatActivity {
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 if (ApiClient.isNetworkAvailable(WelcomeActivity.this)) {
+                    btnSave.setEnabled(false);
+                    btnSave.setText("Saving... please wait");
+                    // patch(dropPointMaster.getAttrib().getDropId());
+                    save(dropPointMaster.getAttrib().getDropId());
 
-                    patch(dropPointMaster.getAttrib().getDropId());
+                    // //checkIfLoginfromDifferentLobby(dropPointMaster.getAttrib().getDropId(), prefManager.getIdDefaultDropPoint());
+                    //removeAllCheckinList();
 
-                    //checkIfLoginfromDifferentLobby(dropPointMaster.getAttrib().getDropId(), prefManager.getIdDefaultDropPoint());
-                    removeAllCheckinList();
+                    //prefManager.setIdSite(mRoleOption.getSiteId());
+                    //prefManager.setSiteName(mRoleOption.getSiteName());
+                    //prefManager.setDefaultDropPoint(dropPointMaster.getAttrib().getDropId());
+                    //prefManager.setDefaultDropPointName(dropPointMaster.getAttrib().getDropName());
+                    //prefManager.setUserRoleId(mRoleOption.getUserRoleId());
 
-                    prefManager.setIdSite(mRoleOption.getSiteId());
-                    prefManager.setSiteName(mRoleOption.getSiteName());
-                    prefManager.setDefaultDropPoint(dropPointMaster.getAttrib().getDropId());
-                    prefManager.setDefaultDropPointName(dropPointMaster.getAttrib().getDropName());
-                    prefManager.setUserRoleId(mRoleOption.getUserRoleId());
+                    //setLastLoginDate();
+                    //setRefreshTokenAlarm();
 
-                    setLastLoginDate();
-                    setRefreshTokenAlarm();
-
-                    goToMain();
+                    //goToMain();
                 } else {
-                    Toast.makeText(WelcomeActivity.this,"Oops, you are not connected to internet. Please try again later", Toast.LENGTH_SHORT).show();
+                    showErrorDialog("Internet Problem", "Unable to submit site & lobby data due to connection problem.");
                 }
 
             }
@@ -168,7 +171,69 @@ public class WelcomeActivity extends AppCompatActivity {
         finish();
     }
 
+    private void save(final int idLobby) {
+        TokenDao.getToken(new ProcessRequest() {
+            @Override
+            public void process(String token) {
+                PatchMeBody patchMeBody = new PatchMeBody();
+                PatchMeBody.Data data = new PatchMeBody.Data();
+                PatchMeBody.Data.RoleOpt role = new PatchMeBody.Data.RoleOpt();
+                role.setUserRoleId(mRoleOption.getUserRoleId());
+                role.setLobbyId(idLobby);
+                role.setDeviceId(prefManager.getDeviceId());
+                data.setRoleOpt(role);
+                patchMeBody.setData(data);
+
+                ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class);
+                Call<PatchMeResponse> call = apiEndpoint.patchMe(patchMeBody, token);
+                call.enqueue(new Callback<PatchMeResponse>() {
+                    @Override
+                    public void onResponse(Call<PatchMeResponse> call, Response<PatchMeResponse> response) {
+                        //checkIfLoginfromDifferentLobby(dropPointMaster.getAttrib().getDropId(), prefManager.getIdDefaultDropPoint());
+                        if (response != null && response.body() != null) {
+                            removeAllCheckinList();
+
+                            prefManager.setIdSite(mRoleOption.getSiteId());
+                            prefManager.setSiteName(mRoleOption.getSiteName());
+                            prefManager.setDefaultDropPoint(dropPointMaster.getAttrib().getDropId());
+                            prefManager.setDefaultDropPointName(dropPointMaster.getAttrib().getDropName());
+                            prefManager.setUserRoleId(mRoleOption.getUserRoleId());
+
+                            setLastLoginDate();
+                            setRefreshTokenAlarm();
+
+                            goToMain();
+                        }else {
+                            btnSave.setEnabled(true);
+                            btnSave.setText("SAVE");
+                            showErrorDialog("Request Problem", "Response code: " + response.code() + "\n" + "Message: " + response.message());
+                        }
+
+                    }
+
+                    @Override
+                    public void onFailure(Call<PatchMeResponse> call, Throwable t) {
+                        btnSave.setEnabled(true);
+                        btnSave.setText("SAVE");
+                        Toast.makeText(WelcomeActivity.this,t.getMessage(), Toast.LENGTH_SHORT).show();
+                        showErrorDialog("Request Failure", "Message: " + t.getCause().getMessage());
+
+                    }
+                });
+            }
+        }, this);
+    }
+
     private void patch(final int idLobby){
+
+        if (!ApiClient.isNetworkAvailable(this)) {
+            showErrorDialog("Internet Problem", "Unable to download lobbies due to internet connection problem.");
+            if (dropPointAdapter != null && !dropPointList.isEmpty()) {
+                dropPointList.clear();
+                dropPointAdapter.notifyDataSetChanged();
+            }
+        }
+
         TokenDao.getToken(new ProcessRequest() {
             @Override
             public void process(String token) {
@@ -241,6 +306,20 @@ public class WelcomeActivity extends AppCompatActivity {
         if (btnSave.getVisibility() == View.INVISIBLE) {
             btnSave.setVisibility(View.VISIBLE);
         }
+    }
+
+    private void showErrorDialog(String title, String content) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(title);
+        builder.setMessage(content);
+        builder.setIcon(R.drawable.ic_error_outline);
+        builder.setPositiveButton("Oke", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        builder.show();
     }
 
 
