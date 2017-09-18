@@ -325,7 +325,7 @@ public class Main2Activity extends AppCompatActivity
                     .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            finish();
+                            Main2Activity.this.finishAffinity();
                         }
                     })
                     .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
