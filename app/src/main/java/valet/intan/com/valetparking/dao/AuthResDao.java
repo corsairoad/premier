@@ -140,6 +140,7 @@ public class AuthResDao {
             savePwx(password);
             saveToken(token);
             saveTokenExpiredDate(expiredDate);
+
             this.authListener.loginSuccess();
         }else {
             proceedToFailed(HTTP_STATUS_LOGIN_ERR_RESPONSE, null);

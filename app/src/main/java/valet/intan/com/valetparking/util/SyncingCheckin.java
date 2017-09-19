@@ -102,6 +102,7 @@ public class SyncingCheckin extends IntentService {
                     EntryCheckinResponse response = httpResponse.body();
 
                     if (response != null) {
+
                         noTiket = response.getData().getAttribute().getNoTiket().trim();
                         remoteVthdId = response.getData().getAttribute().getId();
                         tiketSeq = response.getData().getAttribute().getIdTransaksi();
@@ -134,16 +135,22 @@ public class SyncingCheckin extends IntentService {
                             startSyncChekoutService();
                         }
 
+
                     } else {
-                        //int code = httpResponse.code();
-                        //String message = "Login " + httpResponse.message();
-                        //sendMessage(ACTION_ERROR_RESPONSE, message + " " + code);
-                        //stopSelf();
+                        int code = httpResponse.code();
+                        String message = "Response checkin error: " + httpResponse.message() + ". Code: " + code;
+                        sendMessage(ACTION_ERROR_RESPONSE, message);
+                        stopSelf();
                     }
 
                 } catch (IOException e) {
-                    PrefManager.getInstance(SyncingCheckin.this).setLoggingOut(false);
                     e.printStackTrace();
+
+                    PrefManager.getInstance(SyncingCheckin.this).setLoggingOut(false);
+
+                    String message = e.getMessage();
+                    sendMessage(ACTION_ERROR_RESPONSE, message);
+                    stopSelf();
                 } catch (NumberFormatException e) {
                     // remove checkin data from db
                     if (noTiket != null && remoteVthdId >0 && tiketSeq != null) {
@@ -172,7 +179,6 @@ public class SyncingCheckin extends IntentService {
                 }
             }
         }, this);
-
     }
 
     private void sendMessage(String action,String message){

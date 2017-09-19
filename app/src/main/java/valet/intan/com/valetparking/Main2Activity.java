@@ -23,6 +23,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -108,8 +109,6 @@ public class Main2Activity extends AppCompatActivity
 
         prefManager = PrefManager.getInstance(this);
 
-        initSyncReceiver();
-
         // back to login
         validateAuthentication();
         validateSiteAndLobby();
@@ -156,6 +155,12 @@ public class Main2Activity extends AppCompatActivity
         // startCheckoutEntryAlarm();
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        initSyncReceiver();
+    }
+
     private void validateAuthentication() {
         if (prefManager.getAuthResponse() == null || prefManager.getIdSite() == 0) {
             prefManager.saveAuthResponse(null);
@@ -173,6 +178,8 @@ public class Main2Activity extends AppCompatActivity
     }
 
     private void initSyncReceiver() {
+        Log.d(Main2Activity.class.getSimpleName(), "initSyncReceiver: called");
+
         IntentFilter filter = new IntentFilter();
         filter.addAction(SyncingCheckin.ACTION);
         filter.addAction(SyncingCheckin.ACTION_ERROR_RESPONSE);
@@ -233,11 +240,17 @@ public class Main2Activity extends AppCompatActivity
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    protected void onPause() {
+        Log.d(Main2Activity.class.getSimpleName(), "onPause: called");
         if (syncReceiver != null) {
             LocalBroadcastManager.getInstance(this).unregisterReceiver(syncReceiver);
         }
+        super.onPause();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
     }
 
     private void setTitle() {
@@ -526,6 +539,8 @@ public class Main2Activity extends AppCompatActivity
                             prefManager.resetDefaultDropPoint();
                             prefManager.setLoggingOut(false);
                             prefManager.setPrinterMacAddress(null);
+                            prefManager.setExpiredDateToken(null);
+
                             stopAllService();
                             goToSplash();
 

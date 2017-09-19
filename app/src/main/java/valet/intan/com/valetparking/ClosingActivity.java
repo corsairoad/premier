@@ -15,6 +15,8 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -218,19 +220,16 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
 
         startDate = inputDateFrom.getText().toString();
         endDate = inputDateUntil.getText().toString();
+    }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        // Register local broadcast receiver
         setupSyncReceiver();
-
-        //downloadData(DOWNLOAD_PER_LOBBY);
-        if (ApiClient.isNetworkAvailable(this)){
-            syncPendingData();
-            //downloadClosingData(DOWNLOAD_PER_LOBBY);
-        } else {
-            numberProgressBar.setVisibility(View.GONE);
-            progressBar.setVisibility(View.GONE);
-            showDialogNoInternet();
-        }
-
+        // Synchronize pending data before download closing data
+        syncPendingData();
+        //downloadClosingData(DOWNLOAD_PER_LOBBY);
     }
 
     private void setupSyncReceiver() {
@@ -263,6 +262,12 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
         LocalBroadcastManager.getInstance(this).registerReceiver(syncReceiver,filter);
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_closing, menu);
+        return true;
+    }
+
     private void setProgressMessage(String stringExtra) {
         if (syncDialog != null) {
             syncDialog.setMessage(stringExtra);
@@ -271,17 +276,43 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
 
     private void showErrorSync(String message) {
         if (syncDialog != null) {
+            if (progressBar != null && numberProgressBar != null) {
+                progressBar.setVisibility(View.GONE);
+                numberProgressBar.setVisibility(View.GONE);
+            }
             syncDialog.setErrorMessage(message);
         }
     }
 
     private void syncPendingData() {
-        setupSyncDialog();
+        if (ApiClient.isNetworkAvailable(this)) {
 
-        Intent intent = new Intent(this, SyncingCheckin.class);
-        intent.setAction(SyncingCheckin.ACTION);
-        intent.putExtra(EXTRA_CLOSING, true);
-        startService(intent);
+            if (closingAdapter != null) {
+                isTotalPageRetrieved = false;
+                total_data = 0;
+                total_page = 0;
+                currentPage = 1;
+                downloadedTotal = 0;
+
+                setTextTotal(downloadedTotal, 0);
+
+                closingData.clear();
+                closingAdapter.clearData();
+                closingAdapter.notifyDataSetChanged();
+            }
+
+            setupSyncDialog();
+
+            Intent intent = new Intent(this, SyncingCheckin.class);
+            intent.setAction(SyncingCheckin.ACTION);
+            intent.putExtra(EXTRA_CLOSING, true);
+            startService(intent);
+        }else {
+            numberProgressBar.setVisibility(View.GONE);
+            progressBar.setVisibility(View.GONE);
+            showDialogNoInternet();
+        }
+
     }
 
     private void setupSyncDialog() {
@@ -319,6 +350,7 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
     protected void onPause() {
         Log.d(TAG, "PAUSED");
         //cancelTask();
+        unregisterLocalBroadcastReceiver();
         super.onPause();
     }
 
@@ -327,6 +359,12 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
         Log.d(TAG, "STOPPED");
         //cancelTask();
         super.onStop();
+    }
+
+    private void unregisterLocalBroadcastReceiver(){
+        if (syncReceiver != null) {
+            LocalBroadcastManager.getInstance(this).unregisterReceiver(syncReceiver);
+        }
     }
 
     private void cancelTask() {
@@ -362,6 +400,13 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.action_refresh_closing:
+                syncPendingData();
+                break;
+            default: break;
+        }
         return super.onOptionsItemSelected(item);
     }
 
@@ -635,14 +680,16 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     private void downloadClosingData(final String flag) {
-        progressBar.setVisibility(View.VISIBLE);
-        numberProgressBar.setVisibility(View.VISIBLE);
-        syncDialog.dismiss();
+        if (progressBar != null && numberProgressBar != null && syncDialog != null) {
+            progressBar.setVisibility(View.VISIBLE);
+            numberProgressBar.setVisibility(View.VISIBLE);
+            syncDialog.dismiss();
+        }
 
         TokenDao.getToken(new ProcessRequest() {
             @Override
             public void process(String token) {
-                ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class, null);
+                ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class);
                //call = apiEndpoint.getClosingData(currentPage, DATA_PER_PAGE, token);
 
                 if (flag != null) {
@@ -664,7 +711,8 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
                     public void onResponse(Call<ClosingData> call, Response<ClosingData> response) {
                         if (response != null && response.body() != null) {
                             calculateTotalPage(response.body());
-                            updateListClosing(response.body().getDataList());
+                            List<ClosingData.Data> dataList = response.body().getDataList();
+                            updateListClosing(dataList);
                         } else {
                             progressBar.setVisibility(View.GONE);
                             try {
@@ -785,7 +833,6 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
 
             if ((total_data>0) && (downloadedTotal <= total_data)){
                 closingAdapter.addAll(datas);
-
                 updateProgressBar(downloadedTotal);
 
                 currentPage = (downloadedTotal / DATA_PER_PAGE) + 1;
