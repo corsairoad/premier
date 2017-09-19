@@ -84,9 +84,8 @@ public class AuthResDao {
         call.enqueue(new Callback<JsonElement>() {
             @Override
             public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
-                JsonElement jsonElemet = response.body();
-
                 int responseCode = response.code();
+                JsonElement jsonElemet = response.body();
                 Gson gson = new Gson();
                 switch (responseCode) {
                     case HTTP_STATUS_LOGIN_SUKSES:
@@ -129,17 +128,28 @@ public class AuthResDao {
     private void proceedToSucceed(AuthResponse response, String password) {
         if (response != null ) {
             AuthResponse.Data.Role role = response.getData().getRole();
-            String token = response.getMeta().getToken();
             if (role.getRoleId() != 20) {
                 proceedToFailed(HTTP_STATUS_LOGIN_ERR_ROLE, null);
                 return;
             }
+
+            String token = response.getMeta().getToken();
+            String expiredDate = response.getMeta().getExpiredDate();
+
             saveAuthRes(response);
             savePwx(password);
             saveToken(token);
+            saveTokenExpiredDate(expiredDate);
+
             this.authListener.loginSuccess();
         }else {
             proceedToFailed(HTTP_STATUS_LOGIN_ERR_RESPONSE, null);
+        }
+    }
+
+    private void saveTokenExpiredDate(String expiredDate) {
+        if (expiredDate != null) {
+            prefManager.setExpiredDateToken(expiredDate);
         }
     }
 

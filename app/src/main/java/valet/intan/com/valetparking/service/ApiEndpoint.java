@@ -167,6 +167,8 @@ public interface ApiEndpoint {
     @GET("ad_checkout_finish_fine")
     Call<ClosingData> getCheckoutDataFromServer(@Query("page[size]")int pageSize, @Query("filter") String filter, @Header("Authorization") String token);
 
+    @GET("token_refresh")
+    Call<AuthResponse.MetaContainer> refreshToken(@Header("Authorization") String oldToken);
     //@GET("reprint_checkin")
     //Call<GetReprintCheckinResponse> getReprintData(@Query("filter") String filter);
 

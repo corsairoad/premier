@@ -2,6 +2,7 @@ package valet.intan.com.valetparking.util;
 
 import android.app.IntentService;
 import android.content.Intent;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
@@ -49,8 +50,8 @@ public class SyncingCheckout extends IntentService {
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
         if (ACTION.equalsIgnoreCase(intent.getAction())) {
-            sync();
             usedForClosing = intent.getBooleanExtra(ClosingActivity.EXTRA_CLOSING, false);
+            sync();
         }
     }
 
@@ -80,7 +81,10 @@ public class SyncingCheckout extends IntentService {
                 count++;
             }
 
-        } else {
+        } else if (usedForClosing){
+            sendMessage(ACTION_CLOSING,null);
+            //sendClosingBroadcast();
+        }else {
             sendMessage(ACTION_LOGOUT, null);
         }
     }
@@ -120,6 +124,7 @@ public class SyncingCheckout extends IntentService {
                             sendMessage(ACTION_LOGOUT, null);
                         }else {
                             sendMessage(ACTION_CLOSING,null);
+                            //sendClosingBroadcast();
                         }
 
                     }else {
@@ -146,5 +151,16 @@ public class SyncingCheckout extends IntentService {
     private FinishCheckOut toObject(String json) {
         Gson gson = new Gson();
         return gson.fromJson(json,FinishCheckOut.class);
+    }
+
+    private void sendClosingBroadcast() {
+        Handler handler = new Handler();
+        Runnable r = new Runnable() {
+            @Override
+            public void run() {
+                sendMessage(ACTION_CLOSING,null);
+            }
+        };
+        handler.postDelayed(r, 7000);
     }
 }

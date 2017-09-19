@@ -10,6 +10,7 @@ import android.widget.TextView;
 import com.google.gson.Gson;
 
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import valet.intan.com.valetparking.R;
 import valet.intan.com.valetparking.dao.EntryDao;
@@ -41,15 +42,29 @@ public class ListSyncCheckoutAdapter extends RecyclerView.Adapter<ListSyncChecko
 
     @Override
     public void onBindViewHolder(CheckoutViewHolder holder, int position) {
-        CheckoutData checkoutData = checkoutDataList.get(position);
-        FinishCheckOut checkOut = toFinishCheckout(checkoutData.getJsonData());
-        String ticketNo = checkoutData.getNoTiket();
-        String checkoutTime = "Checkout " + checkOut.getData().getAttribute().getCheckoutTime();
-        String platNo = getPlatNo(ticketNo);
+            CheckoutData checkoutData = checkoutDataList.get(position);
+            FinishCheckOut checkOut = toFinishCheckout(checkoutData.getJsonData());
+            String ticketNo = checkoutData.getNoTiket();
+            String checkoutTime = "";
+            String platNo = getPlatNo(ticketNo);
 
-        holder.txtSyncTicketNo.setText(ticketNo);
-        holder.txtSyncPlateNo.setText(platNo);
-        holder.txtSyncCheckoutTime.setText(checkoutTime);
+            try {
+                checkoutTime  = checkOut.getData().getAttribute().getCheckoutTime();
+            }catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            if (ticketNo != null) {
+                holder.txtSyncTicketNo.setText(ticketNo);
+            }
+
+            if (checkoutTime != null) {
+                holder.txtSyncPlateNo.setText(platNo);
+            }
+
+            if (checkoutTime != null) {
+                holder.txtSyncCheckoutTime.setText(checkoutTime);
+            }
     }
 
     @Override

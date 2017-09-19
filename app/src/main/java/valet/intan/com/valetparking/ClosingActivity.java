@@ -1,16 +1,22 @@
 package valet.intan.com.valetparking;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -57,6 +63,9 @@ import valet.intan.com.valetparking.service.ApiClient;
 import valet.intan.com.valetparking.service.ApiEndpoint;
 import valet.intan.com.valetparking.service.ProcessRequest;
 import valet.intan.com.valetparking.util.PrefManager;
+import valet.intan.com.valetparking.util.SyncCustomDialog;
+import valet.intan.com.valetparking.util.SyncingCheckin;
+import valet.intan.com.valetparking.util.SyncingCheckout;
 
 public class ClosingActivity extends AppCompatActivity implements View.OnClickListener, ListClosingAdapter.OnClosingItemClickListener, AdapterView.OnItemSelectedListener {
 
@@ -72,25 +81,26 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
     public static final int PRINT_SUMMARY = 1;
     public static final int PRINT_DETAILS = 2;
 
-    EditText inputDateFrom;
-    EditText inputDateUntil;
-    EditText inputRemark;
-    Button btnSetFrom;
-    Button btnSetUntil;
-    List<ClosingData.Data> closingData = new ArrayList<>();
-    ListClosingAdapter closingAdapter;
-    RecyclerView listClosingView;
-    TextView textRegular;
-    TextView textExclusive;
-    TextView textTotal;
-    MaterialProgressBar progressBar;
-    Button btnClosing;
-    Button btnPrintDetails;
-    Button btnPrintSummary;
-    LinearLayout layoutPrintSummary;
-    Spinner spReport;
-    Toolbar toolbar;
-    NumberProgressBar numberProgressBar;
+    private EditText inputDateFrom;
+    private EditText inputDateUntil;
+    private EditText inputRemark;
+    private Button btnSetFrom;
+    private Button btnSetUntil;
+    private List<ClosingData.Data> closingData = new ArrayList<>();
+    private ListClosingAdapter closingAdapter;
+    private RecyclerView listClosingView;
+    private TextView textRegular;
+    private TextView textExclusive;
+    private TextView textTotal;
+    private MaterialProgressBar progressBar;
+    private Button btnClosing;
+    private Button btnPrintDetails;
+    private Button btnPrintSummary;
+    private LinearLayout layoutPrintSummary;
+    private Spinner spReport;
+    private Toolbar toolbar;
+    private NumberProgressBar numberProgressBar;
+    private SyncCustomDialog syncDialog;
 
     int mYear;
     int mMonth;
@@ -120,6 +130,7 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
     private DownloadClosingDataTask downloadClosingDataTask;
     private Call<ClosingData> call;
     private List<GetReprintCheckinResponse.Data> listDataReprint = new ArrayList<>();
+    private BroadcastReceiver syncReceiver;
 
     public static final String EXTRA_CLOSING = ClosingActivity.class.getSimpleName();
 
@@ -133,9 +144,7 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
         //progressBar.setVisibility(View.VISIBLE);
 
         numberProgressBar = (NumberProgressBar) findViewById(R.id.number_progress_bar);
-
         numberProgressBar.setMax(100);
-
 
         textRegular = (TextView) findViewById(R.id.text_regular);
         textExclusive = (TextView) findViewById(R.id.text_exclusive);
@@ -156,6 +165,7 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
         listClosingView.setLayoutManager(layoutManager);
         closingAdapter = new ListClosingAdapter(this);
         listClosingView.setAdapter(closingAdapter);
+
         /*
         listClosingView.addOnScrollListener(new PaginationScrollListener((LinearLayoutManager) layoutManager) {
             @Override
@@ -195,6 +205,7 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
         spReportAdapter.setDropDownViewResource(R.layout.text_dropdown_item_spinner_report);
         spReport.setAdapter(spReportAdapter);
         spReport.setOnItemSelectedListener(this);
+        spReport.setOnItemSelectedListener(this);
 
         btnSetFrom.setOnClickListener(this);
         btnSetUntil.setOnClickListener(this);
@@ -209,16 +220,106 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
 
         startDate = inputDateFrom.getText().toString();
         endDate = inputDateUntil.getText().toString();
+    }
 
-        //downloadData(DOWNLOAD_PER_LOBBY);
-        if (ApiClient.isNetworkAvailable(this)){
-            downloadClosingData(DOWNLOAD_PER_LOBBY);
+    @Override
+    protected void onStart() {
+        super.onStart();
+        // Register local broadcast receiver
+        setupSyncReceiver();
+        // Synchronize pending data before download closing data
+        syncPendingData();
+        //downloadClosingData(DOWNLOAD_PER_LOBBY);
+    }
+
+    private void setupSyncReceiver() {
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(SyncingCheckin.ACTION);
+        filter.addAction(SyncingCheckin.ACTION_ERROR_RESPONSE);
+        filter.addAction(SyncingCheckout.ACTION);
+        filter.addAction(SyncingCheckout.ACTION_CLOSING);
+
+        syncReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                switch (intent.getAction()){
+                    case SyncingCheckin.ACTION:
+                        setProgressMessage(intent.getStringExtra(SyncingCheckin.EXTRA));
+                        break;
+                    case SyncingCheckout.ACTION:
+                        setProgressMessage(intent.getStringExtra(SyncingCheckout.EXTRA));
+                        break;
+                    case SyncingCheckout.ACTION_CLOSING:
+                        downloadClosingData(DOWNLOAD_PER_LOBBY);
+                        break;
+                    case SyncingCheckin.ACTION_ERROR_RESPONSE:
+                        showErrorSync(intent.getStringExtra(SyncingCheckin.EXTRA));
+                        break;
+                }
+            }
+        };
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(syncReceiver,filter);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_closing, menu);
+        return true;
+    }
+
+    private void setProgressMessage(String stringExtra) {
+        if (syncDialog != null) {
+            syncDialog.setMessage(stringExtra);
+        }
+    }
+
+    private void showErrorSync(String message) {
+        if (syncDialog != null) {
+            if (progressBar != null && numberProgressBar != null) {
+                progressBar.setVisibility(View.GONE);
+                numberProgressBar.setVisibility(View.GONE);
+            }
+            syncDialog.setErrorMessage(message);
+        }
+    }
+
+    private void syncPendingData() {
+        if (ApiClient.isNetworkAvailable(this)) {
+
+            if (closingAdapter != null) {
+                isTotalPageRetrieved = false;
+                total_data = 0;
+                total_page = 0;
+                currentPage = 1;
+                downloadedTotal = 0;
+
+                setTextTotal(downloadedTotal, 0);
+
+                closingData.clear();
+                closingAdapter.clearData();
+                closingAdapter.notifyDataSetChanged();
+            }
+
+            setupSyncDialog();
+
+            Intent intent = new Intent(this, SyncingCheckin.class);
+            intent.setAction(SyncingCheckin.ACTION);
+            intent.putExtra(EXTRA_CLOSING, true);
+            startService(intent);
         }else {
             numberProgressBar.setVisibility(View.GONE);
             progressBar.setVisibility(View.GONE);
             showDialogNoInternet();
         }
 
+    }
+
+    private void setupSyncDialog() {
+        syncDialog = new SyncCustomDialog(this);
+        syncDialog.setTitle("Checking pending data...");
+        //syncDialog.setCancelable(false);
+        syncDialog.show();
     }
 
     private void showDialogNoInternet() {
@@ -249,6 +350,7 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
     protected void onPause() {
         Log.d(TAG, "PAUSED");
         //cancelTask();
+        unregisterLocalBroadcastReceiver();
         super.onPause();
     }
 
@@ -257,6 +359,12 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
         Log.d(TAG, "STOPPED");
         //cancelTask();
         super.onStop();
+    }
+
+    private void unregisterLocalBroadcastReceiver(){
+        if (syncReceiver != null) {
+            LocalBroadcastManager.getInstance(this).unregisterReceiver(syncReceiver);
+        }
     }
 
     private void cancelTask() {
@@ -292,6 +400,13 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.action_refresh_closing:
+                syncPendingData();
+                break;
+            default: break;
+        }
         return super.onOptionsItemSelected(item);
     }
 
@@ -565,10 +680,16 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     private void downloadClosingData(final String flag) {
+        if (progressBar != null && numberProgressBar != null && syncDialog != null) {
+            progressBar.setVisibility(View.VISIBLE);
+            numberProgressBar.setVisibility(View.VISIBLE);
+            syncDialog.dismiss();
+        }
+
         TokenDao.getToken(new ProcessRequest() {
             @Override
             public void process(String token) {
-                ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class, null);
+                ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class);
                //call = apiEndpoint.getClosingData(currentPage, DATA_PER_PAGE, token);
 
                 if (flag != null) {
@@ -590,8 +711,9 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
                     public void onResponse(Call<ClosingData> call, Response<ClosingData> response) {
                         if (response != null && response.body() != null) {
                             calculateTotalPage(response.body());
-                            updateListClosing(response.body().getDataList());
-                        }else {
+                            List<ClosingData.Data> dataList = response.body().getDataList();
+                            updateListClosing(dataList);
+                        } else {
                             progressBar.setVisibility(View.GONE);
                             try {
                                 String errorBody = response.errorBody().string();
@@ -711,7 +833,6 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
 
             if ((total_data>0) && (downloadedTotal <= total_data)){
                 closingAdapter.addAll(datas);
-
                 updateProgressBar(downloadedTotal);
 
                 currentPage = (downloadedTotal / DATA_PER_PAGE) + 1;

@@ -40,7 +40,6 @@ public class DownloadCheckoutService extends IntentService {
         if (intent != null && ACTION.equalsIgnoreCase(intent.getAction())) {
             downloadCheckoutData();
         }
-
     }
 
     private void downloadCheckoutData() {
@@ -58,6 +57,12 @@ public class DownloadCheckoutService extends IntentService {
                             EntryDao.getInstance(DownloadCheckoutService.this).setCheckoutCar(checkoutData);
 
                             reloadParkedCarsList();
+                        }else {
+                            // 401 = token expired. then force logout
+                            int httpResponseCode = response.code();
+                            if (httpResponseCode == 401) {
+                                RefreshTokenService.startActionRefreshToken(DownloadCheckoutService.this);
+                            }
                         }
                     }
 

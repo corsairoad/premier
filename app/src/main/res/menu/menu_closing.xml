@@ -3,8 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/action_refresh"
-        android:icon="@drawable/ic_autorenew_black_24dp"
+        android:id="@+id/action_refresh_closing"
+        android:icon="@drawable/restart"
         android:title="@string/refresh"
-        android:showAsAction="ifRoom"/>
+        app:showAsAction="ifRoom"/>
 </menu>

@@ -6,6 +6,10 @@ import android.preference.PreferenceManager;
 
 import com.google.gson.Gson;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import valet.intan.com.valetparking.domain.AuthResponse;
 
 /**
@@ -27,6 +31,9 @@ public class PrefManager {
     public static final String KEY_LOBBY_TYPE = "key_lobby_type";
     public static final String KEY_TOKEN = "key_token";
     public static final String KEY_LOGGINGOUT = "key_logging_out";
+    public static final String KEY_USER_ROLE_ID = "user.role.id";
+    public static final String KEY_EXPIRED_TOKEN = "expired.token";
+    public static final String KEY_DATE_LAST_LOGIN = "last.login";
 
     private Context context;
     private static PrefManager prefManager;
@@ -83,7 +90,7 @@ public class PrefManager {
     }
 
     public void saveToken(String token) {
-        editor.putString(KEY_TOKEN, token);
+        editor.putString(KEY_TOKEN, "Bearer " + token);
         editor.commit();
     }
 
@@ -215,5 +222,44 @@ public class PrefManager {
         editor.putBoolean(KEY_LOGGINGOUT, loggingOut);
         editor.commit();
     }
+
+    public void setUserRoleId(int id){
+        editor.putInt(KEY_USER_ROLE_ID, id);
+        editor.commit();
+    }
+
+    public int getUserRoleId() {
+        return sharedPreferences.getInt(KEY_USER_ROLE_ID,20);
+    }
+
+    //  expdate parameter in long converted to string
+    public void setExpiredDateToken(String expDate) {
+        editor.putString(KEY_EXPIRED_TOKEN, expDate);
+        editor.commit();
+    }
+
+    public String getExpiredToken() {
+        return sharedPreferences.getString(KEY_EXPIRED_TOKEN, null);
+    }
+
+    // date parameter in String : MM/dd/yy hh:mm:ss
+    public void saveLastLoginDate(String date) {
+        editor.putString(KEY_DATE_LAST_LOGIN, date);
+        editor.commit();
+    }
+
+    public String getLastLoginDate() {
+        return sharedPreferences.getString(KEY_DATE_LAST_LOGIN, null);
+    }
+
+    public void setLastLoginDateToCurrentDate() {
+        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
+        Date date = new Date();
+        String lastLogin = dateFormat.format(date);
+
+        saveLastLoginDate(lastLogin);
+    }
+
+
 
 }
