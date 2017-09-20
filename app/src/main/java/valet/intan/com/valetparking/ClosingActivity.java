@@ -377,9 +377,11 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
     private void handleIntent() {
         if (getIntent() != null) {
             if (Main2Activity.ACTION_REPORT.equals(getIntent().getAction())) {
-                getSupportActionBar().setTitle(getString(R.string.report)); // set title
-                isReportOnly = true;
-                //showPrintButtonOnly();
+                if (getSupportActionBar() != null) {
+                    getSupportActionBar().setTitle(getString(R.string.report)); // set title
+                    isReportOnly = true;
+                    //showPrintButtonOnly();
+                }
             }
         }
     }
@@ -715,14 +717,17 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
                             updateListClosing(dataList);
                         } else {
                             progressBar.setVisibility(View.GONE);
-                            try {
-                                String errorBody = response.errorBody().string();
-                                LoginError403 error403 = new Gson().fromJson(errorBody, LoginError403.class);
-                                processFailedResponse(error403);
-                                //Toast.makeText(ClosingActivity.this, "Can not download closing data. Error code: " + code, Toast.LENGTH_SHORT).show();
-                            } catch (IOException e) {
-                                e.printStackTrace();
+                            if (response != null) {
+                                try {
+                                    String errorBody = response.errorBody().string();
+                                    LoginError403 error403 = new Gson().fromJson(errorBody, LoginError403.class);
+                                    processFailedResponse(error403);
+                                    //Toast.makeText(ClosingActivity.this, "Can not download closing data. Error code: " + code, Toast.LENGTH_SHORT).show();
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
                             }
+
                         }
                     }
 
@@ -808,8 +813,6 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
                             if (t.getMessage().contains(" ECONNRESET")){
                                 Log.d(TAG, t.getMessage());
                                 downloadData(DOWNLOAD_PER_LOBBY);
-                            } else {
-                                //progressBar.setVisibility(View.GONE);
                             }
 
                         }

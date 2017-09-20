@@ -44,6 +44,7 @@ import retrofit2.Response;
 import valet.intan.com.valetparking.adapter.ParkedCarPagerAdapter;
 import valet.intan.com.valetparking.dao.AuthResDao;
 import valet.intan.com.valetparking.dao.DropDao;
+import valet.intan.com.valetparking.dao.FinishCheckoutDao;
 import valet.intan.com.valetparking.dao.TokenDao;
 import valet.intan.com.valetparking.domain.DropPointMaster;
 import valet.intan.com.valetparking.domain.EntryCheckoutCont;
@@ -542,6 +543,10 @@ public class Main2Activity extends AppCompatActivity
                             prefManager.setExpiredDateToken(null);
 
                             stopAllService();
+
+                            // remove all synced checkout data
+                            FinishCheckoutDao.getInstance(Main2Activity.this).removeAllSyncedCheckout();
+
                             goToSplash();
 
                         } else if (code == AuthResDao.HTTP_STATUS_LOGOUT_INVALID){

@@ -39,16 +39,16 @@ public class LoginError403 {
 
         @Override
         public String toString() {
-            String deviceId = "";
-            String site = "";
-            String lobby = "";
+            StringBuffer sbDeviceId = new StringBuffer();
+            StringBuffer sbSite = new StringBuffer();
+            StringBuffer sbLobby = new StringBuffer();
 
             for (LoggedInDeviceDetail device : getDeviceDetails()) {
-                deviceId = deviceId + device.getDevice() + ",";
-                site = site + device.getSite();
-                lobby = lobby + device.getLobby();
+                sbDeviceId.append(device.getDevice()).append(" ");
+                sbSite.append(device.getSite()).append(" ");
+                sbLobby.append(device.getLobby()).append(" ");
             }
-            return String.format("Device id: %s\nSite: %s\nLobby: %s\n", deviceId, site, lobby);
+            return String.format("Device id: %s\nSite: %s\nLobby: %s\n", sbDeviceId.toString(), sbSite.toString(), sbLobby.toString());
         }
     }
 

@@ -234,6 +234,8 @@ public class WelcomeActivity extends AppCompatActivity {
             }
         }
 
+        btnSave.setVisibility(View.GONE);
+
         TokenDao.getToken(new ProcessRequest() {
             @Override
             public void process(String token) {
@@ -272,23 +274,30 @@ public class WelcomeActivity extends AppCompatActivity {
                                                 dropPointList = response.body().getDropPointList();
                                                 dropDao.insertDropPoints(dropPointList);
                                                 updateSpinnerLobby();
+                                                btnSave.setVisibility(View.VISIBLE);
+                                            }else {
+                                                btnSave.setVisibility(View.VISIBLE);
                                             }
                                         }
 
                                         @Override
                                         public void onFailure(Call<DropPointMasterResponse> call, Throwable t) {
                                             Toast.makeText(WelcomeActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
+                                            btnSave.setVisibility(View.VISIBLE);
                                             //Log.d("DropPointMaster error: ", t.getMessage());
                                         }
                                     });
                                 }
                             }, WelcomeActivity.this);
+                        }else {
+                            btnSave.setVisibility(View.VISIBLE);
                         }
                     }
 
                     @Override
                     public void onFailure(Call<PatchMeResponse> call, Throwable t) {
                         Toast.makeText(WelcomeActivity.this, "error", Toast.LENGTH_SHORT).show();
+                        btnSave.setVisibility(View.VISIBLE);
                     }
                 });
             }

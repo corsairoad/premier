@@ -115,11 +115,11 @@ public class SyncingCheckin extends IntentService {
                         PrefManager.getInstance(SyncingCheckin.this).saveLastTicketCounter(lastTicketCounter);
 
                         // update vthd id and transaction id (not ticket number)
-                        int updateSuccess = EntryDao.getInstance(SyncingCheckin.this)
+                        EntryDao.getInstance(SyncingCheckin.this)
                                 .updateRemoteAndTicketSequenceId(String.valueOf(fakeVthdId), remoteVthdId, tiketSeq);
 
                         // update vthd id in checkout data if exist
-                        int updateIdDataCheckout = FinishCheckoutDao.getInstance(SyncingCheckin.this)
+                        FinishCheckoutDao.getInstance(SyncingCheckin.this)
                                 .updateCheckoutVthdId(noTiket, remoteVthdId);
 
                         EntryCheckinContainerDao.getInstance(SyncingCheckin.this)
@@ -137,20 +137,27 @@ public class SyncingCheckin extends IntentService {
 
 
                     } else {
-                        int code = httpResponse.code();
-                        String message = "Response checkin error: " + httpResponse.message() + ". Code: " + code;
-                        sendMessage(ACTION_ERROR_RESPONSE, message);
-                        stopSelf();
+                        if (count == totalcheckinToPost) {
+                            startSyncChekoutService();
+                        }
+                        //int code = httpResponse.code();
+                        //String message = "Response checkin error: " + httpResponse.message() + ". Code: " + code;
+                        //sendMessage(ACTION_ERROR_RESPONSE, message);
+                        //stopSelf();
                     }
 
                 } catch (IOException e) {
                     e.printStackTrace();
 
                     PrefManager.getInstance(SyncingCheckin.this).setLoggingOut(false);
-
                     String message = e.getMessage();
                     sendMessage(ACTION_ERROR_RESPONSE, message);
-                    stopSelf();
+
+                    if (count == totalcheckinToPost) {
+                        startSyncChekoutService();
+                    }
+
+                    //stopSelf();
                 } catch (NumberFormatException e) {
                     // remove checkin data from db
                     if (noTiket != null && remoteVthdId >0 && tiketSeq != null) {
@@ -161,11 +168,11 @@ public class SyncingCheckin extends IntentService {
                                 .deleteCheckinDataByTicketNo(noTiket);
 
                         // update vthd id in checkout data if exist
-                        int updtateCheckoutVthdId = FinishCheckoutDao.getInstance(SyncingCheckin.this)
+                        FinishCheckoutDao.getInstance(SyncingCheckin.this)
                                 .updateCheckoutVthdId(noTiket, remoteVthdId);
 
                         // update synced checkin item in checkin list
-                        int updateRemoteTicketSeq = EntryDao.getInstance(SyncingCheckin.this)
+                        EntryDao.getInstance(SyncingCheckin.this)
                                 .updateRemoteAndTicketSecByTicketNo(noTiket, remoteVthdId, tiketSeq);
 
                         reloadCheckinList();

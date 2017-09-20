@@ -326,6 +326,14 @@ public class FinishCheckoutDao implements ProcessRequest {
         return db.update(FinishCheckOut.Table.TABLE_NAME,cv, whereClause, args);
     }
 
+    public int removeAllSyncedCheckout() {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        String where = FinishCheckOut.Table.COL_STATUS + " = ?";
+        String[] args = new String[] {String.valueOf(STATUS_SYNCED)};
+
+        return db.delete(FinishCheckOut.Table.TABLE_NAME, where, args);
+    }
+
     public boolean isAlreadyCheckout(String noTiket) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         String whereClause = FinishCheckOut.Table.COL_NO_TIKET + " = ?";
