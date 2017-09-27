@@ -88,6 +88,26 @@ public class ClosingData {
             private String checkout;
             @SerializedName("vthd_tix_id")
             private String noTiket;
+            @SerializedName("vthd_apps_time_ci")
+            private String checkinTimeApp;
+            @SerializedName("vthd_apps_time_co")
+            private String checkoutTimeApp;
+
+            public String getCheckinTimeApp() {
+                return checkinTimeApp;
+            }
+
+            public void setCheckinTimeApp(String checkinTimeApp) {
+                this.checkinTimeApp = checkinTimeApp;
+            }
+
+            public String getCheckoutTimeApp() {
+                return checkoutTimeApp;
+            }
+
+            public void setCheckoutTimeApp(String checkoutTimeApp) {
+                this.checkoutTimeApp = checkoutTimeApp;
+            }
 
             public String getCreatedAt() {
                 return createdAt;
@@ -152,6 +172,8 @@ public class ClosingData {
             public String getValetTpyeKey() {
                 return valetTpyeKey;
             }
+
+
         }
 
         public static class Links {

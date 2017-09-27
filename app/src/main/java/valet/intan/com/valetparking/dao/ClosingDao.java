@@ -9,6 +9,7 @@ import com.google.gson.Gson;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import valet.intan.com.valetparking.Main2Activity;
 import valet.intan.com.valetparking.domain.ClosingBody;
 import valet.intan.com.valetparking.domain.ClosingResponse;
 import valet.intan.com.valetparking.service.ApiClient;
@@ -61,6 +62,10 @@ public class ClosingDao{
                         if (response != null && response.body() != null) {
                             Toast.makeText(context, "Closing success", Toast.LENGTH_SHORT).show();
                             EntryDao.getInstance(context).deleteUncheckedOutEntry();
+
+                            // remove all synced checkout data
+                            FinishCheckoutDao.getInstance(context).removeAllSyncedCheckout();
+
                         }else {
                             Toast.makeText(context, "Closing failed", Toast.LENGTH_SHORT).show();
                         }

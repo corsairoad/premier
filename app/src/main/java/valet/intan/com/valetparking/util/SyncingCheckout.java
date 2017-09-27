@@ -6,12 +6,9 @@ import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-
 import com.google.gson.Gson;
-
 import java.io.IOException;
 import java.util.List;
-
 import retrofit2.Call;
 import retrofit2.Response;
 import valet.intan.com.valetparking.ClosingActivity;
@@ -45,7 +42,6 @@ public class SyncingCheckout extends IntentService {
     public SyncingCheckout() {
         super(TAG);
     }
-
 
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
@@ -106,6 +102,7 @@ public class SyncingCheckout extends IntentService {
                     FinishCheckoutResponse checkoutResponse = httpResponse.body();
 
                     if (checkoutResponse != null) {
+
                         Log.d(TAG, "Checkout succeed. VthdId: " + remoteVthdId + ", Tiket:" + noTiket);
 
                         FinishCheckoutDao checkoutDao = FinishCheckoutDao.getInstance(SyncingCheckout.this);
@@ -119,24 +116,19 @@ public class SyncingCheckout extends IntentService {
                         }
 
                         sendMessage(ACTION, "Synchronizing checkout data " + count + "/" + totalCheckoutData);
-
-                        if (count == totalCheckoutData && !usedForClosing) {
-                            sendMessage(ACTION_LOGOUT, null);
-                        }else {
-                            sendMessage(ACTION_CLOSING,null);
-                            //sendClosingBroadcast();
-                        }
-
-                    }else {
-                        int code = httpResponse.code();
-                        String message = "Logout " + httpResponse.message();
-                        sendMessage(ACTION_LOGOUT_ERROR_RESPONSE, message + " " + code);
-                        stopSelf();
+                        handleAction();
+                    } else {
+                        //int code = httpResponse.code();
+                        //String message = "Logout " + httpResponse.message();
+                        //sendMessage(ACTION_LOGOUT_ERROR_RESPONSE, message + " " + code);
+                        //stopSelf();
                         PrefManager.getInstance(SyncingCheckout.this).setLoggingOut(false);
+                        handleAction();
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
                     PrefManager.getInstance(SyncingCheckout.this).setLoggingOut(false);
+                    handleAction();
                 }
             }
         }, this);
@@ -162,5 +154,14 @@ public class SyncingCheckout extends IntentService {
             }
         };
         handler.postDelayed(r, 7000);
+    }
+
+    private void handleAction(){
+        if (count == totalCheckoutData && !usedForClosing) {
+            sendMessage(ACTION_LOGOUT, null);
+        } else {
+            sendMessage(ACTION_CLOSING,null);
+            //sendClosingBroadcast();
+        }
     }
 }

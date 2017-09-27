@@ -32,6 +32,7 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.daimajia.numberprogressbar.NumberProgressBar;
 import com.epson.eposprint.EposException;
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 
@@ -377,9 +378,11 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
     private void handleIntent() {
         if (getIntent() != null) {
             if (Main2Activity.ACTION_REPORT.equals(getIntent().getAction())) {
-                getSupportActionBar().setTitle(getString(R.string.report)); // set title
-                isReportOnly = true;
-                //showPrintButtonOnly();
+                if (getSupportActionBar() != null) {
+                    getSupportActionBar().setTitle(getString(R.string.report)); // set title
+                    isReportOnly = true;
+                    //showPrintButtonOnly();
+                }
             }
         }
     }
@@ -715,14 +718,21 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
                             updateListClosing(dataList);
                         } else {
                             progressBar.setVisibility(View.GONE);
-                            try {
-                                String errorBody = response.errorBody().string();
-                                LoginError403 error403 = new Gson().fromJson(errorBody, LoginError403.class);
-                                processFailedResponse(error403);
-                                //Toast.makeText(ClosingActivity.this, "Can not download closing data. Error code: " + code, Toast.LENGTH_SHORT).show();
-                            } catch (IOException e) {
-                                e.printStackTrace();
+                            if (response != null) {
+
+                                try {
+                                    String errorBody = response.errorBody().string();
+                                    LoginError403 error403 = new Gson().fromJson(errorBody, LoginError403.class);
+                                    processFailedResponse(error403);
+                                    //Toast.makeText(ClosingActivity.this, "Can not download closing data. Error code: " + code, Toast.LENGTH_SHORT).show();
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                } catch (JsonSyntaxException e) {
+                                    e.printStackTrace();
+                                    showDialogError("Response Exception", e.getMessage() + "\nResponse:\n" + response.code() + " " + response.message());
+                                }
                             }
+
                         }
                     }
 
@@ -758,6 +768,20 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
                     });
             builder.show();
         }
+    }
+
+    private void showDialogError(String title, String message) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this)
+                .setTitle(title)
+                .setIcon(R.drawable.ic_error_outline)
+                .setMessage(message)
+                .setPositiveButton("Close", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+        builder.show();
     }
 
     private class DownloadClosingDataTask extends AsyncTask<String, Void, List<ClosingData.Data>> {
@@ -808,8 +832,6 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
                             if (t.getMessage().contains(" ECONNRESET")){
                                 Log.d(TAG, t.getMessage());
                                 downloadData(DOWNLOAD_PER_LOBBY);
-                            } else {
-                                //progressBar.setVisibility(View.GONE);
                             }
 
                         }
