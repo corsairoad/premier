@@ -103,6 +103,7 @@ public class SyncingCheckin extends IntentService {
 
                     if (response != null) {
 
+
                         noTiket = response.getData().getAttribute().getNoTiket().trim();
                         remoteVthdId = response.getData().getAttribute().getId();
                         tiketSeq = response.getData().getAttribute().getIdTransaksi();
@@ -135,8 +136,19 @@ public class SyncingCheckin extends IntentService {
                             startSyncChekoutService();
                         }
 
-
                     } else {
+
+                        if (httpResponse.code() == 403) {
+                            EntryCheckinContainerDao.getInstance(SyncingCheckin.this)
+                                    .deleteCheckinDataByTicketNo(checkin.getEntryCheckin().getAttrib().getTicketNo());
+
+                            sendMessage(ACTION,"Posting data checkin " + count + "/" + totalcheckinToPost);
+
+                            reloadCheckinList();
+                            reloadCheckinList();
+                            reloadCheckinList();
+                        }
+
                         if (count == totalcheckinToPost) {
                             startSyncChekoutService();
                         }

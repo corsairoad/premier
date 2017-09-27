@@ -554,7 +554,7 @@ public class Main2Activity extends AppCompatActivity
                             //Toast.makeText(Main2Activity.this, "Logout failed, invalid token", Toast.LENGTH_SHORT).show();
                         } else {
                             prefManager.setLoggingOut(false);
-                            Toast.makeText(Main2Activity.this, "Logout failed, error response occured. Please try again later.", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(Main2Activity.this, "Logout failed, " + response.message() + ". Please try again later.", Toast.LENGTH_LONG).show();
                             cancelLogout();
                         }
                     }

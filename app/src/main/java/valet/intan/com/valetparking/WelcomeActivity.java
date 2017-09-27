@@ -121,14 +121,14 @@ public class WelcomeActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 dropPointMaster = (DropPointMaster) dropPointAdapter.getItem(i);
-                updateBtnSave();
-                /*
+                //updateBtnSave();
+
                 if (dropPointMaster != null) {
                     prefManager.setDefaultDropPoint(dropPointMaster.getAttrib().getDropId());
                     prefManager.setDefaultDropPointName(dropPointMaster.getAttrib().getDropName());
                     updateBtnSave();
                 }
-                */
+
             }
 
             @Override
@@ -192,6 +192,11 @@ public class WelcomeActivity extends AppCompatActivity {
                         //checkIfLoginfromDifferentLobby(dropPointMaster.getAttrib().getDropId(), prefManager.getIdDefaultDropPoint());
                         if (response != null && response.body() != null) {
                             removeAllCheckinList();
+
+                            String remoteDeviceId = response.body().getData().getRemoteDeviceId();
+                            int lastTicketCounter = response.body().getData().getLastCounterTicket();
+                            prefManager.saveRemoteDeviceId(remoteDeviceId);
+                            prefManager.saveLastTicketCounter(lastTicketCounter);
 
                             prefManager.setIdSite(mRoleOption.getSiteId());
                             prefManager.setSiteName(mRoleOption.getSiteName());

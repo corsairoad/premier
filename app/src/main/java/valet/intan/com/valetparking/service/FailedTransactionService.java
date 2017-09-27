@@ -122,12 +122,11 @@ public class FailedTransactionService extends IntentService {
                                 PrefManager.getInstance(FailedTransactionService.this).saveLastTicketCounter(lastTicketCounter);
 
                                 // update vthd id and transaction id (not ticket number)
-                                int updateSuccess = EntryDao.getInstance(FailedTransactionService.this)
+                                EntryDao.getInstance(FailedTransactionService.this)
                                         .updateRemoteAndTicketSequenceId(String.valueOf(fakeVthdId), remoteVthdId, tiketSeq);
 
-
                                 // update vthd id in checkout data if exist
-                                int updateIdDataCheckout = FinishCheckoutDao.getInstance(FailedTransactionService.this)
+                                FinishCheckoutDao.getInstance(FailedTransactionService.this)
                                         .updateCheckoutVthdId(noTiket, remoteVthdId);
 
 

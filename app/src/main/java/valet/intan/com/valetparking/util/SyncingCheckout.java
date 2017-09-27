@@ -102,6 +102,7 @@ public class SyncingCheckout extends IntentService {
                     FinishCheckoutResponse checkoutResponse = httpResponse.body();
 
                     if (checkoutResponse != null) {
+
                         Log.d(TAG, "Checkout succeed. VthdId: " + remoteVthdId + ", Tiket:" + noTiket);
 
                         FinishCheckoutDao checkoutDao = FinishCheckoutDao.getInstance(SyncingCheckout.this);
@@ -116,7 +117,7 @@ public class SyncingCheckout extends IntentService {
 
                         sendMessage(ACTION, "Synchronizing checkout data " + count + "/" + totalCheckoutData);
                         handleAction();
-                    }else {
+                    } else {
                         //int code = httpResponse.code();
                         //String message = "Logout " + httpResponse.message();
                         //sendMessage(ACTION_LOGOUT_ERROR_RESPONSE, message + " " + code);

@@ -75,6 +75,9 @@ public class LoginError403 {
 
     @Override
     public String toString() {
+        if (errorBody == null) {
+            return "";
+        }
         return String.format("%s\n%s\n", errorBody.getMessage(), errorBody);
     }
 }

@@ -32,6 +32,7 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.daimajia.numberprogressbar.NumberProgressBar;
 import com.epson.eposprint.EposException;
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 
@@ -718,6 +719,7 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
                         } else {
                             progressBar.setVisibility(View.GONE);
                             if (response != null) {
+
                                 try {
                                     String errorBody = response.errorBody().string();
                                     LoginError403 error403 = new Gson().fromJson(errorBody, LoginError403.class);
@@ -725,6 +727,9 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
                                     //Toast.makeText(ClosingActivity.this, "Can not download closing data. Error code: " + code, Toast.LENGTH_SHORT).show();
                                 } catch (IOException e) {
                                     e.printStackTrace();
+                                } catch (JsonSyntaxException e) {
+                                    e.printStackTrace();
+                                    showDialogError("Response Exception", e.getMessage() + "\nResponse:\n" + response.code() + " " + response.message());
                                 }
                             }
 
@@ -763,6 +768,20 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
                     });
             builder.show();
         }
+    }
+
+    private void showDialogError(String title, String message) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this)
+                .setTitle(title)
+                .setIcon(R.drawable.ic_error_outline)
+                .setMessage(message)
+                .setPositiveButton("Close", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+        builder.show();
     }
 
     private class DownloadClosingDataTask extends AsyncTask<String, Void, List<ClosingData.Data>> {

@@ -128,8 +128,10 @@ public class PrintReceiptClosing extends PrintReceipt {
                     lostTicket +=1;
                 }
 
-                String checkinTime = data.getAttributes().getCheckIn();
-                String checkoutTime = data.getAttributes().getCheckout();
+                //String checkinTime = data.getAttributes().getCheckIn(); // sync time
+                //String checkoutTime = data.getAttributes().getCheckout(); // sync time
+                String checkinTime = data.getAttributes().getCheckinTimeApp(); // app time
+                String checkoutTime = data.getAttributes().getCheckoutTimeApp(); // app time
 
                 if (checkinTime != null && checkoutTime != null) {
                     status = "Checkout";
