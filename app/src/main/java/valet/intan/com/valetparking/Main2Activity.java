@@ -444,9 +444,17 @@ public class Main2Activity extends AppCompatActivity
     }
 
     private void showImei() {
+
+        StringBuilder sb = new StringBuilder()
+                .append("Device ID").append("\t:\t").append(prefManager.getRemoteDeviceId()).append("\n")
+                .append("Imei").append("\t:\t").append(prefManager.getDeviceId()).append("\n")
+                .append("Last login").append("\t:\t").append(prefManager.getLastLoginDate()).append("\n")
+                .append("Token expired date").append("\t:\t").append(prefManager.getExpiredToken()).append("\n")
+                .append("Last ticket counter").append("\t:\t").append(prefManager.getLastPrintedTicket());
+
         AlertDialog.Builder builder = new AlertDialog.Builder(this)
-                .setTitle("Id Device")
-                .setMessage(PrefManager.getInstance(this).getRemoteDeviceId())
+                .setTitle("Device info")
+                .setMessage(sb.toString())
                 .setPositiveButton("Oke", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {

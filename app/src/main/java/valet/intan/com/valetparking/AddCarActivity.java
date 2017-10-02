@@ -200,7 +200,7 @@ public class AddCarActivity extends FragmentActivity implements StepOneFragmet.O
     }
 
     @Override
-    public void setBitMapSign(Bitmap bitMapSign) {
+    public void setBitMapSign(Bitmap bitMapSign, String signatureCoordinates) {
 
         if (sdf != null) {
             sdf.dismiss();
@@ -209,6 +209,7 @@ public class AddCarActivity extends FragmentActivity implements StepOneFragmet.O
         showDialog(true);
 
         fragmentReview.setSignBitmap(bitMapSign);
+        fragmentReview.setSignatureCoordinates(signatureCoordinates);
         //showConfirmDialog(fragmentReview);
         fragmentRegFirst.setCheckIn();
         progressBar.setVisibility(View.VISIBLE);
@@ -271,6 +272,7 @@ public class AddCarActivity extends FragmentActivity implements StepOneFragmet.O
         EntryCheckinResponse entryCheckinResponse = new EntryCheckinResponse();
         EntryCheckinResponse.Data data = new EntryCheckinResponse.Data();
         EntryCheckinResponse.Attribute attr = new EntryCheckinResponse.Attribute();
+
         attr.setValetType(builder.getValetType().getAttrib().getValetTypeName());
         attr.setAreaParkir(" ");
         attr.setAreaParkirStatus(" ");
@@ -302,7 +304,7 @@ public class AddCarActivity extends FragmentActivity implements StepOneFragmet.O
         entryCheckin.setId(String.valueOf(fakeVthdId));
         entryCheckin.getAttrib().setCheckinTime(attr.getCheckinTime());
         entryCheckin.getAttrib().setTicketNo(attr.getIdTransaksi());
-        entryCheckin.getAttrib().setQrCode("------------------------");
+        entryCheckin.getAttrib().setQrCode(" ");
         entryCheckin.getAttrib().setDeviceId(prefManager.getDeviceId());
         entryCheckin.getAttrib().setAppId(prefManager.getAppId());
         entryCheckin.getAttrib().setLastTicketCounter(lastTicketCounter);

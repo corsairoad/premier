@@ -31,8 +31,8 @@ public class PrintReceiptCheckout extends PrintReceipt {
     }
 
     @Override
-    public void buildPrintData() {
-        try {
+    public void buildPrintData() throws EposException {
+
             Builder builder = getBuilder();
             StringBuilder sb = new StringBuilder();
 
@@ -143,10 +143,6 @@ public class PrintReceiptCheckout extends PrintReceipt {
             builder.addCut(Builder.CUT_FEED);
 
             print();
-
-        } catch (EposException e) {
-            e.printStackTrace();
-        }
 
     }
 }

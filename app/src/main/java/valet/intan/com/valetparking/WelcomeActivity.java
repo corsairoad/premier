@@ -198,6 +198,10 @@ public class WelcomeActivity extends AppCompatActivity {
                             prefManager.saveRemoteDeviceId(remoteDeviceId);
                             prefManager.saveLastTicketCounter(lastTicketCounter);
 
+                            if (lastTicketCounter > prefManager.getLastPrintedTicket()) {
+                                prefManager.saveLastPrintedTicketCounter(lastTicketCounter);
+                            }
+
                             prefManager.setIdSite(mRoleOption.getSiteId());
                             prefManager.setSiteName(mRoleOption.getSiteName());
                             prefManager.setDefaultDropPoint(dropPointMaster.getAttrib().getDropId());
@@ -264,7 +268,6 @@ public class WelcomeActivity extends AppCompatActivity {
                             prefManager.saveRemoteDeviceId(remoteDeviceId);
                             prefManager.saveLastTicketCounter(lastTicketCounter);
 
-                            Log.d("Last_ticket", ""+lastTicketCounter);
 
                             //download lobby
                             TokenDao.getToken(new ProcessRequest() {

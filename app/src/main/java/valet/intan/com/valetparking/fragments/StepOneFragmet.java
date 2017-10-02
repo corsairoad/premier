@@ -308,6 +308,12 @@ public class StepOneFragmet extends Fragment implements View.OnClickListener, Ch
     }
 
     private boolean checkIfAlreadyCheckedIn(String platNo, EditText editText) {
+        if (TextUtils.isEmpty(platNo)){
+            Toast.makeText(getContext(), "License plate cannot be empty", Toast.LENGTH_LONG).show();
+            inputPlatNo.setError("Licesne plate empty");
+            return false;
+        }
+
         if (EntryDao.getInstance(getContext()).isAlreadyCheckedIn(platNo)) {
             editText.setError("This car is already checked in");
             AlertDialog.Builder builder = new AlertDialog.Builder(getContext())

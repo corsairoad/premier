@@ -3,6 +3,7 @@ package valet.intan.com.valetparking.domain;
 import android.content.Context;
 import android.graphics.Bitmap;
 
+import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 
 import java.math.BigInteger;
@@ -370,23 +371,28 @@ public class EntryCheckin {
         private ValetTypeJson.Data  valetType;
         private String checkInTime;
         private int vthdId;
-
+        private String signatureCoordinates;
         private static final String FORMAT_DATE_FORMAL = "yyyy-MM-dd HH:mm:ss";
         private static final String FORMAT_DATE_FOR_ID = "yyMMddHHmmss";
 
         public Builder() {
         }
 
-        public Builder setAttribute(DropPointMaster dropPointMaster, String platNo, CarMaster carMaster, ColorMaster colorMaster, String email, Bitmap bmpDefects, Bitmap bmpSignature, ValetTypeJson.Data valetType) {
+        public Builder setAttribute(DropPointMaster dropPointMaster, String platNo, CarMaster carMaster,
+                                    ColorMaster colorMaster, String email, Bitmap bmpDefects, Bitmap bmpSignature,
+                                    ValetTypeJson.Data valetType, String signatureCoordiante, List<DefectMaster> defectMasterList) {
+
             this.dropPointMaster = dropPointMaster;
             this.carMaster = carMaster;
             this.colorMaster = colorMaster;
             this.email = email;
             this.bitmapDefect = bmpDefects;
             this.bitmapSignature = bmpSignature;
+            this.signatureCoordinates = signatureCoordiante;
             this.valetType = valetType;
             this.checkInTime = getCurrentDate(FORMAT_DATE_FORMAL);
             this.vthdId = generateId();
+
             attrib = new Attrib();
             attrib.setDropMasterId(String.valueOf(dropPointMaster.getAttrib().getDropId()));
 
@@ -395,6 +401,7 @@ public class EntryCheckin {
             if (Character.isDigit(p.trim().charAt(0))) {
                 platNo = "B" + platNo;
             }
+
             this.platNo = platNo;
             attrib.setPlatNo(platNo);
 
@@ -408,8 +415,10 @@ public class EntryCheckin {
             }
 
             attrib.setEmailCustomer(email);
-            attrib.setDefect(BitmapToString.create(bmpDefects));
-            attrib.setParaf(BitmapToString.create(bmpSignature));
+            //attrib.setDefect(BitmapToString.create(bmpDefects));
+            attrib.setDefect(new Gson().toJson(defectMasterList));
+            //attrib.setParaf(BitmapToString.create(bmpSignature));
+            attrib.setParaf(signatureCoordiante);
 
             return this;
         }
@@ -547,6 +556,8 @@ public class EntryCheckin {
 
             if (lastTicketCounter <= lastPrintedTicketCounter) {
                 lastTicketCounter = lastPrintedTicketCounter + 1;
+            }else {
+                lastTicketCounter+=1;
             }
 
             prefManager.saveLastPrintedTicketCounter(lastTicketCounter);

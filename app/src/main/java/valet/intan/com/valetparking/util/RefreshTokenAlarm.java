@@ -52,14 +52,16 @@ public class RefreshTokenAlarm {
             DateFormat dateFormat = new SimpleDateFormat("dd/MM/yy HH:mm:ss");
             Date date = dateFormat.parse(expDate);
 
+            Log.d(TAG, "expired in: " + date);
+
             Calendar calendar = Calendar.getInstance();
             calendar.setTime(date);
             calendar.setTimeZone(TimeZone.getTimeZone("GMT+7"));
             //calendar.set(Calendar.HOUR_OF_DAY, calendar.get(Calendar.HOUR));
-            calendar.set(Calendar.DAY_OF_MONTH, calendar.get(Calendar.DAY_OF_MONTH) - 2);
-            calendar.set(Calendar.HOUR_OF_DAY, 13);
-            calendar.set(Calendar.MINUTE, 0);
-            calendar.set(Calendar.SECOND, 0);
+            //calendar.set(Calendar.DAY_OF_MONTH, calendar.get(Calendar.DAY_OF_MONTH) - 7);
+            //calendar.set(Calendar.HOUR_OF_DAY, 13);
+            calendar.set(Calendar.MINUTE, calendar.get(Calendar.MINUTE) + 1);
+            //calendar.set(Calendar.SECOND, 0);
 
             long calLong = calendar.getTimeInMillis();
             Log.d(TAG, "startAlarmIn5days: calLong: " + calLong);

@@ -1,10 +1,16 @@
 package valet.intan.com.valetparking;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
@@ -53,6 +59,7 @@ import valet.intan.com.valetparking.domain.FineFee;
 import valet.intan.com.valetparking.domain.FinishCheckOut;
 import valet.intan.com.valetparking.domain.MembershipResponse;
 import valet.intan.com.valetparking.domain.PaymentMethod;
+import valet.intan.com.valetparking.domain.PrintReceipt;
 import valet.intan.com.valetparking.service.ApiClient;
 import valet.intan.com.valetparking.service.ApiEndpoint;
 import valet.intan.com.valetparking.service.ProcessRequest;
@@ -63,6 +70,9 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
 
     private static final String TAG_MEMBERSHIP = "mem";
     private static final String TAG_PAYMENT = "pymnt";
+    public static final String ACTION_CHECKOUT = "checkout";
+    public static final String ACTION_ERROR_PRINT = "print.error";
+    public static final String EXTRA_STATUS_PRINT = "extra.status.print";
 
     TextView txtPlatNo;
     TextView txtLokasiParkir;
@@ -113,6 +123,8 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
     SpinnerBankAdapter spinnerBankAdapter;
     MembershipResponse.Data dataMembership;
     EntryCheckinResponse entryCheckinResponse;
+
+    private BroadcastReceiver receiverCheckout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -190,6 +202,20 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
         spBank.setAdapter(spinnerBankAdapter);
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        registerCheckoutReceiver();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (receiverCheckout != null) {
+            LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverCheckout);
+        }
+    }
+
     private void setupMembersip() {
         TokenDao.getToken(new ProcessRequest() {
             @Override
@@ -215,6 +241,30 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
                 });
             }
         }, this);
+    }
+
+    private void registerCheckoutReceiver() {
+
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(ACTION_CHECKOUT);
+        filter.addAction(ACTION_ERROR_PRINT);
+
+        receiverCheckout = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                switch (intent.getAction()) {
+                    case ACTION_CHECKOUT:
+                        submitCheckout();
+                        break;
+                    case ACTION_ERROR_PRINT:
+                        showDialogFailedPrint(intent.getIntExtra(EXTRA_STATUS_PRINT,0));
+                        break;
+                    default:break;
+
+                }
+            }
+        };
+        LocalBroadcastManager.getInstance(this).registerReceiver(receiverCheckout, filter);
     }
 
     @Override
@@ -579,8 +629,8 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
     private void init(EntryCheckoutCont.EntryChekout entryChekout) {
         if (entryChekout != null) {
             EntryCheckoutCont.EntryChekout.Attrib attrib = entryChekout.getAttrib();
-            String platNo = attrib.getPlatNo();
-            String lokasiParkir = attrib.getAreaParkir() + " " + attrib.getBlokParkir() + " " + attrib.getSektorParkir();
+            //String platNo = attrib.getPlatNo();
+            //String lokasiParkir = attrib.getAreaParkir() + " " + attrib.getBlokParkir() + " " + attrib.getSektorParkir();
 
             //txtPlatNo.setText(platNo);
             //txtLokasiParkir.setText(lokasiParkir);
@@ -648,6 +698,7 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
         if (cbOvernight.isChecked()) {
             builder.setOvernightFee(mOvernightFine);
         }
+
         if (cbFineFe.isChecked()) {
             builder.setLostTicketFee(mLostTicketFine);
         }
@@ -722,10 +773,12 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
         protected String doInBackground(String... strings) {
 
             try {
-                finishCheckoutDao.print(idValetHeader);
-                finishCheckoutDao.saveDataCheckout(remoteValetHeader, finishCheckoutDao.getFinishCheckOut(), noTiket.trim());
-                finishCheckoutDao.setCheckoutCar(idValetHeader);
-                ReprintDao.getInstance(CheckoutActivity.this).removeReprintData(noTiket);
+                String printStatus = finishCheckoutDao.print(idValetHeader);
+                if (FinishCheckoutDao.PRINT_CHECOUT_SUCCEED.equals(printStatus)) {
+                    finishCheckoutDao.saveDataCheckout(remoteValetHeader, finishCheckoutDao.getFinishCheckOut(), noTiket.trim());
+                    finishCheckoutDao.setCheckoutCar(idValetHeader);
+                }
+                return printStatus;
             }catch (Exception e) {
                 e.printStackTrace();
             }
@@ -737,7 +790,9 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
             progressBar.setVisibility(View.GONE);
-            goToMain();
+            if (FinishCheckoutDao.PRINT_CHECOUT_SUCCEED.equals(s)) {
+                goToMain();
+            }
         }
     }
 
@@ -749,4 +804,20 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
         startActivity(intent);
         finish();
     }
+
+    private void showDialogFailedPrint(int status) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Print checkout failed");
+        builder.setIcon(R.drawable.ic_error_outline);
+        builder.setMessage("Unable to checkout data due to printer problem: " + PrintReceipt.getEposExceptionText(status));
+        builder.setPositiveButton("Retry", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                submitCheckout();
+            }
+        });
+        builder.show();
+    }
+
+
 }
