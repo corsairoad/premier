@@ -62,8 +62,10 @@ import valet.intan.com.valetparking.domain.PaymentMethod;
 import valet.intan.com.valetparking.domain.PrintReceipt;
 import valet.intan.com.valetparking.service.ApiClient;
 import valet.intan.com.valetparking.service.ApiEndpoint;
+import valet.intan.com.valetparking.service.LoggingUtils;
 import valet.intan.com.valetparking.service.ProcessRequest;
 import valet.intan.com.valetparking.util.MakeCurrencyString;
+import valet.intan.com.valetparking.util.MyLifecycleHandler;
 import valet.intan.com.valetparking.util.PrefManager;
 
 public class CheckoutActivity extends AppCompatActivity implements CompoundButton.OnCheckedChangeListener, View.OnClickListener, AdapterView.OnItemSelectedListener {
@@ -125,11 +127,14 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
     EntryCheckinResponse entryCheckinResponse;
 
     private BroadcastReceiver receiverCheckout;
+    private LoggingUtils loggingUtils;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_checkout);
+
+        loggingUtils = LoggingUtils.getInstance(this);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -206,6 +211,12 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
     protected void onStart() {
         super.onStart();
         registerCheckoutReceiver();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        MyLifecycleHandler.relaunchAppIfNotVisible(this);
     }
 
     @Override
@@ -777,6 +788,8 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
                 if (FinishCheckoutDao.PRINT_CHECOUT_SUCCEED.equals(printStatus)) {
                     finishCheckoutDao.saveDataCheckout(remoteValetHeader, finishCheckoutDao.getFinishCheckOut(), noTiket.trim());
                     finishCheckoutDao.setCheckoutCar(idValetHeader);
+
+                    logCheckout(finishCheckoutDao);
                 }
                 return printStatus;
             }catch (Exception e) {
@@ -792,8 +805,24 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
             progressBar.setVisibility(View.GONE);
             if (FinishCheckoutDao.PRINT_CHECOUT_SUCCEED.equals(s)) {
                 goToMain();
+            }else {
+                loggingUtils.logPrintCheckoutFailed(finishCheckoutDao);
             }
         }
+    }
+
+    private void logCheckout(FinishCheckoutDao finishCheckoutDao) {
+        if (finishCheckoutDao != null && finishCheckoutDao.getEntryCheckinResponse() != null && finishCheckoutDao.getEntryCheckinResponse().getData() != null
+                && finishCheckoutDao.getEntryCheckinResponse().getData().getAttribute() != null) {
+            String username = PrefManager.getInstance(this).getUserName();
+            String lobbyCheckout = PrefManager.getInstance(this).getDefaultDropPointName();
+            String lobbyCheckin = finishCheckoutDao.getEntryCheckinResponse().getData().getAttribute().getDropPoint();
+            String platNo = finishCheckoutDao.getEntryCheckinResponse().getData().getAttribute().getPlatNo();
+            String noTicket = finishCheckoutDao.getEntryCheckinResponse().getData().getAttribute().getNoTiket();
+            String paymentMethod = finishCheckoutDao.getPaymentData().getAttr().getPaymentName();
+            loggingUtils.logCheckout(username, noTicket,platNo,lobbyCheckout,lobbyCheckin, paymentMethod);
+        }
+
     }
 
     private void goToMain() {

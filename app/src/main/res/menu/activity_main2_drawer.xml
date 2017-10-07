@@ -54,6 +54,11 @@
             android:id="@+id/menu_imei"
             android:icon="@drawable/ic_action_phone"
             android:title="@string/id_device" />
+
+        <item
+            android:id="@+id/menu_send_log"
+            android:icon="@drawable/ic_menu_send"
+            android:title="Send log report"/>
     </group>
 
     <item android:title="Communicate" android:visible="false">

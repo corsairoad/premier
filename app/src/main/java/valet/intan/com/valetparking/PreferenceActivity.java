@@ -43,6 +43,7 @@ import valet.intan.com.valetparking.domain.DropPointMaster;
 import valet.intan.com.valetparking.service.ApiClient;
 import valet.intan.com.valetparking.service.ApiEndpoint;
 import valet.intan.com.valetparking.service.ProcessRequest;
+import valet.intan.com.valetparking.util.MyLifecycleHandler;
 import valet.intan.com.valetparking.util.ObjectToJson;
 import valet.intan.com.valetparking.util.ValetDbHelper;
 
@@ -112,6 +113,12 @@ public class PreferenceActivity extends AppCompatPreferenceActivity {
             return true;
         }
     };
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        MyLifecycleHandler.relaunchAppIfNotVisible(this);
+    }
 
     @Override
     protected void onNewIntent(Intent intent) {

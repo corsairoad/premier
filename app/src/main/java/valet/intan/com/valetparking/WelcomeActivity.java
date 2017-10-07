@@ -32,7 +32,9 @@ import valet.intan.com.valetparking.domain.PatchMeBody;
 import valet.intan.com.valetparking.domain.PatchMeResponse;
 import valet.intan.com.valetparking.service.ApiClient;
 import valet.intan.com.valetparking.service.ApiEndpoint;
+import valet.intan.com.valetparking.service.LoggingUtils;
 import valet.intan.com.valetparking.service.ProcessRequest;
+import valet.intan.com.valetparking.util.MyLifecycleHandler;
 import valet.intan.com.valetparking.util.PrefManager;
 import valet.intan.com.valetparking.util.RefreshTokenAlarm;
 import valet.intan.com.valetparking.util.ValetDbHelper;
@@ -52,10 +54,17 @@ public class WelcomeActivity extends AppCompatActivity {
     ValetDbHelper valetDbHelper;
     AuthResponse.Data.RoleOption mRoleOption;
 
+    private LoggingUtils loggingUtils;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_welcome);
+
+        PrefManager.getInstance(this).setRelaunch(true);
+
+        loggingUtils = LoggingUtils.getInstance(this);
 
         valetDbHelper = ValetDbHelper.getInstance(this);
         dropDao = DropDao.getInstance(valetDbHelper);
@@ -70,6 +79,7 @@ public class WelcomeActivity extends AppCompatActivity {
                     btnSave.setEnabled(false);
                     btnSave.setText("Saving... please wait");
                     // patch(dropPointMaster.getAttrib().getDropId());
+                    loggingUtils.logSetSiteAndLobby(prefManager.getUserName(), mRoleOption.getSiteName(), dropPointMaster.getAttrib().getDropName());
                     save(dropPointMaster.getAttrib().getDropId());
 
                     // //checkIfLoginfromDifferentLobby(dropPointMaster.getAttrib().getDropId(), prefManager.getIdDefaultDropPoint());
@@ -86,6 +96,7 @@ public class WelcomeActivity extends AppCompatActivity {
 
                     //goToMain();
                 } else {
+                    loggingUtils.logSetSiteAndLobbyError("No internet connecntion");
                     showErrorDialog("Internet Problem", "Unable to submit site & lobby data due to connection problem.");
                 }
 
@@ -124,8 +135,8 @@ public class WelcomeActivity extends AppCompatActivity {
                 //updateBtnSave();
 
                 if (dropPointMaster != null) {
-                    prefManager.setDefaultDropPoint(dropPointMaster.getAttrib().getDropId());
-                    prefManager.setDefaultDropPointName(dropPointMaster.getAttrib().getDropName());
+                    //prefManager.setDefaultDropPoint(dropPointMaster.getAttrib().getDropId());
+                    //prefManager.setDefaultDropPointName(dropPointMaster.getAttrib().getDropName());
                     updateBtnSave();
                 }
 
@@ -138,12 +149,19 @@ public class WelcomeActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        MyLifecycleHandler.relaunchToWelcomeActivity(this);
+    }
+
     private void setLastLoginDate() {
         prefManager.setLastLoginDateToCurrentDate();
     }
 
     private void setRefreshTokenAlarm() {
         RefreshTokenAlarm refreshTokenAlarm = RefreshTokenAlarm.getInstance(this);
+        refreshTokenAlarm.startRepeatAlarm();
         refreshTokenAlarm.startAlarmIn5Days();
     }
 
@@ -198,9 +216,7 @@ public class WelcomeActivity extends AppCompatActivity {
                             prefManager.saveRemoteDeviceId(remoteDeviceId);
                             prefManager.saveLastTicketCounter(lastTicketCounter);
 
-                            if (lastTicketCounter > prefManager.getLastPrintedTicket()) {
-                                prefManager.saveLastPrintedTicketCounter(lastTicketCounter);
-                            }
+                            manageTicketCounter(dropPointMaster.getAttrib().getDropId(), lastTicketCounter);
 
                             prefManager.setIdSite(mRoleOption.getSiteId());
                             prefManager.setSiteName(mRoleOption.getSiteName());
@@ -211,8 +227,11 @@ public class WelcomeActivity extends AppCompatActivity {
                             setLastLoginDate();
                             setRefreshTokenAlarm();
 
+                            loggingUtils.logSetSiteAndLobbySucceed(mRoleOption.getSiteName(), dropPointMaster.getAttrib().getDropName(),remoteDeviceId, lastTicketCounter);
+
                             goToMain();
                         }else {
+                            loggingUtils.logSetSiteAndLobbyError(response.message());
                             btnSave.setEnabled(true);
                             btnSave.setText("SAVE");
                             showErrorDialog("Request Problem", "Response code: " + response.code() + "\n" + "Message: " + response.message());
@@ -222,6 +241,7 @@ public class WelcomeActivity extends AppCompatActivity {
 
                     @Override
                     public void onFailure(Call<PatchMeResponse> call, Throwable t) {
+                        loggingUtils.logSetSiteAndLobbyError(t.getCause().getMessage());
                         btnSave.setEnabled(true);
                         btnSave.setText("SAVE");
                         Toast.makeText(WelcomeActivity.this,t.getMessage(), Toast.LENGTH_SHORT).show();
@@ -231,6 +251,17 @@ public class WelcomeActivity extends AppCompatActivity {
                 });
             }
         }, this);
+    }
+
+    private void manageTicketCounter(int idLobby, int counterFromServer) {
+        int lastPrintedTicket = prefManager.getLastPrintedTicket();
+        int lastLobbyId = Integer.valueOf(prefManager.getIdDefaultDropPoint());
+
+        if (counterFromServer > lastPrintedTicket) {
+            prefManager.saveLastPrintedTicketCounter(counterFromServer);
+        } else if (idLobby != lastLobbyId) {
+            prefManager.saveLastPrintedTicketCounter(counterFromServer);
+        }
     }
 
     private void patch(final int idLobby){

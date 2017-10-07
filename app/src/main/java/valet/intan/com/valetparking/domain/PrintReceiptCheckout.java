@@ -34,6 +34,8 @@ public class PrintReceiptCheckout extends PrintReceipt {
     public void buildPrintData() throws EposException {
 
             Builder builder = getBuilder();
+            builder.addTextFont(Builder.FONT_C);
+
             StringBuilder sb = new StringBuilder();
 
             String valetType = printCheckoutParam.getEntryCheckinResponse().getData().getAttribute().getValetType();

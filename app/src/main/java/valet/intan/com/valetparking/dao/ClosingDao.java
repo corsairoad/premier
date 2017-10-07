@@ -14,6 +14,7 @@ import valet.intan.com.valetparking.domain.ClosingBody;
 import valet.intan.com.valetparking.domain.ClosingResponse;
 import valet.intan.com.valetparking.service.ApiClient;
 import valet.intan.com.valetparking.service.ApiEndpoint;
+import valet.intan.com.valetparking.service.LoggingUtils;
 import valet.intan.com.valetparking.service.ProcessRequest;
 
 /**
@@ -65,15 +66,17 @@ public class ClosingDao{
 
                             // remove all synced checkout data
                             FinishCheckoutDao.getInstance(context).removeAllSyncedCheckout();
-
+                            LoggingUtils.getInstance(context).logEODSucceed();
                         }else {
                             Toast.makeText(context, "Closing failed", Toast.LENGTH_SHORT).show();
+                            LoggingUtils.getInstance(context).logEODFailed(response.code(), response.message());
                         }
                     }
 
                     @Override
                     public void onFailure(Call<ClosingResponse> call, Throwable t) {
                         Toast.makeText(context, "Closing failed", Toast.LENGTH_SHORT).show();
+                        LoggingUtils.getInstance(context).logEODError(t.getMessage());
                     }
                 });
             }

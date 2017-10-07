@@ -9,6 +9,7 @@ import android.graphics.Matrix;
 import android.graphics.RectF;
 
 import com.epson.epos2.Epos2Exception;
+import com.epson.epos2.printer.Printer;
 import com.epson.eposprint.Builder;
 import com.epson.eposprint.EposException;
 import com.epson.eposprint.Print;
@@ -25,7 +26,7 @@ public abstract class PrintReceipt implements StatusChangeEventListener {
 
     private static final String PRINTER_NAME = "TM-T88V";
     private static final int PRINTER_LANGUAGE = com.epson.eposprint.Builder.LANG_EN;
-    private static final int SEND_TIMEOUT =  20 * 1000;
+    private static final int SEND_TIMEOUT =  40 * 1000;
     private static Print printer;
     private Context context;
     private PrefManager prefManager;
@@ -47,7 +48,7 @@ public abstract class PrintReceipt implements StatusChangeEventListener {
 
             printer = new Print(context.getApplicationContext());
             printer.setStatusChangeEventCallback(this);
-            printer.openPrinter(Print.DEVTYPE_TCP, printerTarget,Print.TRUE, Print.PARAM_DEFAULT);
+            printer.openPrinter(Print.DEVTYPE_TCP, printerTarget,Print.TRUE, Printer.PARAM_DEFAULT);
 
         }catch (EposException e) {
             //ShowMsg.showException(e,"OPEN_PRINTER", context.getApplicationContext());
@@ -84,7 +85,7 @@ public abstract class PrintReceipt implements StatusChangeEventListener {
             mBuilder = new Builder(PRINTER_NAME, PRINTER_LANGUAGE, context.getApplicationContext());
         }
         mBuilder.clearCommandBuffer();
-        mBuilder.addTextFont(Builder.FONT_B);
+        // mBuilder.addTextFont(Builder.FONT_B);
         return mBuilder;
     }
 

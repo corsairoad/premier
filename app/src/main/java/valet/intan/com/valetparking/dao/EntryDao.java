@@ -16,6 +16,7 @@ import java.util.List;
 
 import valet.intan.com.valetparking.domain.ClosingData;
 import valet.intan.com.valetparking.domain.EntryCheckinResponse;
+import valet.intan.com.valetparking.service.LoggingUtils;
 import valet.intan.com.valetparking.util.CheckinComparator;
 import valet.intan.com.valetparking.util.ValetDbHelper;
 
@@ -128,12 +129,14 @@ public class EntryDao {
             for (EntryCheckinResponse.Data e : checkinList) {
                 if (e != null) {
                     //removeEntryById(e.getAttribute().getId());
-                    int remoteVthdId = e.getAttribute().getId();
+                    //int remoteVthdId = e.getAttribute().getId();
                     String noTiket = e.getAttribute().getNoTiket().trim().replace(" ","");
                     if (!finishCheckoutDao.isAlreadyCheckout(noTiket)) {
                         EntryCheckinResponse entryCheckinResponse = new EntryCheckinResponse();
                         entryCheckinResponse.setData(e);
                         insertEntryResponse(entryCheckinResponse,EntryCheckinResponse.FLAG_UPLOAD_SUCCESS);
+
+                        LoggingUtils.getInstance(dbHelper.getContext()).logAddParkedCarFromOtherDevices(entryCheckinResponse);
                     }
                 }
             }
@@ -425,18 +428,27 @@ public class EntryDao {
             Iterator<ClosingData.Data> iCheckouts = dataCheckouts.iterator();
             Iterator<EntryCheckinResponse> iCheckins = checkins.iterator();
 
+            ClosingData.Data checkout;
+            String checkoutTicket;
+            EntryCheckinResponse checkin;
+            String checkinTicket;
+
             while (iCheckouts.hasNext()) {
-                ClosingData.Data checkout = iCheckouts.next();
-                String checkoutTicket = checkout.getAttributes().getNoTiket().replace(" ","");
+                //ClosingData.Data checkout = iCheckouts.next();
+                checkout = iCheckouts.next();
+                //String checkoutTicket = checkout.getAttributes().getNoTiket().replace(" ","");
+                checkoutTicket = checkout.getAttributes().getNoTiket().replace(" ","");
                 while (iCheckins.hasNext()) {
-                    EntryCheckinResponse checkin = iCheckins.next();
-
-                    String checkinTicket = checkin.getData().getAttribute().getNoTiket().replace(" ","");
-
+                    //EntryCheckinResponse checkin = iCheckins.next();
+                    checkin = iCheckins.next();
+                    //String checkinTicket = checkin.getData().getAttribute().getNoTiket().replace(" ","");
+                    checkinTicket = checkin.getData().getAttribute().getNoTiket().replace(" ","");
                     if (checkinTicket.equalsIgnoreCase(checkoutTicket)) {
                         //String platNo = checkin.getData().getAttribute().getPlatNo();
+                        String platNo = checkin.getData().getAttribute().getPlatNo();
                         int vthdId = checkin.getData().getAttribute().getId();
                         setCheckout(vthdId);
+                        LoggingUtils.getInstance(dbHelper.getContext()).logCheckoutFromAnotherLobby(checkinTicket, platNo);
                     }
                 }
                 iCheckins = checkins.iterator();
