@@ -785,6 +785,7 @@ public class CheckoutActivity extends AppCompatActivity implements CompoundButto
 
             try {
                 String printStatus = finishCheckoutDao.print(idValetHeader);
+
                 if (FinishCheckoutDao.PRINT_CHECOUT_SUCCEED.equals(printStatus)) {
                     finishCheckoutDao.saveDataCheckout(remoteValetHeader, finishCheckoutDao.getFinishCheckOut(), noTiket.trim());
                     finishCheckoutDao.setCheckoutCar(idValetHeader);

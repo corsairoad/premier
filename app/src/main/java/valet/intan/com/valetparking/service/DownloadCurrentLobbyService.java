@@ -43,7 +43,7 @@ public class DownloadCurrentLobbyService extends IntentService {
                 @Override
                 public void process(String token) {
                     ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class, null);
-                    Call<CheckinList> call = apiEndpoint.getCurrentCheckinList(100, token);
+                    Call<CheckinList> call = apiEndpoint.getCurrentCheckinList(200, token);
                     call.enqueue(new Callback<CheckinList>() {
                         @Override
                         public void onResponse(Call<CheckinList> call, Response<CheckinList> response) {

@@ -93,8 +93,8 @@ public class RefreshTokenService extends IntentService {
                             }
                         } else {
                             if (response != null) {
-                                handleErrorResponseCode(response.code(), token, response);
                                 loggingUtils.logRefreshTokenFailed(response.message(), response.code());
+                                handleErrorResponseCode(response.code(), token, response);
                             }
                         }
 
@@ -102,7 +102,7 @@ public class RefreshTokenService extends IntentService {
 
                     @Override
                     public void onFailure(Call<AuthResponse.MetaContainer> call, Throwable t) {
-                        forceLogout(token);
+                        //forceLogout(token);
                         Log.d(TAG, "onFailure: refresh token failure occured: " + t.getMessage());
                         loggingUtils.logRefreshTokenError(t.getMessage());
                     }
@@ -164,7 +164,7 @@ public class RefreshTokenService extends IntentService {
         prefManager.setLoggingOut(false);
         prefManager.setPrinterMacAddress(null);
 
-        logout(token);
+        //logout(token);
         stopAllService();
         goToSplash();
         stopSelf();
@@ -213,6 +213,11 @@ public class RefreshTokenService extends IntentService {
     }
 
     private void handleTokenExpired(String token, Response<AuthResponse.MetaContainer> response) {
+        if (!response.isSuccessful()) {
+            loggingUtils.logRefreshTokenFailed(response.message(),response.code());
+            return;
+        }
+
         try {
             forceLogout(token);
             assert response != null;

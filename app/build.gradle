@@ -9,8 +9,8 @@ android {
         applicationId "valet.intan.com.valetparking"
         minSdkVersion 16
         targetSdkVersion 24
-        versionCode 441
-        versionName "4.4.1[RELEASE]"
+        versionCode 443
+        versionName "4.4.3[RELEASE]"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
     }
