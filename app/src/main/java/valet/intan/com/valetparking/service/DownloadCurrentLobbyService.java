@@ -37,11 +37,13 @@ public class DownloadCurrentLobbyService extends IntentService {
     protected void onHandleIntent(@Nullable Intent intent) {
         Log.d(TAG, "Service Download data current lobby called");
         if (ACTION_DOWNLOAD.equals(intent.getAction())) {
+            LoggingUtils.getInstance(this).logServiceAddCheckinFromOtherDeviceCalled();
+
             TokenDao.getToken(new ProcessRequest() {
                 @Override
                 public void process(String token) {
                     ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class, null);
-                    Call<CheckinList> call = apiEndpoint.getCurrentCheckinList(500, token);
+                    Call<CheckinList> call = apiEndpoint.getCurrentCheckinList(200, token);
                     call.enqueue(new Callback<CheckinList>() {
                         @Override
                         public void onResponse(Call<CheckinList> call, Response<CheckinList> response) {

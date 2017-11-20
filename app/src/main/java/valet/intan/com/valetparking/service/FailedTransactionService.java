@@ -27,15 +27,24 @@ public class FailedTransactionService extends IntentService {
 
     public static final String TAG = FailedTransactionService.class.getSimpleName();
 
-    Call<EntryCheckinResponse> call;
+    private Call<EntryCheckinResponse> call;
+    private LoggingUtils loggingUtils;
 
     public FailedTransactionService() {
         super(TAG);
     }
 
     @Override
+    public void onCreate() {
+        super.onCreate();
+        loggingUtils = LoggingUtils.getInstance(this);
+    }
+
+    @Override
     protected void onHandleIntent(Intent intent) {
         Log.d(TAG, "post checkin service called");
+        loggingUtils.logSyncCheckinCalled();
+
         if (ApiClient.isNetworkAvailable(this)){
 
             if (PrefManager.getInstance(this).isLoggingOut()) {
@@ -48,15 +57,19 @@ public class FailedTransactionService extends IntentService {
             List<EntryCheckinContainer> containers = containerDao.fetchAll();
 
             if (!containers.isEmpty()) {
+                loggingUtils.logTotalSyncCheckin(containers.size());
                 for (EntryCheckinContainer container : containers) {
                     postCheckin(container);
                 }
+            }else {
+                loggingUtils.logCheckinDataEmpty();
             }
 
             //startDownloadCurrentLobbyService();
             startPostCheckoutService();
-
             Log.d(TAG, "STARTED");
+        } else {
+            loggingUtils.logSyncCheckinAborted();
         }
     }
 
@@ -102,7 +115,10 @@ public class FailedTransactionService extends IntentService {
             public void process(String token) {
 
                 // for debugging
-                convertToJson(entryCheckinContainer);
+                //convertToJson(entryCheckinContainer);
+
+                loggingUtils.logPostingCheckin(entryCheckinContainer);
+                logJsonCheckin(entryCheckinContainer);
 
                 ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class, null);
                 call = apiEndpoint.postCheckin(entryCheckinContainer, token);
@@ -147,10 +163,13 @@ public class FailedTransactionService extends IntentService {
 
                                 Log.d("Post Checkin", noTiket + " successfully posted");
 
+                                loggingUtils.logPostingCheckinSucceed(response.body());
                             }catch (Exception e) {
                                 e.printStackTrace();
                                 // remove checkin data from db
                                 Log.d("Post Checkin from error", noTiket + " successfully posted");
+                                loggingUtils.logPostingCheckinSucceed(response.body());
+
                                 EntryCheckinContainerDao.getInstance(FailedTransactionService.this)
                                         .deleteCheckinDataByTicketNo(noTiket);
 
@@ -162,26 +181,35 @@ public class FailedTransactionService extends IntentService {
 
                                 startDownloadCurrentLobbyService();
                             }
+                        }else {
+                            loggingUtils.logPostingCheckinFailed(response);
                         }
                     }
 
                     @Override
                     public void onFailure(Call<EntryCheckinResponse> call, Throwable t) {
 
+                        loggingUtils.logPostingCheckinError(t.getMessage(), entryCheckinContainer);
                     }
                 });
             }
         }, this);
     }
 
-    private void convertToJson(EntryCheckinContainer entryCheckinContainer){
+    private String convertToJson(EntryCheckinContainer entryCheckinContainer){
         Gson gson = new Gson();
-        String json = gson.toJson(entryCheckinContainer);
-        Log.d("Post Checkin json", json);
+        return gson.toJson(entryCheckinContainer);
     }
 
     private void reloadCheckinList() {
         Intent RTReturn = new Intent(ParkedCarFragment.RECEIVE_CURRENT_LOBBY_DATA);
         LocalBroadcastManager.getInstance(FailedTransactionService.this).sendBroadcast(RTReturn);
     }
+
+    private void logJsonCheckin(EntryCheckinContainer entryCheckinContainer) {
+        if (entryCheckinContainer != null && entryCheckinContainer.getEntryCheckin() != null && entryCheckinContainer.getEntryCheckin().getAttrib() != null) {
+            loggingUtils.logJsonCheckin(convertToJson(entryCheckinContainer));
+        }
+    }
+
 }

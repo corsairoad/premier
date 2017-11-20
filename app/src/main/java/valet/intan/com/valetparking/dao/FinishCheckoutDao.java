@@ -2,21 +2,26 @@ package valet.intan.com.valetparking.dao;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.epson.epos2.Epos2Exception;
+import com.epson.eposprint.EposException;
 import com.google.gson.Gson;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import valet.intan.com.valetparking.CheckoutActivity;
 import valet.intan.com.valetparking.Main2Activity;
+import valet.intan.com.valetparking.R;
 import valet.intan.com.valetparking.domain.Bank;
 import valet.intan.com.valetparking.domain.CheckoutData;
 import valet.intan.com.valetparking.domain.EntryCheckinResponse;
@@ -25,6 +30,7 @@ import valet.intan.com.valetparking.domain.FinishCheckoutResponse;
 import valet.intan.com.valetparking.domain.MembershipResponse;
 import valet.intan.com.valetparking.domain.PaymentMethod;
 import valet.intan.com.valetparking.domain.PrintCheckoutParam;
+import valet.intan.com.valetparking.domain.PrintReceipt;
 import valet.intan.com.valetparking.domain.PrintReceiptCheckout;
 import valet.intan.com.valetparking.service.ApiClient;
 import valet.intan.com.valetparking.service.ApiEndpoint;
@@ -36,6 +42,9 @@ import valet.intan.com.valetparking.util.ValetDbHelper;
  */
 
 public class FinishCheckoutDao implements ProcessRequest {
+
+    public static final String PRINT_CHECOUT_SUCCEED = "oke";
+    public static final String PRINT_CHECKOUT_FAILED = "failed";
 
     private Context context;
     private ValetDbHelper dbHelper;
@@ -60,7 +69,6 @@ public class FinishCheckoutDao implements ProcessRequest {
     private FinishCheckoutDao(Context context) {
         this.context = context;
         dbHelper = ValetDbHelper.getInstance(context);
-
     }
 
     public static FinishCheckoutDao getInstance(Context c) {
@@ -192,30 +200,35 @@ public class FinishCheckoutDao implements ProcessRequest {
         });
     }
 
-    public void print(int remoteId) {
+    public String print(final int remoteId) {
+        try {
+            // create print checkout param
+            String ticketSeq = EntryDao.getInstance(context).getTicketSequence(remoteId);
+            PrintCheckoutParam.Builder paramBuilder = new PrintCheckoutParam.Builder()
+                    .setTotalBayar(getTotalBayar())
+                    .setEntryCheckinResponse(getEntryCheckinResponse())
+                    .setTotalCheckin(ticketSeq)
+                    .setFinishCheckout(getFinishCheckOut())
+                    .setOvernigthFine(getOverNightFine())
+                    .setLostTicketFine(getLostTicketFine())
+                    .setNovoucher(getNomorVoucher())
+                    .setDataMembership(getDataMembership())
+                    .setIdMembership(getIdMembership())
+                    .setCheckoutTime(getCheckedOutTime())
+                    .setPaymentData(getPaymentData())
+                    .setBankData(getBankData());
 
-        // create print checkout param
-        String ticketSeq = EntryDao.getInstance(context).getTicketSequence(remoteId);
-        PrintCheckoutParam.Builder paramBuilder = new PrintCheckoutParam.Builder()
-                .setTotalBayar(getTotalBayar())
-                .setEntryCheckinResponse(getEntryCheckinResponse())
-                .setTotalCheckin(ticketSeq)
-                .setFinishCheckout(getFinishCheckOut())
-                .setOvernigthFine(getOverNightFine())
-                .setLostTicketFine(getLostTicketFine())
-                .setNovoucher(getNomorVoucher())
-                .setDataMembership(getDataMembership())
-                .setIdMembership(getIdMembership())
-                .setCheckoutTime(getCheckedOutTime())
-                .setPaymentData(getPaymentData())
-                .setBankData(getBankData());
-
-        // print data
-        PrintReceiptCheckout printReceiptCheckout = new PrintReceiptCheckout(context,paramBuilder.build());
-        printReceiptCheckout.buildPrintData();
-
+            // print data
+            PrintReceiptCheckout printReceiptCheckout = new PrintReceiptCheckout(context,paramBuilder.build());
+            printReceiptCheckout.buildPrintData();
+            ReprintDao.getInstance(context).removeReprintData(paramBuilder.build().getEntryCheckinResponse().getData().getAttribute().getNoTiket());
+            return PRINT_CHECOUT_SUCCEED;
+        } catch (final EposException e) {
+            e.printStackTrace();
+            sendBroadcastErrorPrint(e.getErrorStatus());
+        }
+        return PRINT_CHECKOUT_FAILED;
         //goToMain();
-
         /*
         ---------- cara print lama -------------------
         ----------------------------------------------
@@ -370,6 +383,16 @@ public class FinishCheckoutDao implements ProcessRequest {
         String finishCheckOut = gson.toJson(dataCheckout);
         Log.d("json checkout", finishCheckOut);
         return finishCheckOut;
+    }
+
+
+
+
+    private void sendBroadcastErrorPrint(int statusPrint) {
+        Intent intent = new Intent();
+        intent.putExtra(CheckoutActivity.EXTRA_STATUS_PRINT, statusPrint);
+        intent.setAction(CheckoutActivity.ACTION_ERROR_PRINT);
+        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
 
 }

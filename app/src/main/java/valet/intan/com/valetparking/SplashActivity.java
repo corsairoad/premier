@@ -17,6 +17,7 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -26,9 +27,11 @@ import java.util.Calendar;
 import java.util.UUID;
 import valet.intan.com.valetparking.dao.AuthResDao;
 import valet.intan.com.valetparking.service.ApiClient;
+import valet.intan.com.valetparking.service.LoggingUtils;
+import valet.intan.com.valetparking.util.MyLifecycleHandler;
 import valet.intan.com.valetparking.util.PrefManager;
 
-public class SplashActivity extends AppCompatActivity implements View.OnClickListener, AuthResDao.OnAuthListener {
+public class SplashActivity extends AppCompatActivity implements View.OnClickListener, AuthResDao.OnAuthListener, View.OnLongClickListener {
 
     public static final String KEY_EXTRA_FORCE_LOGOUT = "com.valet.force.logout";
 
@@ -39,19 +42,28 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
     private ProgressBar progressBar;
     private TextView txtVersion;
     private TextView txtForceLogout;
+    private ImageView logoSplash;
 
     private String email;
     private String password;
+
+    private LoggingUtils loggingUtils;
+    private static boolean RELAUNCH = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
-        if (PrefManager.getInstance(this).getAuthResponse() != null) {
+        PrefManager prefManager = PrefManager.getInstance(this);
+        prefManager.setRelaunch(true);
+
+        if (prefManager.getAuthResponse() != null) {
             goToMain();
             return;
         }
+
+        loggingUtils = LoggingUtils.getInstance(this);
 
         linearLayout = (LinearLayout) findViewById(R.id.container_input);
         inputEmail = (EditText) findViewById(R.id.input_email);
@@ -61,6 +73,9 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
         progressBar = (ProgressBar) findViewById(R.id.progressbar);
         txtVersion = (TextView) findViewById(R.id.text_app_version);
         txtForceLogout = (TextView) findViewById(R.id.text_notif);
+        logoSplash = (ImageView) findViewById(R.id.logo_splash);
+        logoSplash.setOnLongClickListener(this);
+
         setTextVersion();
     }
 
@@ -68,6 +83,13 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
     protected void onStart() {
         super.onStart();
         handleIntent(getIntent());
+        requestPermissionForWriteToDisk();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        MyLifecycleHandler.relaunchAppIfNotVisible(this);
     }
 
     private void handleIntent(Intent intent) {
@@ -84,6 +106,7 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
         try {
             packageInfo = getPackageManager().getPackageInfo(getPackageName(),0);
             txtVersion.setText("Versi " + packageInfo.versionName);
+            txtVersion.setOnLongClickListener(this);
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
@@ -99,6 +122,12 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
         }
     }
 
+    private void requestPermissionForWriteToDisk() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, 3);
+        }
+    }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode) {
@@ -110,6 +139,7 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
                 }
                 break;
             }
+
         }
     }
 
@@ -132,20 +162,20 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
     @Override
     public void onClick(View view) {
         progressBar.setVisibility(View.VISIBLE);
-
+        btnLogin.setEnabled(false);
         email = inputEmail.getText().toString().trim();
         password = inputPassword.getText().toString().trim();
 
         if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password)) {
             progressBar.setVisibility(View.GONE);
             Toast.makeText(SplashActivity.this, R.string.login_empty,Toast.LENGTH_SHORT).show();
+            btnLogin.setEnabled(true);
             return;
         }
 
         new Thread(new Runnable() {
             @Override
             public void run() {
-
                 requestPermissionForDevId();
 
             }
@@ -155,6 +185,7 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
 
     @Override
     public void loginFailed(int messageCode, String messg) {
+        btnLogin.setEnabled(true);
         String title = "Login failed";
         String message = "";
         switch (messageCode) {
@@ -174,6 +205,8 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
                 message = "Error response occurred";
                 break;
         }
+
+        loggingUtils.logLoginError(email, message);
 
         progressBar.setVisibility(View.GONE);
         AlertDialog.Builder builder = new AlertDialog.Builder(this)
@@ -195,11 +228,18 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
 
     @Override
     public void loginSuccess() {
+        btnLogin.setEnabled(true);
+        PrefManager prefManager = PrefManager.getInstance(this);
+        loggingUtils.logLoginSucced(email);
+        loggingUtils.logToken(prefManager.getToken());
+        loggingUtils.logExpiredDate(prefManager.getExpiredToken());
+
         ApiClient.downloadData(this);
         goToMain();
     }
 
     private void goToMain() {
+
         Intent intent = new Intent(this, WelcomeActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
@@ -223,6 +263,16 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
     private void proceessToLogin() {
         AuthResDao authResDao = AuthResDao.getInstance(SplashActivity.this);
         authResDao.login(email, password, SplashActivity.this);
+        loggingUtils.logLogin(email);
     }
 
+    @Override
+    public boolean onLongClick(View v) {
+        int id = v.getId();
+        if (id == logoSplash.getId() || id == txtVersion.getId()){
+            PrefManager.getInstance(this).setRelaunch(false);
+            finishAffinity();
+        }
+        return false;
+    }
 }

@@ -18,6 +18,8 @@ import valet.intan.com.valetparking.domain.EntryCheckinResponse;
 import valet.intan.com.valetparking.domain.PrintCheckin;
 import valet.intan.com.valetparking.domain.PrintReceiptTest;
 import valet.intan.com.valetparking.domain.SpnModelsItem;
+import valet.intan.com.valetparking.service.LoggingUtils;
+import valet.intan.com.valetparking.util.MyLifecycleHandler;
 import valet.intan.com.valetparking.util.PrefManager;
 
 public class PrinterActivity extends AppCompatActivity implements View.OnClickListener{
@@ -101,6 +103,12 @@ public class PrinterActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     @Override
+    protected void onStop() {
+        super.onStop();
+        MyLifecycleHandler.relaunchAppIfNotVisible(this);
+    }
+
+    @Override
     protected void onActivityResult(int requestCode, final int resultCode, final Intent data) {
         if (data != null && resultCode == RESULT_OK) {
             String target = data.getStringExtra(getString(R.string.title_target));
@@ -108,6 +116,7 @@ public class PrinterActivity extends AppCompatActivity implements View.OnClickLi
                 PrefManager.getInstance(this).setPrinterMacAddress(target);
                 EditText mEdtTarget = (EditText)findViewById(R.id.edtTarget);
                 mEdtTarget.setText("TCP:"+target);
+                LoggingUtils.getInstance(PrinterActivity.this).logSetPrinter(target);
             }
         }
     }

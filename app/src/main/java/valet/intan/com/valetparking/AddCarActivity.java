@@ -38,7 +38,9 @@ import valet.intan.com.valetparking.fragments.SignDialogFragment;
 import valet.intan.com.valetparking.fragments.StepOneFragmet;
 import valet.intan.com.valetparking.fragments.StepThreeFragment;
 import valet.intan.com.valetparking.fragments.StepTwoFragment;
+import valet.intan.com.valetparking.service.LoggingUtils;
 import valet.intan.com.valetparking.util.CheckinCheckoutAlarm;
+import valet.intan.com.valetparking.util.MyLifecycleHandler;
 import valet.intan.com.valetparking.util.PrefManager;
 
 public class AddCarActivity extends FragmentActivity implements StepOneFragmet.OnRegsitrationValid,
@@ -59,10 +61,13 @@ public class AddCarActivity extends FragmentActivity implements StepOneFragmet.O
     private EntryCheckinContainerDao entryCheckinContainerDao;
     private SignDialogFragment sdf;
     private MaterialDialog materialDialog;
+    private LoggingUtils loggingUtils;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_car);
+
+        loggingUtils = LoggingUtils.getInstance(this);
 
         layoutGrey = (LinearLayout) findViewById(R.id.layout_grey);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
@@ -136,6 +141,12 @@ public class AddCarActivity extends FragmentActivity implements StepOneFragmet.O
     }
 
     @Override
+    protected void onStop() {
+        super.onStop();
+        MyLifecycleHandler.relaunchAppIfNotVisible(this);
+    }
+
+    @Override
     public void setCheckin(String dropPoint, String platNo, String carType, String merk, String email, String warna) {
         fragmentReview.setCheckin(dropPoint, platNo, carType, merk, email, warna);
     }
@@ -200,7 +211,7 @@ public class AddCarActivity extends FragmentActivity implements StepOneFragmet.O
     }
 
     @Override
-    public void setBitMapSign(Bitmap bitMapSign) {
+    public void setBitMapSign(Bitmap bitMapSign, String signatureCoordinates) {
 
         if (sdf != null) {
             sdf.dismiss();
@@ -209,6 +220,7 @@ public class AddCarActivity extends FragmentActivity implements StepOneFragmet.O
         showDialog(true);
 
         fragmentReview.setSignBitmap(bitMapSign);
+        fragmentReview.setSignatureCoordinates(signatureCoordinates);
         //showConfirmDialog(fragmentReview);
         fragmentRegFirst.setCheckIn();
         progressBar.setVisibility(View.VISIBLE);
@@ -243,11 +255,13 @@ public class AddCarActivity extends FragmentActivity implements StepOneFragmet.O
         final PrintReceiptChekin printReceiptChekin = new PrintReceiptChekin(this,response, fragmentReview.getBitmapDefect(), fragmentReview.getSignatureBmp(), fragmentReview.getItemsList());
         try {
             printReceiptChekin.buildPrintData();
+            loggingUtils.logPrintCheckinSucceed(response.getData().getAttribute().getNoTiket());
             //goToMain();
         } catch (final EposException e) {
             final int errStatus = e.getErrorStatus();
             e.printStackTrace();
             printReceiptChekin.closePrinter();
+            loggingUtils.logPrintCheckinError(response.getData().getAttribute().getNoTiket());
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -271,6 +285,7 @@ public class AddCarActivity extends FragmentActivity implements StepOneFragmet.O
         EntryCheckinResponse entryCheckinResponse = new EntryCheckinResponse();
         EntryCheckinResponse.Data data = new EntryCheckinResponse.Data();
         EntryCheckinResponse.Attribute attr = new EntryCheckinResponse.Attribute();
+
         attr.setValetType(builder.getValetType().getAttrib().getValetTypeName());
         attr.setAreaParkir(" ");
         attr.setAreaParkirStatus(" ");
@@ -302,13 +317,15 @@ public class AddCarActivity extends FragmentActivity implements StepOneFragmet.O
         entryCheckin.setId(String.valueOf(fakeVthdId));
         entryCheckin.getAttrib().setCheckinTime(attr.getCheckinTime());
         entryCheckin.getAttrib().setTicketNo(attr.getIdTransaksi());
-        entryCheckin.getAttrib().setQrCode("------------------------");
+        entryCheckin.getAttrib().setQrCode(" ");
         entryCheckin.getAttrib().setDeviceId(prefManager.getDeviceId());
         entryCheckin.getAttrib().setAppId(prefManager.getAppId());
         entryCheckin.getAttrib().setLastTicketCounter(lastTicketCounter);
 
         entryDao.insertEntryResponse(entryCheckinResponse, EntryCheckinResponse.FLAG_UPLOAD_PENDING);
         entryCheckinContainerDao.insert(checkinContainer);
+
+        logAddCheckin(entryCheckinResponse);
 
         saveReprintData(entryCheckinResponse,noTiket.trim());
         print(entryCheckinResponse);
@@ -365,5 +382,17 @@ public class AddCarActivity extends FragmentActivity implements StepOneFragmet.O
         } catch (Exception e) {
             Toast.makeText(this, e.getMessage(),Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private void logAddCheckin(EntryCheckinResponse entryCheckin) {
+
+        String username = PrefManager.getInstance(this).getUserName();
+        String noTicket = entryCheckin.getData().getAttribute().getNoTiket();
+        String noPlat = entryCheckin.getData().getAttribute().getPlatNo();
+        String carType = entryCheckin.getData().getAttribute().getCar();
+        String color = entryCheckin.getData().getAttribute().getColor();
+        String lobby = PrefManager.getInstance(this).getDefaultDropPointName();
+
+        loggingUtils.logAddCar(username,noTicket,noPlat,carType,color,lobby);
     }
 }

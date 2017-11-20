@@ -19,6 +19,7 @@ import valet.intan.com.valetparking.domain.FinishCheckOut;
 import valet.intan.com.valetparking.domain.FinishCheckoutResponse;
 import valet.intan.com.valetparking.service.ApiClient;
 import valet.intan.com.valetparking.service.ApiEndpoint;
+import valet.intan.com.valetparking.service.LoggingUtils;
 import valet.intan.com.valetparking.service.ProcessRequest;
 
 /**
@@ -38,9 +39,15 @@ public class SyncingCheckout extends IntentService {
     private int count = 1;
     private Call<FinishCheckoutResponse> call;
     private boolean usedForClosing;
-
+    private LoggingUtils loggingUtils;
     public SyncingCheckout() {
         super(TAG);
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        loggingUtils = LoggingUtils.getInstance(this);
     }
 
     @Override
@@ -60,6 +67,8 @@ public class SyncingCheckout extends IntentService {
     }
 
     private void sync() {
+        loggingUtils.logSyncCheckoutPendingData();
+
         FinishCheckoutDao checkoutDao = FinishCheckoutDao.getInstance(this);
         List<CheckoutData> checkoutDataList = checkoutDao.getCheckoutData();
 
@@ -69,7 +78,7 @@ public class SyncingCheckout extends IntentService {
         sendMessage(ACTION, message);
 
         if (!checkoutDataList.isEmpty()) {
-
+            loggingUtils.logTotalCheckoutPendingData(totalCheckoutData);
             sendMessage(ACTION, "Synchronizing checkout data " + count + "/" + totalCheckoutData);
 
             for (CheckoutData data : checkoutDataList) {
@@ -86,6 +95,7 @@ public class SyncingCheckout extends IntentService {
     }
 
     private void postCheckout(final CheckoutData data) {
+        loggingUtils.logPostingCheckoutPendingData(data);
         TokenDao.getToken(new ProcessRequest() {
             @Override
             public void process(String token) {
@@ -115,9 +125,16 @@ public class SyncingCheckout extends IntentService {
                             Log.d(TAG, "Sync Checkout data failed. VthdId: " + remoteVthdId + ", Tiket:" + noTiket);
                         }
 
+                        loggingUtils.logPostingCheckoutPendingDataSucceed(noTiket);
+
                         sendMessage(ACTION, "Synchronizing checkout data " + count + "/" + totalCheckoutData);
                         handleAction();
                     } else {
+                        if (httpResponse != null) {
+                            int code = httpResponse.code();
+                            String message = "Logout " + httpResponse.message();
+                            loggingUtils.logPostingCheckoutPendingDataFailed(noTiket, message, code);
+                        }
                         //int code = httpResponse.code();
                         //String message = "Logout " + httpResponse.message();
                         //sendMessage(ACTION_LOGOUT_ERROR_RESPONSE, message + " " + code);

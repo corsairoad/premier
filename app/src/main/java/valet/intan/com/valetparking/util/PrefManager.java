@@ -34,6 +34,8 @@ public class PrefManager {
     public static final String KEY_USER_ROLE_ID = "user.role.id";
     public static final String KEY_EXPIRED_TOKEN = "expired.token";
     public static final String KEY_DATE_LAST_LOGIN = "last.login";
+    public static final String KEY_TOKEN_BACKUP = "token_backup";
+    public static final String KEY_RELAUNCH_APP = "relaunch";
 
     private Context context;
     private static PrefManager prefManager;
@@ -79,7 +81,7 @@ public class PrefManager {
     }
 
     public String getIdDefaultDropPoint() {
-        String id = sharedPreferences.getString(KEY_DEFAULT_DROPPOINT, null);
+        String id = sharedPreferences.getString(KEY_DEFAULT_DROPPOINT, "0");
         return id;
     }
 
@@ -94,8 +96,26 @@ public class PrefManager {
         editor.commit();
     }
 
+    public void setRelaunch(boolean relaunch) {
+        editor.putBoolean(KEY_RELAUNCH_APP, relaunch);
+        editor.commit();
+    }
+
+    public boolean getRelaunch() {
+        return sharedPreferences.getBoolean(KEY_RELAUNCH_APP, true);
+    }
+
     public String getToken() {
         return sharedPreferences.getString(KEY_TOKEN,null);
+    }
+
+    public void saveBackupToken(String backupToken){
+        editor.putString(KEY_TOKEN_BACKUP, backupToken);
+        editor.commit();
+    }
+
+    public String getBackupToken() {
+        return sharedPreferences.getString(KEY_TOKEN_BACKUP, null);
     }
 
     public void saveRemoteDeviceId(String remoteDevId) {

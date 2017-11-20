@@ -8,6 +8,8 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.RectF;
 
+import com.epson.epos2.Epos2Exception;
+import com.epson.epos2.printer.Printer;
 import com.epson.eposprint.Builder;
 import com.epson.eposprint.EposException;
 import com.epson.eposprint.Print;
@@ -24,7 +26,7 @@ public abstract class PrintReceipt implements StatusChangeEventListener {
 
     private static final String PRINTER_NAME = "TM-T88V";
     private static final int PRINTER_LANGUAGE = com.epson.eposprint.Builder.LANG_EN;
-    private static final int SEND_TIMEOUT =  20 * 1000;
+    private static final int SEND_TIMEOUT =  40 * 1000;
     private static Print printer;
     private Context context;
     private PrefManager prefManager;
@@ -46,7 +48,7 @@ public abstract class PrintReceipt implements StatusChangeEventListener {
 
             printer = new Print(context.getApplicationContext());
             printer.setStatusChangeEventCallback(this);
-            printer.openPrinter(Print.DEVTYPE_TCP, printerTarget,Print.TRUE, Print.PARAM_DEFAULT);
+            printer.openPrinter(Print.DEVTYPE_TCP, printerTarget,Print.TRUE, Printer.PARAM_DEFAULT);
 
         }catch (EposException e) {
             //ShowMsg.showException(e,"OPEN_PRINTER", context.getApplicationContext());
@@ -83,7 +85,7 @@ public abstract class PrintReceipt implements StatusChangeEventListener {
             mBuilder = new Builder(PRINTER_NAME, PRINTER_LANGUAGE, context.getApplicationContext());
         }
         mBuilder.clearCommandBuffer();
-        mBuilder.addTextFont(Builder.FONT_B);
+        // mBuilder.addTextFont(Builder.FONT_B);
         return mBuilder;
     }
 
@@ -209,5 +211,63 @@ public abstract class PrintReceipt implements StatusChangeEventListener {
                 Builder.HALFTONE_DITHER,
                 Builder.PARAM_DEFAULT);
         builder.addFeedLine(1);
+    }
+
+    public static String getEposExceptionText(int state) {
+        String return_text = "";
+        switch (state) {
+            case    Epos2Exception.ERR_PARAM:
+                return_text = "ERR_PARAM";
+                break;
+            case    Epos2Exception.ERR_CONNECT:
+                return_text = "ERR_CONNECT";
+                break;
+            case    Epos2Exception.ERR_TIMEOUT:
+                return_text = "ERR_TIMEOUT";
+                break;
+            case    Epos2Exception.ERR_MEMORY:
+                return_text = "ERR_MEMORY";
+                break;
+            case    Epos2Exception.ERR_ILLEGAL:
+                return_text = "ERR_ILLEGAL";
+                break;
+            case    Epos2Exception.ERR_PROCESSING:
+                return_text = "ERR_PROCESSING";
+                break;
+            case    Epos2Exception.ERR_NOT_FOUND:
+                return_text = "ERR_NOT_FOUND";
+                break;
+            case    Epos2Exception.ERR_IN_USE:
+                return_text = "ERR_IN_USE";
+                break;
+            case    Epos2Exception.ERR_TYPE_INVALID:
+                return_text = "ERR_TYPE_INVALID";
+                break;
+            case    Epos2Exception.ERR_DISCONNECT:
+                return_text = "ERR_DISCONNECT";
+                break;
+            case    Epos2Exception.ERR_ALREADY_OPENED:
+                return_text = "ERR_ALREADY_OPENED";
+                break;
+            case    Epos2Exception.ERR_ALREADY_USED:
+                return_text = "ERR_ALREADY_USED";
+                break;
+            case    Epos2Exception.ERR_BOX_COUNT_OVER:
+                return_text = "ERR_BOX_COUNT_OVER";
+                break;
+            case    Epos2Exception.ERR_BOX_CLIENT_OVER:
+                return_text = "ERR_BOX_CLIENT_OVER";
+                break;
+            case    Epos2Exception.ERR_UNSUPPORTED:
+                return_text = "ERR_UNSUPPORTED";
+                break;
+            case    Epos2Exception.ERR_FAILURE:
+                return_text = "ERR_FAILURE";
+                break;
+            default:
+                return_text = String.format("%d", state);
+                break;
+        }
+        return return_text;
     }
 }

@@ -10,13 +10,10 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import com.github.gcacace.signaturepad.views.SignaturePad;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-
 import valet.intan.com.valetparking.R;
 import valet.intan.com.valetparking.dao.DropDao;
 import valet.intan.com.valetparking.domain.AdditionalItems;
@@ -36,8 +33,7 @@ import valet.intan.com.valetparking.util.ValetDbHelper;
 public class ReviewFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+
 
     private Checkin checkin = new Checkin();
     private SignaturePad signPad;
@@ -58,6 +54,7 @@ public class ReviewFragment extends Fragment {
     private Bitmap bitmapDefect;
     private ValetTypeJson.Data  valetType;
     private Bitmap signBitmap;
+    private String signatureCoordinates;
     private EntryCheckin.Builder builder;
 
     public ReviewFragment() {
@@ -138,6 +135,8 @@ public class ReviewFragment extends Fragment {
         init();
     }
 
+
+
     public void selectDefect(String defect, DefectMaster defectMaster) {
         checkin.getDefects().add(defect);
         getDefectMasterList().add(defectMaster);
@@ -184,6 +183,14 @@ public class ReviewFragment extends Fragment {
 
     public void setSignBitmap(Bitmap signBitmap) {
         this.signBitmap = signBitmap;
+    }
+
+    public String getSignatureCoordinates() {
+        return signatureCoordinates;
+    }
+
+    public void setSignatureCoordinates(String signatureCoordinates) {
+        this.signatureCoordinates = signatureCoordinates;
     }
 
     public Checkin getCheckin() {
@@ -242,8 +249,11 @@ public class ReviewFragment extends Fragment {
 
     private EntryCheckinContainer buildCheckinEntry() {
         builder = new EntryCheckin.Builder();
-        builder.setAttribute(dropPoint,textPlatNo.getText().toString(), carMaster, colorMaster,textEmail.getText().toString(),bitmapDefect, signBitmap, valetType);
+        builder.setAttribute(dropPoint,textPlatNo.getText().toString(), carMaster, colorMaster,textEmail.getText().toString(),
+                bitmapDefect, signBitmap, valetType, getSignatureCoordinates(), getDefectMasterList());
+
         builder.setRelationShip(getDefectMasterList(), getItemsList());
+
         EntryCheckin entryCheckin = builder.build();
         EntryCheckinContainer entryCheckinContainer = new EntryCheckinContainer();
         entryCheckinContainer.setEntryCheckin(entryCheckin);

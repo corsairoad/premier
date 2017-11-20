@@ -26,6 +26,7 @@ public class PostCheckoutService extends IntentService {
 
     private static final String TAG = PostCheckoutService.class.getSimpleName();
     public static final String ACTION = "premier.valet.post.checkout.data";
+    private LoggingUtils loggingUtils;
 
     private FinishCheckoutDao checkoutDao;
     private Call<FinishCheckoutResponse> call;
@@ -36,16 +37,27 @@ public class PostCheckoutService extends IntentService {
     }
 
     @Override
+    public void onCreate() {
+        super.onCreate();
+        loggingUtils = LoggingUtils.getInstance(this);
+    }
+
+    @Override
     protected void onHandleIntent(@Nullable Intent intent) {
         if (ACTION.equalsIgnoreCase(intent.getAction())) {
             Log.d(TAG, "Post Checkout service called");
+            loggingUtils.logPostCheckoutServiceCalled();
+
             List<CheckoutData> checkoutDataList = checkoutDao.getCheckoutData();
             if (!checkoutDataList.isEmpty()) {
+                loggingUtils.logTotalCheckoutDataToPost(checkoutDataList.size());
+
                 for (CheckoutData data : checkoutDataList) {
                     post(data);
                 }
             }else {
                 Log.d(TAG, "data checkout empty");
+                loggingUtils.logPostCheckoutEmpty();
             }
 
         }
@@ -65,6 +77,8 @@ public class PostCheckoutService extends IntentService {
         final String noTiket = data.getNoTiket();
         if (finishCheckOut != null) {
             Log.d(TAG, "posting data checkout");
+            loggingUtils.logPostCheckoutData(data);
+
             TokenDao.getToken(new ProcessRequest() {
                 @Override
                 public void process(String token) {
@@ -75,6 +89,7 @@ public class PostCheckoutService extends IntentService {
                         public void onResponse(Call<FinishCheckoutResponse> call, Response<FinishCheckoutResponse> response) {
                             if (response != null && response.body() != null) {
                                 Log.d(TAG, "Checkout from bg service success. VthdId: " + remoteVthdId + ", Tiket:" + noTiket);
+                                loggingUtils.logPostCheckoutSucceed(noTiket);
                                 //checkoutDao.deleteDatabyRemoteId(remoteVthdId);
                                 int statusUpdate = checkoutDao.updateStatus(remoteVthdId, FinishCheckoutDao.STATUS_SYNCED);
                                 if (statusUpdate > 0) {
@@ -84,12 +99,14 @@ public class PostCheckoutService extends IntentService {
                                 }
                             }else {
                                 Log.d(TAG, "Checkout from bg service failed. VthdId: " + remoteVthdId + ", Tiket:" + noTiket);
+                                loggingUtils.logPostCheckoutFailed(noTiket, remoteVthdId, response.code());
                             }
                         }
 
                         @Override
                         public void onFailure(Call<FinishCheckoutResponse> call, Throwable t) {
-                            Log.d(TAG, "Checkout from bg service failed. VthdId: " + remoteVthdId);
+                            Log.d(TAG, "Checkout from bg service error. VthdId: " + remoteVthdId);
+                            loggingUtils.logPostCheckoutError(noTiket, t.getMessage());
                         }
                     });
 

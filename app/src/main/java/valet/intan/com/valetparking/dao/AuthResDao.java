@@ -19,6 +19,7 @@ import valet.intan.com.valetparking.domain.CancelResponse;
 import valet.intan.com.valetparking.domain.LoginError403;
 import valet.intan.com.valetparking.service.ApiClient;
 import valet.intan.com.valetparking.service.ApiEndpoint;
+import valet.intan.com.valetparking.service.LoggingUtils;
 import valet.intan.com.valetparking.util.PrefManager;
 
 /**
@@ -113,7 +114,7 @@ public class AuthResDao {
 
             @Override
             public void onFailure(Call<JsonElement> call, Throwable t) {
-                Toast.makeText(context,"Login Failed, Connection problem.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context,"Login Failed, Connection problem. Message: " + t.getMessage(), Toast.LENGTH_SHORT).show();
                 proceedToFailed(HTTP_STATUS_LOGIN_ERR_CONN, null);
             }
 

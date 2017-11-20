@@ -63,6 +63,7 @@ public class PrintReceiptClosing extends PrintReceipt {
             Toast.makeText(getContext(), "Printing", Toast.LENGTH_SHORT).show();
 
             Builder builder = getBuilder();
+            builder.addTextFont(Builder.FONT_B);
 
             StringBuilder sb = new StringBuilder();
             StringBuilder sbSample = new StringBuilder();
@@ -184,7 +185,6 @@ public class PrintReceiptClosing extends PrintReceipt {
             builder.addTextFont(Builder.FONT_A);
 
             print();
-
     }
 
 

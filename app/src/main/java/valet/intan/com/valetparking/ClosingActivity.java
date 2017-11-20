@@ -62,7 +62,10 @@ import valet.intan.com.valetparking.domain.PrintClosingParam;
 import valet.intan.com.valetparking.domain.PrintReceiptClosing;
 import valet.intan.com.valetparking.service.ApiClient;
 import valet.intan.com.valetparking.service.ApiEndpoint;
+import valet.intan.com.valetparking.service.LoggingUtils;
 import valet.intan.com.valetparking.service.ProcessRequest;
+import valet.intan.com.valetparking.service.RefreshTokenService;
+import valet.intan.com.valetparking.util.MyLifecycleHandler;
 import valet.intan.com.valetparking.util.PrefManager;
 import valet.intan.com.valetparking.util.SyncCustomDialog;
 import valet.intan.com.valetparking.util.SyncingCheckin;
@@ -134,11 +137,14 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
     private BroadcastReceiver syncReceiver;
 
     public static final String EXTRA_CLOSING = ClosingActivity.class.getSimpleName();
+    private LoggingUtils loggingUtils;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_closing);
+
+        loggingUtils = LoggingUtils.getInstance(this);
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         progressBar = (MaterialProgressBar) findViewById(R.id.progressbar);
@@ -357,9 +363,9 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
 
     @Override
     protected void onStop() {
-        Log.d(TAG, "STOPPED");
         //cancelTask();
         super.onStop();
+        MyLifecycleHandler.relaunchAppIfNotVisible(this);
     }
 
     private void unregisterLocalBroadcastReceiver(){
@@ -415,6 +421,8 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
 
     private synchronized void close(String flagHeader, int flagPrint) {
         try {
+            loggingUtils.logProcessingEOD(closingAdapter.getItemCount());
+
             print(flagHeader, flagPrint);
             ClosingDao closingDao = ClosingDao.getInstance(this);
             String readInfo = inputRemark.getText().toString();
@@ -435,7 +443,7 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     private void print(String flagHeader, int flagPrint) throws EposException {
-        Toast.makeText(this, "Printing..", Toast.LENGTH_LONG).show();
+        //Toast.makeText(this, "Printing..", Toast.LENGTH_LONG).show();
 
         PrefManager prefManager = PrefManager.getInstance(this);
         String lobbyName = prefManager.getDefaultDropPointName();
@@ -458,6 +466,8 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
         // BUILD AND PRINT CLOSING DATA
         PrintReceiptClosing printReceiptClosing = new PrintReceiptClosing(this, closingParam,flagHeader, flagPrint);
         printReceiptClosing.buildPrintData();
+
+        loggingUtils.logPrintEODSucceed();
     }
 
     @Override
@@ -482,6 +492,8 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
                                 sweetAlertDialog.dismiss();
                                 Toast.makeText(ClosingActivity.this, "Printing..", Toast.LENGTH_SHORT).show();
                                 close(null, PRINT_CLOSING);
+
+                                refreshToken();
                                 //new DownloadClosingDataTask().execute(DOWNLOAD_PER_LOBBY);
                             }
                         })
@@ -688,6 +700,8 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
             numberProgressBar.setVisibility(View.VISIBLE);
             syncDialog.dismiss();
         }
+
+        loggingUtils.logDownloadClosingData(flag);
 
         TokenDao.getToken(new ProcessRequest() {
             @Override
@@ -1035,6 +1049,12 @@ public class ClosingActivity extends AppCompatActivity implements View.OnClickLi
 
         return String.format("and(ge(created_at,%s),le(created_at,%s))", dateFrom, dateTo);
         //return "and(ge(created_at,2017-06-08T00:00:00Z),le(created_at,2017-06-08T23:59:59Z))";
+    }
+
+    private void refreshToken() {
+        Intent intent = new Intent(this, RefreshTokenService.class);
+        intent.setAction(RefreshTokenService.ACTION_REFRESH_TOKEN);
+        startService(intent);
     }
 
 }

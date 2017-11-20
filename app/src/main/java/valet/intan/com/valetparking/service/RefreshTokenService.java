@@ -22,6 +22,10 @@ import valet.intan.com.valetparking.util.RefreshTokenAlarm;
 public class RefreshTokenService extends IntentService {
     private static final String TAG = RefreshTokenService.class.getSimpleName();
     public static final String ACTION_REFRESH_TOKEN = "valet.intan.com.valetparking.service.action.refresh.token";
+    public static final int RESPONSE_TOKEN_EXPIRED = 401;
+    public static final int RESPONSE_INVALID_TOKEN_REQUEST = 400;
+    public static final int RESPONSE_INTERNAL_SERVER_ERROR = 500;
+    private LoggingUtils loggingUtils;
 
     public RefreshTokenService() {
         super(TAG);
@@ -36,12 +40,23 @@ public class RefreshTokenService extends IntentService {
     }
 
     @Override
+    public void onCreate() {
+        super.onCreate();
+        loggingUtils = LoggingUtils.getInstance(this);
+    }
+
+    @Override
     protected void onHandleIntent(Intent intent) {
         if (intent != null) {
             final String action = intent.getAction();
             if (ACTION_REFRESH_TOKEN.equals(action)) {
                 Log.d(TAG, "Refresh token service called");
-                handleActionRefreshToken();
+                if (ApiClient.isNetworkAvailable(RefreshTokenService.this)) {
+                    handleActionRefreshToken();
+                }else {
+                    //resetRefreshTokenAlarm();
+                    loggingUtils.logRefreshTokenError("No internet connection");
+                }
             }
         }
     }
@@ -50,29 +65,36 @@ public class RefreshTokenService extends IntentService {
         TokenDao.getToken(new ProcessRequest() {
             @Override
             public void process(final String token) {
-                Log.d(TAG, "Connecting to server. Token: " + token);
+                Log.d(TAG, "Connecting to server. old Token: " + token);
+                loggingUtils.logOldToken(token);
+
                 ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class);
                 Call<AuthResponse.MetaContainer> call = apiEndpoint.refreshToken(token);
                 call.enqueue(new Callback<AuthResponse.MetaContainer>() {
                     @Override
                     public void onResponse(Call<AuthResponse.MetaContainer> call, Response<AuthResponse.MetaContainer> response) {
-                        Log.d(TAG, "Server connected");
                         if (response != null && response.body() != null) {
                             String token2 = response.body().getData().getMeta().getToken();
                             String expDate = response.body().getData().getMeta().getExpiredDate();
 
+                            logIfEquals(token, token2);
+
                             if (token2 != null && expDate != null) {
+                                saveToBackupToken(token2);
                                 saveTokenAndExpDate(token2, expDate);
                                 resetRefreshTokenAlarm();
-                                Log.d(TAG, "refresh token succeed. token: " + token2);
+
+                                Log.d(TAG, "refresh token succeed. new token: " + token2);
+
+                                loggingUtils.logRefreshTokenSucceed(token2);
+
+                            }else {
+                                loggingUtils.logIfTokenOrExpDateNull(token2, expDate);
                             }
-                        }else {
-                            try {
-                                forceLogout(token);
-                                assert response != null;
-                                Log.d(TAG, "onResponse: refresh token failed: " + response.errorBody().string());
-                            } catch (IOException e) {
-                                e.printStackTrace();
+                        } else {
+                            if (response != null) {
+                                loggingUtils.logRefreshTokenFailed(response.message(), response.code());
+                                handleErrorResponseCode(response.code(), token, response);
                             }
                         }
 
@@ -80,17 +102,53 @@ public class RefreshTokenService extends IntentService {
 
                     @Override
                     public void onFailure(Call<AuthResponse.MetaContainer> call, Throwable t) {
-                        forceLogout(token);
-                        Log.d(TAG, "onFailure: refresh token failure occured");
+                        //forceLogout(token);
+                        Log.d(TAG, "onFailure: refresh token failure occured: " + t.getMessage());
+                        loggingUtils.logRefreshTokenError(t.getMessage());
                     }
                 });
             }
         }, this);
     }
 
-    private void saveTokenAndExpDate(String token, String expDate){
+    private void logIfEquals(String token, String token2) {
+        if (token.equalsIgnoreCase(token2)) {
+            loggingUtils.logNewTokenEqualsToTheLastOne(token,token2);
+        }
+    }
+
+    private  void handleErrorResponseCode(int code, String token, Response<AuthResponse.MetaContainer> response) {
+        switch (code) {
+            case RESPONSE_TOKEN_EXPIRED:
+                handleTokenExpired(token, response);
+                break;
+            case RESPONSE_INVALID_TOKEN_REQUEST:
+                replaceTokenWithBackupToken();
+                break;
+            case RESPONSE_INTERNAL_SERVER_ERROR:
+                //resetRefreshTokenAlarm();
+                break;
+            default:
+                //resetRefreshTokenAlarm();
+                break;
+
+        }
+    }
+
+    private void replaceTokenWithBackupToken() {
         PrefManager prefManager = PrefManager.getInstance(this);
-        prefManager.saveToken(token);
+        String backupToken = prefManager.getBackupToken();
+        String currentToken = prefManager.getToken();
+
+        if (backupToken != null && !backupToken.equals(currentToken)) {
+            prefManager.saveToken(backupToken);
+            loggingUtils.logReplaceCurrentTokenWithBackupOne();
+        }
+    }
+
+    private void saveTokenAndExpDate(String token2, String expDate){
+        PrefManager prefManager = PrefManager.getInstance(this);
+        prefManager.saveToken(token2);
         prefManager.setExpiredDateToken(expDate);
         prefManager.setLastLoginDateToCurrentDate();
     }
@@ -106,7 +164,7 @@ public class RefreshTokenService extends IntentService {
         prefManager.setLoggingOut(false);
         prefManager.setPrinterMacAddress(null);
 
-        logout(token);
+        //logout(token);
         stopAllService();
         goToSplash();
         stopSelf();
@@ -154,5 +212,23 @@ public class RefreshTokenService extends IntentService {
         });
     }
 
+    private void handleTokenExpired(String token, Response<AuthResponse.MetaContainer> response) {
+        if (!response.isSuccessful()) {
+            loggingUtils.logRefreshTokenFailed(response.message(),response.code());
+            return;
+        }
+
+        try {
+            forceLogout(token);
+            assert response != null;
+            Log.d(TAG, "onResponse: refresh token failed: " + response.errorBody().string());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void saveToBackupToken(String newToken) {
+        PrefManager.getInstance(this).saveBackupToken("Bearer " + newToken);
+    }
 
 }

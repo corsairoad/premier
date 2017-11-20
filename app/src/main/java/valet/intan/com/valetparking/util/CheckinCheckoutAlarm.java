@@ -24,14 +24,16 @@ public class CheckinCheckoutAlarm {
     }
 
     public static CheckinCheckoutAlarm getInstance(Context context) {
+
         if (checkinCheckoutAlarm == null) {
             checkinCheckoutAlarm = new CheckinCheckoutAlarm(context);
         }
+
         return checkinCheckoutAlarm;
     }
 
     public void startAlarm() {
-        alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 3 * 60 * 1000, pendingIntent);
+        alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 5 * 60 * 1000, pendingIntent);
     }
 
     public void cancelAlarm() {

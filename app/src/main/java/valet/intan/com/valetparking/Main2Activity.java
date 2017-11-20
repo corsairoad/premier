@@ -31,12 +31,12 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import cn.pedant.SweetAlert.SweetAlertDialog;
+import de.hdodenhof.circleimageview.CircleImageView;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -54,20 +54,25 @@ import valet.intan.com.valetparking.service.ApiClient;
 import valet.intan.com.valetparking.service.ApiEndpoint;
 import valet.intan.com.valetparking.service.DownloadCurrentLobbyService;
 import valet.intan.com.valetparking.service.FailedTransactionService;
+import valet.intan.com.valetparking.service.LoggingUtils;
 import valet.intan.com.valetparking.service.PostCheckoutService;
 import valet.intan.com.valetparking.service.ProcessRequest;
+import valet.intan.com.valetparking.service.RefreshTokenService;
+import valet.intan.com.valetparking.service.ServiceSendMail;
 import valet.intan.com.valetparking.util.CheckinCheckoutAlarm;
 import valet.intan.com.valetparking.util.CheckoutReadyAlarm;
 import valet.intan.com.valetparking.util.DownloadCheckinAlarm;
+import valet.intan.com.valetparking.util.MyLifecycleHandler;
 import valet.intan.com.valetparking.util.PrefManager;
 import valet.intan.com.valetparking.util.RefreshTokenAlarm;
+import valet.intan.com.valetparking.util.RelaunchAlarm;
 import valet.intan.com.valetparking.util.SyncingCheckin;
 import valet.intan.com.valetparking.util.SyncingCheckout;
 import valet.intan.com.valetparking.util.ValetDbHelper;
 
 public class Main2Activity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener, ParkedCarFragment.CountParkedCarListener,
-        CalledCarFragment.CountCalledCarListener{
+        CalledCarFragment.CountCalledCarListener, View.OnLongClickListener{
 
     public static final String ACTION_DOWNLOAD_CHECKINS = "com.valet.download.data.checkin";
     public static final String ACTION_REPORT = "com.valet.report";
@@ -87,6 +92,7 @@ public class Main2Activity extends AppCompatActivity
     private ProgressBar syncProgress;
     private TextView textProgress;
     private Button btnCancelLogout;
+    private CircleImageView profileImage;
 
     private CheckinCheckoutAlarm checkinCheckoutAlarm;
     private DownloadCheckinAlarm downloadCheckinAlarm;
@@ -109,6 +115,7 @@ public class Main2Activity extends AppCompatActivity
         downloadCheckinAlarm = DownloadCheckinAlarm.getInstance(this);
 
         prefManager = PrefManager.getInstance(this);
+        prefManager.setRelaunch(true);
 
         // back to login
         validateAuthentication();
@@ -126,6 +133,8 @@ public class Main2Activity extends AppCompatActivity
         btnLogout.setOnClickListener(this);
         navView = (NavigationView) findViewById(R.id.nav_view);
         headerView = navView.inflateHeaderView(R.layout.nav_header_main2);
+        profileImage = (CircleImageView) headerView.findViewById(R.id.profile_image);
+        profileImage.setOnLongClickListener(this);
         txtUserName = (TextView) headerView.findViewById(R.id.text_user_name);
         setUserName();
 
@@ -187,6 +196,7 @@ public class Main2Activity extends AppCompatActivity
         filter.addAction(SyncingCheckout.ACTION);
         filter.addAction(SyncingCheckout.ACTION_LOGOUT);
         filter.addAction(SyncingCheckout.ACTION_LOGOUT_ERROR_RESPONSE);
+        filter.addAction(LoggingUtils.ACTION_STATUS_SEND_REPORT);
 
         syncReceiver = new BroadcastReceiver() {
             @Override
@@ -206,10 +216,19 @@ public class Main2Activity extends AppCompatActivity
                         //logout();
                         showErrorSync(intent.getStringExtra(SyncingCheckin.EXTRA));
                         break;
+                    case LoggingUtils.ACTION_STATUS_SEND_REPORT:
+                        showStatusSendReport(intent.getStringExtra(LoggingUtils.EXTRA_STATUS_SEND_REPORT));
+                        break;
+                    default:break;
                 }
             }
         };
+
         LocalBroadcastManager.getInstance(this).registerReceiver(syncReceiver,filter);
+    }
+
+    private void showStatusSendReport(String stringExtra) {
+        Toast.makeText(this,  stringExtra, Toast.LENGTH_SHORT).show();
     }
 
     private void showErrorSync(String stringExtra) {
@@ -400,10 +419,12 @@ public class Main2Activity extends AppCompatActivity
 
         if(parkedCarFragment != null) {
             parkedCarFragment.downloadCheckinList(indexLobbyType);
+        }else {
+            downloadCheckinList();
         }
 
         postCheckinData();
-
+        //downloadCheckinList();
     }
 
     private void postCheckinData(){
@@ -432,6 +453,10 @@ public class Main2Activity extends AppCompatActivity
             case R.id.menu_sync_data:
                 intent = new Intent(this, SyncingActivity.class);
                 break;
+            case R.id.menu_send_log:
+                drawer.closeDrawer(GravityCompat.START);
+                sendLogReport();
+                return false;
             default:
                 break;
         }
@@ -443,10 +468,43 @@ public class Main2Activity extends AppCompatActivity
         return true;
     }
 
-    private void showImei() {
+    private void sendLogReport() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this)
-                .setTitle("Id Device")
-                .setMessage(PrefManager.getInstance(this).getRemoteDeviceId())
+                .setTitle("Log report")
+                .setMessage("Send log report ?")
+                .setPositiveButton("Send", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if (ApiClient.isNetworkAvailable(Main2Activity.this)){
+                            Toast.makeText(Main2Activity.this, "Sending report...", Toast.LENGTH_SHORT).show();
+                            startService(new Intent(Main2Activity.this, ServiceSendMail.class).setAction(ServiceSendMail.ACTION_SEND_REPORT));
+                        }else {
+                            Toast.makeText(Main2Activity.this, "No internet connection. Sending report aborted", Toast.LENGTH_SHORT).show();
+                        }
+
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+        builder.show();
+    }
+
+    private void showImei() {
+
+        StringBuilder sb = new StringBuilder()
+                .append("Device ID").append("\t:\t").append(prefManager.getRemoteDeviceId()).append("\n")
+                .append("Imei").append("\t:\t").append(prefManager.getDeviceId()).append("\n")
+                .append("Last login").append("\t:\t").append(prefManager.getLastLoginDate()).append("\n")
+                .append("Next refresh token").append("\t:\t").append(prefManager.getExpiredToken()).append("\n")
+                .append("Last ticket counter").append("\t:\t").append(prefManager.getLastPrintedTicket());
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this)
+                .setTitle("Device info")
+                .setMessage(sb.toString())
                 .setPositiveButton("Oke", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -522,12 +580,15 @@ public class Main2Activity extends AppCompatActivity
     }
 
     private void logout() {
-        //Toast.makeText(this, "Logging out, please wait", Toast.LENGTH_LONG).show();
+        final LoggingUtils loggingUtils = LoggingUtils.getInstance(this);
+        loggingUtils.logLogout(prefManager.getUserName());
 
         //prefManager.resetDefaultDropPoint();
         TokenDao.getToken(new ProcessRequest() {
             @Override
             public void process(String token) {
+                Log.d("Tokennnn", "token logout: " + token);
+
                 ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class, null);
                 Call<ResponseBody> call = apiEndpoint.logout(token);
                 call.enqueue(new Callback<ResponseBody>() {
@@ -535,9 +596,11 @@ public class Main2Activity extends AppCompatActivity
                     public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                         int code = response.code();
                         if (code == AuthResDao.HTTP_STATUS_LOGOUT_SUKSES) {
+                            loggingUtils.logLogoutSucceed(prefManager.getUserName());
+
                             PrefManager prefManager = PrefManager.getInstance(Main2Activity.this);
                             prefManager.logoutUser();
-                            prefManager.resetDefaultDropPoint();
+                            //prefManager.resetDefaultDropPoint();
                             prefManager.setLoggingOut(false);
                             prefManager.setPrinterMacAddress(null);
                             prefManager.setExpiredDateToken(null);
@@ -546,21 +609,33 @@ public class Main2Activity extends AppCompatActivity
 
                             // remove all synced checkout data
                             FinishCheckoutDao.getInstance(Main2Activity.this).removeAllSyncedCheckout();
-
+                            LoggingUtils.getInstance(Main2Activity.this).removeLogFile();
+                            //prefManager.saveLastPrintedTicketCounter(0);
                             goToSplash();
 
                         } else if (code == AuthResDao.HTTP_STATUS_LOGOUT_INVALID){
                             prefManager.setLoggingOut(false);
+                            FinishCheckoutDao.getInstance(Main2Activity.this).removeAllSyncedCheckout();
+                            stopAllService();
+                            loggingUtils.logLogoutFailed(prefManager.getUserName(), response.message(), code);
+                            goToSplash();
                             //Toast.makeText(Main2Activity.this, "Logout failed, invalid token", Toast.LENGTH_SHORT).show();
+                        } else if(code == RefreshTokenService.RESPONSE_INVALID_TOKEN_REQUEST){
+                            replaceTokenWithBackupToken();
+                            Toast.makeText(Main2Activity.this, "Invalid token request. Please try again later.", Toast.LENGTH_SHORT).show();
                         } else {
+                            loggingUtils.logLogoutFailed(prefManager.getUserName(), response.message(), code);
                             prefManager.setLoggingOut(false);
-                            Toast.makeText(Main2Activity.this, "Logout failed, " + response.message() + ". Please try again later.", Toast.LENGTH_LONG).show();
+                            Toast.makeText(Main2Activity.this, "Logout failed, " + response.message() +  " " + response.code() + ". Please try again later.", Toast.LENGTH_LONG).show();
                             cancelLogout();
+                            //stopAllService();
+                            //goToSplash();
                         }
                     }
 
                     @Override
                     public void onFailure(Call<ResponseBody> call, Throwable t) {
+                        loggingUtils.logLogoutError(prefManager.getUserName(), t.getMessage());
                         prefManager.setLoggingOut(false);
                         Toast.makeText(Main2Activity.this, "Logout failed: " + t.getMessage() + ". Please try again later.", Toast.LENGTH_SHORT).show();
                         cancelLogout();
@@ -569,6 +644,17 @@ public class Main2Activity extends AppCompatActivity
 
             }
         },this);
+    }
+
+    private void replaceTokenWithBackupToken() {
+        PrefManager prefManager = PrefManager.getInstance(this);
+        String backupToken = prefManager.getBackupToken();
+        String currentToken = prefManager.getToken();
+
+        if (backupToken != null && !backupToken.equals(currentToken)) {
+            prefManager.saveToken(backupToken);
+            LoggingUtils.getInstance(this).logReplaceCurrentTokenWithBackupOne();
+        }
     }
 
     private void syncCheckin() {
@@ -644,6 +730,7 @@ public class Main2Activity extends AppCompatActivity
     @Override
     protected void onStop() {
         super.onStop();
+
         if (materialDialog != null) {
             if (materialDialog.isShowing()) {
                 materialDialog.dismiss();
@@ -651,6 +738,8 @@ public class Main2Activity extends AppCompatActivity
             materialDialog = null;
 
         }
+
+        MyLifecycleHandler.relaunchAppIfNotVisible(this);
     }
 
     // checkin, checkout, download current lobby data
@@ -715,4 +804,13 @@ public class Main2Activity extends AppCompatActivity
         startService(intent);
     }
 
+    @Override
+    public boolean onLongClick(View v) {
+        int id = v.getId();
+        if (id == R.id.profile_image) {
+            PrefManager.getInstance(this).setRelaunch(false);
+            finishAffinity();
+        }
+        return false;
+    }
 }

@@ -322,14 +322,17 @@ public class ParkedCarFragment extends Fragment implements ListCheckinAdapter.On
                 }
 
                 ApiEndpoint apiEndpoint = ApiClient.createService(ApiEndpoint.class, null);
-                Call<CheckinList> call = apiEndpoint.getCurrentCheckinList(500, token);
+                Call<CheckinList> callCurrentLobby = apiEndpoint.getCurrentCheckinList(200, token); // currentlobby
+                Call<CheckinList> callAllLobbies = apiEndpoint.getCheckinList(200, token); // all lobbies
+                Call<CheckinList> call;
 
                 if (index == 1) {
-                    call = apiEndpoint.getCheckinList(700, token);
+                    call = callAllLobbies; // all lobbies
+                }else {
+                    call = callCurrentLobby; // current lobby
                 }
 
                 call.enqueue(new Callback<CheckinList>() {
-
                     @Override
                     public void onResponse(Call<CheckinList> call, Response<CheckinList> response) {
                         if (response != null && response.body() != null) {

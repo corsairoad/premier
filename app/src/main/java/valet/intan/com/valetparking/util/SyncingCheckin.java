@@ -21,6 +21,7 @@ import valet.intan.com.valetparking.domain.EntryCheckinResponse;
 import valet.intan.com.valetparking.fragments.ParkedCarFragment;
 import valet.intan.com.valetparking.service.ApiClient;
 import valet.intan.com.valetparking.service.ApiEndpoint;
+import valet.intan.com.valetparking.service.LoggingUtils;
 import valet.intan.com.valetparking.service.ProcessRequest;
 
 /**
@@ -38,11 +39,18 @@ public class SyncingCheckin extends IntentService {
     int count = 1;
     private Call<EntryCheckinResponse> call;
     private boolean usedForClosing;
+    private LoggingUtils loggingUtils;
 
     public SyncingCheckin() {
         super(TAG);
     }
 
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        loggingUtils = LoggingUtils.getInstance(this);
+    }
 
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
@@ -68,8 +76,11 @@ public class SyncingCheckin extends IntentService {
             startSyncChekoutService();
             return;
         }
-
         totalcheckinToPost = checkins.size();
+
+        loggingUtils.logSyncPendingCheckin();
+        loggingUtils.logTotalCheckinPendingDataToPost(totalcheckinToPost);
+
         sendMessage(ACTION,"Posting data checkin 0/" + totalcheckinToPost);
 
         for (final EntryCheckinContainer checkin : checkins) {
@@ -89,6 +100,7 @@ public class SyncingCheckin extends IntentService {
         TokenDao.getToken(new ProcessRequest() {
             @Override
             public void process(String token) {
+                loggingUtils.logPostingCheckinPendingData(checkin);
 
                 String noTiket = null;
                 int remoteVthdId = 0;
@@ -102,8 +114,6 @@ public class SyncingCheckin extends IntentService {
                     EntryCheckinResponse response = httpResponse.body();
 
                     if (response != null) {
-
-
                         noTiket = response.getData().getAttribute().getNoTiket().trim();
                         remoteVthdId = response.getData().getAttribute().getId();
                         tiketSeq = response.getData().getAttribute().getIdTransaksi();
@@ -113,6 +123,8 @@ public class SyncingCheckin extends IntentService {
                         int lastTicketCounter = response.getData().getAttribute().getLastTicketCounter();
 
                         Log.d(TAG, "TICKET C0UNTER "+ lastTicketCounter);
+                        loggingUtils.logPostingCheckinPendingDataSucceed(noTiket, lastTicketCounter);
+
                         PrefManager.getInstance(SyncingCheckin.this).saveLastTicketCounter(lastTicketCounter);
 
                         // update vthd id and transaction id (not ticket number)
@@ -152,6 +164,10 @@ public class SyncingCheckin extends IntentService {
                         if (count == totalcheckinToPost) {
                             startSyncChekoutService();
                         }
+
+                        if (httpResponse != null) {
+                            loggingUtils.logPostingCheckinPendingDataFailed(httpResponse.message(),httpResponse.code());
+                        }
                         //int code = httpResponse.code();
                         //String message = "Response checkin error: " + httpResponse.message() + ". Code: " + code;
                         //sendMessage(ACTION_ERROR_RESPONSE, message);
@@ -169,6 +185,7 @@ public class SyncingCheckin extends IntentService {
                         startSyncChekoutService();
                     }
 
+                    loggingUtils.logPostingCheckinPendingDataFailed(message, 0);
                     //stopSelf();
                 } catch (NumberFormatException e) {
                     // remove checkin data from db
