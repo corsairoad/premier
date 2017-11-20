@@ -106,7 +106,7 @@ public class PostCheckoutService extends IntentService {
                         @Override
                         public void onFailure(Call<FinishCheckoutResponse> call, Throwable t) {
                             Log.d(TAG, "Checkout from bg service error. VthdId: " + remoteVthdId);
-                            loggingUtils.logPostCheckoutError(noTiket, t.getCause().getMessage());
+                            loggingUtils.logPostCheckoutError(noTiket, t.getMessage());
                         }
                     });
 
