@@ -189,7 +189,7 @@ public class FailedTransactionService extends IntentService {
                     @Override
                     public void onFailure(Call<EntryCheckinResponse> call, Throwable t) {
 
-                        loggingUtils.logPostingCheckinError(t.getCause().getMessage(), entryCheckinContainer);
+                        loggingUtils.logPostingCheckinError(t.getMessage(), entryCheckinContainer);
                     }
                 });
             }
