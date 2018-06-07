@@ -28,8 +28,8 @@ import valet.intan.com.valetparking.util.ValetDbHelper;
  */
 
 public class ApiClient {
-    private static final String BASE_URL = "http://premier.intelligence.id/v1/";
-    //private static final String BASE_URL = "http://dev.premier.intelligence.id/v1/";
+    // private static final String BASE_URL = "http://premier.intelligence.id/v1/";
+    private static final String BASE_URL = "http://dev.premier.intelligence.id/v1/";
 
     private static OkHttpClient.Builder httpClient = new OkHttpClient.Builder()
             .readTimeout(30, TimeUnit.SECONDS)
